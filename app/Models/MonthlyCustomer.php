@@ -1,0 +1,37 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class MonthlyCustomer extends Model
+{
+    protected $fillable = [
+        'name',
+        'hotspot_user_id',
+        'contact',
+        'address',
+        'notes',
+        'monthly_price',
+        'billing_day',
+        'is_active',
+    ];
+
+    protected $casts = [
+        'monthly_price' => 'decimal:2',
+        'billing_day' => 'integer',
+        'is_active' => 'boolean',
+    ];
+
+    public function hotspotUser(): BelongsTo
+    {
+        return $this->belongsTo(HotspotUser::class, 'hotspot_user_id');
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(MonthlyPayment::class, 'monthly_customer_id');
+    }
+}

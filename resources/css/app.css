@@ -1,0 +1,58 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+[x-cloak] {
+    display: none !important;
+}
+
+@layer base {
+    html {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    /* Scrollbar styling for sleek modern dashboard */
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: rgba(161, 161, 170, 0.4);
+        border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: rgba(161, 161, 170, 0.7);
+    }
+    .dark ::-webkit-scrollbar-thumb {
+        background: rgba(82, 82, 91, 0.5);
+    }
+    .dark ::-webkit-scrollbar-thumb:hover {
+        background: rgba(82, 82, 91, 0.8);
+    }
+}
+
+/* Print Specific Styles */
+@media print {
+    body {
+        background: white !important;
+        color: black !important;
+    }
+    .no-print {
+        display: none !important;
+    }
+    .print-only {
+        display: block !important;
+    }
+    .print-container {
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+    @page {
+        margin: 5mm;
+        size: auto;
+    }
+}

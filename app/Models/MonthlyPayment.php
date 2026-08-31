@@ -9,6 +9,7 @@ class MonthlyPayment extends Model
 {
     protected $fillable = [
         'monthly_customer_id',
+        'monthly_invoice_id',
         'billing_month',
         'monthly_price',
         'amount_paid',
@@ -30,6 +31,11 @@ class MonthlyPayment extends Model
     public function customer(): BelongsTo
     {
         return $this->belongsTo(MonthlyCustomer::class, 'monthly_customer_id');
+    }
+
+    public function invoice(): BelongsTo
+    {
+        return $this->belongsTo(MonthlyInvoice::class, 'monthly_invoice_id');
     }
 
     public function shift(): BelongsTo

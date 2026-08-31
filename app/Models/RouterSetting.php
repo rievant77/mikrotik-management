@@ -8,6 +8,11 @@ class RouterSetting extends Model
 {
     protected $fillable = [
         'name',
+        'app_name',
+        'app_logo',
+        'app_favicon',
+        'tagline',
+        'contact_phone',
         'host',
         'api_port',
         'username',

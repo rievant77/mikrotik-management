@@ -883,5 +883,78 @@ class RouterOsService
             return false;
         }
     }
+
+    /**
+     * Reset traffic & uptime counters on MikroTik Hotspot.
+     */
+    public function resetHotspotUserCounters(?string $username = null): bool
+    {
+        $client = $this->getClient();
+        if (!$client) {
+            return false;
+        }
+
+        try {
+            $query = new Query('/ip/hotspot/user/print');
+            if ($username) {
+                $query->where('name', $username);
+            }
+            $users = $client->query($query)->read();
+
+            foreach ($users as $u) {
+                if (isset($u['.id'])) {
+                    $resetQuery = (new Query('/ip/hotspot/user/reset-counters'))->equal('.id', $u['.id']);
+                    $client->query($resetQuery)->read();
+                }
+            }
+
+            // If user active, kick from active sessions so counter resets cleanly
+            $activeQuery = new Query('/ip/hotspot/active/print');
+            if ($username) {
+                $activeQuery->where('user', $username);
+            }
+            $actives = $client->query($activeQuery)->read();
+            foreach ($actives as $act) {
+                if (isset($act['.id'])) {
+                    $kickQuery = (new Query('/ip/hotspot/active/remove'))->equal('.id', $act['.id']);
+                    $client->query($kickQuery)->read();
+                }
+            }
+
+            return true;
+        } catch (Exception $e) {
+            Log::error("RouterOS resetHotspotUserCounters error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Remove hotspot users in bulk from MikroTik.
+     */
+    public function removeAllHotspotUsers(array $excludeUsernames = ['default']): bool
+    {
+        $client = $this->getClient();
+        if (!$client) {
+            return false;
+        }
+
+        try {
+            $users = $client->query(new Query('/ip/hotspot/user/print'))->read();
+
+            foreach ($users as $u) {
+                $name = $u['name'] ?? '';
+                if (!in_array($name, $excludeUsernames) && isset($u['.id'])) {
+                    $delQuery = (new Query('/ip/hotspot/user/remove'))->equal('.id', $u['.id']);
+                    $client->query($delQuery)->read();
+                }
+            }
+
+            return true;
+        } catch (Exception $e) {
+            Log::error("RouterOS removeAllHotspotUsers error: " . $e->getMessage());
+            return false;
+        }
+    }
 }
+
 

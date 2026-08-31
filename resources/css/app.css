@@ -11,6 +11,21 @@
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     }
 
+    ::selection {
+        background-color: #10b981;
+        color: #ffffff;
+    }
+
+    input::selection, textarea::selection {
+        background-color: #10b981;
+        color: #ffffff;
+    }
+
+    .dark ::selection, .dark input::selection, .dark textarea::selection {
+        background-color: #059669;
+        color: #ffffff;
+    }
+
     /* Scrollbar styling for sleek modern dashboard */
     ::-webkit-scrollbar {
         width: 6px;

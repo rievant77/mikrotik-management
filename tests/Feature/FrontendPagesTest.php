@@ -62,8 +62,9 @@ class FrontendPagesTest extends TestCase
             '/pos/monthly',
             '/pos/shifts',
             '/settings/router',
-            '/settings/roles',
+            '/settings/profile',
             '/settings/templates',
+            '/settings/maintenance',
             '/audit-logs',
         ];
 
@@ -740,7 +741,250 @@ class FrontendPagesTest extends TestCase
         $profile->refresh();
         $this->assertEquals(5000, $profile->selling_price);
     }
+
+    public function test_pos_monthly_customers_hotspot_linking_and_voucher_metrics(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        // 1. Create a Hotspot User with Profile
+        $profile = \App\Models\HotspotProfile::create([
+            'name' => 'PAKET_RUMAH_10M',
+            'selling_price' => 150000,
+            'validity' => '30 Hari',
+            'is_active' => true,
+        ]);
+
+        $hotspotUser = \App\Models\HotspotUser::create([
+            'username' => 'budi-rumah-01',
+            'password' => 'pass123',
+            'profile_id' => $profile->id,
+            'is_active' => true,
+        ]);
+
+        // 2. Create Monthly Customer linked to Hotspot User
+        $res = $this->postJson(route('pos.monthly.customers.store'), [
+            'name' => 'Budi Santoso',
+            'hotspot_user_id' => $hotspotUser->id,
+            'monthly_price' => 150000,
+            'billing_day' => 5,
+            'contact' => '08123456789',
+            'address' => 'Blok B No 12',
+        ]);
+
+        $res->assertStatus(200);
+        $res->assertJson(['success' => true]);
+        $customerId = $res->json('customer.id');
+
+        $customer = \App\Models\MonthlyCustomer::with('hotspotUser.profile')->find($customerId);
+        $this->assertNotNull($customer);
+        $this->assertEquals('Budi Santoso', $customer->name);
+        $this->assertEquals($hotspotUser->id, $customer->hotspot_user_id);
+        $this->assertEquals('budi-rumah-01', $customer->hotspotUser->username);
+
+        // 3. Test POS Monthly page returns customers and hotspotUsers
+        $pageRes = $this->get(route('pos.monthly'));
+        $pageRes->assertStatus(200);
+        $pageRes->assertViewHas('customers');
+        $pageRes->assertViewHas('hotspotUsers');
+
+        // 4. Test POS Vouchers page returns metrics
+        $voucherSale = \App\Models\VoucherSale::create([
+            'username' => 'vc-pos-001',
+            'profile_name' => 'PAKET_RUMAH_10M',
+            'cost_price' => 50000,
+            'selling_price' => 150000,
+            'profit' => 100000,
+            'activated_at' => now(),
+            'status' => 'completed',
+        ]);
+
+        $vouchersRes = $this->get(route('pos.vouchers'));
+        $vouchersRes->assertStatus(200);
+        $vouchersRes->assertViewHas('metrics');
+        $vouchersRes->assertViewHas('sales');
+        $metrics = $vouchersRes->viewData('metrics');
+        $this->assertGreaterThanOrEqual(1, $metrics['total_count']);
+        $this->assertGreaterThanOrEqual(150000, $metrics['total_revenue']);
+    }
+
+    public function test_monthly_invoicing_batch_generate_and_installments(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        // 1. Create 2 active customers
+        $c1 = \App\Models\MonthlyCustomer::create([
+            'name' => 'Pelanggan Alpha',
+            'monthly_price' => 150000,
+            'billing_day' => 5,
+            'is_active' => true,
+        ]);
+
+        $c2 = \App\Models\MonthlyCustomer::create([
+            'name' => 'Pelanggan Beta',
+            'monthly_price' => 200000,
+            'billing_day' => 10,
+            'is_active' => true,
+        ]);
+
+        // 2. Test Batch Invoices Generation for 2026-09
+        $genRes = $this->postJson(route('pos.monthly.invoices.generate'), [
+            'billing_month' => '2026-09',
+        ]);
+        $genRes->assertStatus(200);
+        $genRes->assertJson([
+            'success' => true,
+            'generated' => 2,
+            'skipped' => 0,
+        ]);
+
+        // Assert 2 invoices created in DB
+        $invoices = \App\Models\MonthlyInvoice::whereDate('billing_month', '2026-09-01')->get();
+        $this->assertCount(2, $invoices);
+        $inv1 = $invoices->where('monthly_customer_id', $c1->id)->first();
+        $this->assertNotNull($inv1);
+        $this->assertEquals(150000, (float) $inv1->amount);
+        $this->assertEquals(150000, (float) $inv1->balance_due);
+        $this->assertEquals('unpaid', $inv1->status);
+
+        // 3. Test Generating again skips already generated invoices (no duplicates)
+        $genRes2 = $this->postJson(route('pos.monthly.invoices.generate'), [
+            'billing_month' => '2026-09',
+        ]);
+        $genRes2->assertStatus(200);
+        $genRes2->assertJson([
+            'success' => true,
+            'generated' => 0,
+            'skipped' => 2,
+        ]);
+
+        // 4. Test Partial Payment (Angsuran #1: Rp 50.000)
+        $payRes1 = $this->postJson(route('pos.monthly.invoices.pay', $inv1->id), [
+            'amount_paid' => 50000,
+            'paid_at' => '2026-09-02',
+            'payment_method' => 'transfer',
+            'notes' => 'Angsuran 1',
+        ]);
+        $payRes1->assertStatus(200);
+        $payRes1->assertJson(['success' => true]);
+
+        $inv1->refresh();
+        $this->assertEquals(50000, (float) $inv1->amount_paid);
+        $this->assertEquals(100000, (float) $inv1->balance_due);
+        $this->assertEquals('partial', $inv1->status);
+
+        // 5. Test Settlement Payment (Pelunasan: Rp 100.000)
+        $payRes2 = $this->postJson(route('pos.monthly.invoices.pay', $inv1->id), [
+            'amount_paid' => 100000,
+            'paid_at' => '2026-09-15',
+            'payment_method' => 'cash',
+            'notes' => 'Pelunasan sisa',
+        ]);
+        $payRes2->assertStatus(200);
+
+        $inv1->refresh();
+        $this->assertEquals(150000, (float) $inv1->amount_paid);
+        $this->assertEquals(0, (float) $inv1->balance_due);
+        $this->assertEquals('paid', $inv1->status);
+
+        // 6. Test VOID Payment #2 restores balance and partial status
+        $payment2 = \App\Models\MonthlyPayment::where('monthly_invoice_id', $inv1->id)
+            ->where('notes', 'Pelunasan sisa')
+            ->first();
+        $this->assertNotNull($payment2);
+
+        $voidRes = $this->postJson(route('pos.monthly.payments.void', $payment2->id), [
+            'reason' => 'Salah input',
+        ]);
+        $voidRes->assertStatus(200);
+
+        $inv1->refresh();
+        $this->assertEquals(50000, (float) $inv1->amount_paid);
+        $this->assertEquals(100000, (float) $inv1->balance_due);
+        $this->assertEquals('partial', $inv1->status);
+    }
+
+    public function test_pos_executive_dashboard_and_monthly_profit_calculations(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        // 1. Create a customer with monthly price & cost price
+        $cust = \App\Models\MonthlyCustomer::create([
+            'name' => 'Pelanggan Rumah Fiber',
+            'monthly_price' => 200000,
+            'cost_price' => 75000, // Upstream modal
+            'billing_day' => 1,
+            'is_active' => true,
+        ]);
+
+        // Generate invoice for current month
+        $monthStr = now()->format('Y-m');
+        $genRes = $this->postJson(route('pos.monthly.invoices.generate'), [
+            'billing_month' => $monthStr,
+        ]);
+        $genRes->assertStatus(200);
+
+        $invoice = \App\Models\MonthlyInvoice::where('monthly_customer_id', $cust->id)
+            ->whereDate('billing_month', now()->startOfMonth()->toDateString())
+            ->first();
+        $this->assertNotNull($invoice);
+        $this->assertEquals(75000, (float) $invoice->cost_price);
+
+        // Pay the invoice in full
+        $this->postJson(route('pos.monthly.invoices.pay', $invoice->id), [
+            'amount_paid' => 200000,
+            'paid_at' => now()->toDateString(),
+            'payment_method' => 'transfer',
+            'notes' => 'Transfer BCA',
+        ]);
+
+        // 2. Create a voucher sale
+        \App\Models\VoucherSale::create([
+            'username' => 'vc-dash-01',
+            'profile_name' => 'PAKET_5K_3JAM',
+            'cost_price' => 2000,
+            'selling_price' => 5000,
+            'profit' => 3000,
+            'activated_at' => now(),
+            'status' => 'completed',
+        ]);
+
+        // 3. Test POS Executive Dashboard Overview
+        $res = $this->get(route('pos.index', ['month' => $monthStr]));
+        $res->assertStatus(200);
+        $res->assertSee('Dashboard Finansial');
+        $res->assertSee('Total Pemasukan Kas');
+        $res->assertSee('Total Laba Bersih');
+        $res->assertSee('Tren Arus Kas');
+
+        $overview = $res->viewData('overview');
+        $this->assertNotNull($overview);
+
+        // Assert Monthly Profit = 200.000 - 75.000 = 125.000
+        $this->assertEquals(200000, (float) $overview['monthly_paid']);
+        $this->assertEquals(75000, (float) $overview['monthly_cost']);
+        $this->assertEquals(125000, (float) $overview['monthly_profit']);
+
+        // Assert Voucher Profit = 3.000
+        $this->assertEquals(5000, (float) $overview['voucher_revenue']);
+        $this->assertEquals(3000, (float) $overview['voucher_profit']);
+
+        // Assert Total Gross = 205.000, Total Net Profit = 128.000
+        $this->assertEquals(205000, (float) $overview['total_gross_income']);
+        $this->assertEquals(128000, (float) $overview['total_net_profit']);
+
+        // Assert Chart Series Exist
+        $this->assertNotEmpty($overview['chart_categories']);
+        $this->assertNotEmpty($overview['chart_voucher_series']);
+        $this->assertNotEmpty($overview['chart_monthly_series']);
+        $this->assertNotEmpty($overview['chart_profit_series']);
+    }
 }
+
+
+
 
 
 

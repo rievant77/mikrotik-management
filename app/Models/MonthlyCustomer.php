@@ -15,12 +15,14 @@ class MonthlyCustomer extends Model
         'address',
         'notes',
         'monthly_price',
+        'cost_price',
         'billing_day',
         'is_active',
     ];
 
     protected $casts = [
         'monthly_price' => 'float',
+        'cost_price' => 'float',
         'billing_day' => 'integer',
         'is_active' => 'boolean',
     ];
@@ -33,5 +35,10 @@ class MonthlyCustomer extends Model
     public function payments(): HasMany
     {
         return $this->hasMany(MonthlyPayment::class, 'monthly_customer_id');
+    }
+
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(MonthlyInvoice::class, 'monthly_customer_id');
     }
 }

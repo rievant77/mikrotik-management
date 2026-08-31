@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>Login - MikroTik Hotspot & Bandwidth Manager</title>
+    <title>Login - {{ $appSetting?->app_name ?? 'MikroTik Hotspot & Bandwidth Manager' }}</title>
+    <link rel="icon" href="{{ !empty($appSetting?->app_favicon) ? asset($appSetting->app_favicon) : asset('favicon.ico') }}">
 
     <script>
         if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -22,13 +23,19 @@
     <div class="sm:mx-auto sm:w-full sm:max-w-md px-4">
         <!-- Logo & Branding -->
         <div class="flex flex-col items-center text-center">
-            <div class="w-12 h-12 rounded-xl bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 flex items-center justify-center font-bold text-xl shadow-md mb-3">
-                <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-            </div>
-            <h2 class="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">MikroTik Manager</h2>
-            <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">Hotspot, Accounting & Bandwidth Management</p>
+            @if(!empty($appSetting?->app_logo))
+                <div class="w-14 h-14 rounded-2xl overflow-hidden bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center p-1 shadow-md mb-3">
+                    <img src="{{ asset($appSetting->app_logo) }}" alt="Logo" class="w-full h-full object-contain">
+                </div>
+            @else
+                <div class="w-12 h-12 rounded-xl bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 flex items-center justify-center font-bold text-xl shadow-md mb-3">
+                    <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </div>
+            @endif
+            <h2 class="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">{{ $appSetting?->app_name ?? 'MikroTik Manager' }}</h2>
+            <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">{{ $appSetting?->tagline ?? 'Hotspot, Accounting & Bandwidth Management' }}</p>
         </div>
 
         <!-- Login Card -->

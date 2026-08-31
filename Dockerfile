@@ -1,0 +1,97 @@
+# ==========================================
+# Stage 1: Frontend Asset Builder
+# ==========================================
+FROM node:20-alpine AS node-builder
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY vite.config.js tailwind.config.js* postcss.config.js* ./
+COPY resources ./resources
+COPY public ./public
+
+RUN npm run build
+
+# ==========================================
+# Stage 2: Composer Dependency Builder
+# ==========================================
+FROM composer:2 AS composer-builder
+
+WORKDIR /app
+
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --no-interaction --no-scripts --prefer-dist --optimize-autoloader --ignore-platform-reqs
+
+COPY . .
+RUN composer dump-autoload --optimize --no-dev
+
+# ==========================================
+# Stage 3: Production Runtime (PHP-FPM + Nginx + SQLite)
+# ==========================================
+FROM php:8.2-fpm-alpine
+
+LABEL maintainer="MikroTik Hotspot Manager"
+
+# Install System Packages, Nginx, Supervisor, SQLite & Build Dependencies
+RUN apk add --no-cache \
+    nginx \
+    supervisor \
+    sqlite \
+    sqlite-dev \
+    curl \
+    libpng-dev \
+    libjpeg-turbo-dev \
+    freetype-dev \
+    libzip-dev \
+    oniguruma-dev \
+    icu-dev \
+    tzdata \
+    ca-certificates
+
+# Install & Configure PHP Extensions
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) \
+        pdo_sqlite \
+        gd \
+        zip \
+        mbstring \
+        intl \
+        bcmath \
+        opcache \
+        sockets \
+        pcntl
+
+# Set working directory
+WORKDIR /var/www/html
+
+# Copy application source code & built vendor from composer stage
+COPY --from=composer-builder /app /var/www/html
+
+# Copy built frontend assets from node stage
+COPY --from=node-builder /app/public/build /var/www/html/public/build
+
+# Copy configuration files
+COPY docker/nginx.conf /etc/nginx/http.d/default.conf
+COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY docker/php.ini /usr/local/etc/php/conf.d/99-custom.ini
+COPY docker/entrypoint.sh /docker/entrypoint.sh
+
+RUN chmod +x /docker/entrypoint.sh
+
+# Create necessary runtime directories and set ownership
+RUN mkdir -p /var/www/html/database \
+    /var/www/html/storage/logs \
+    /var/www/html/public/uploads \
+    /var/log/supervisor \
+    && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database /var/www/html/public/uploads
+
+# Expose HTTP port
+EXPOSE 80
+
+# Entrypoint script handles migrations & permissions on start
+ENTRYPOINT ["/docker/entrypoint.sh"]
+
+# Start Supervisord (runs Nginx, PHP-FPM, and Laravel Scheduler)
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

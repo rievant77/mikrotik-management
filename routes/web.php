@@ -4,9 +4,12 @@ use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DeviceController;
+use App\Http\Controllers\GlobalSearchController;
 use App\Http\Controllers\HotspotProfileController;
 use App\Http\Controllers\HotspotUserController;
+use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\PosController;
+use App\Http\Controllers\ProfileSettingController;
 use App\Http\Controllers\RouterSettingController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VoucherController;
@@ -23,9 +26,10 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 
 // Protected Management Application Routes
 Route::middleware('auth')->group(function () {
-    // Dashboard
+    // Dashboard & Global Search
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/api/dashboard/live', [DashboardController::class, 'liveData'])->name('api.dashboard.live');
+    Route::get('/api/search/global', [GlobalSearchController::class, 'search'])->name('api.search.global');
 
     // Users
     Route::prefix('users')->group(function () {
@@ -84,6 +88,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/monthly/customers', [PosController::class, 'storeCustomer'])->name('pos.monthly.customers.store');
         Route::put('/monthly/customers/{customer}', [PosController::class, 'updateCustomer'])->name('pos.monthly.customers.update');
         Route::delete('/monthly/customers/{customer}', [PosController::class, 'deleteCustomer'])->name('pos.monthly.customers.delete');
+        Route::post('/monthly/invoices/generate', [PosController::class, 'generateInvoices'])->name('pos.monthly.invoices.generate');
+        Route::post('/monthly/invoices/{invoice}/pay', [PosController::class, 'payInvoice'])->name('pos.monthly.invoices.pay');
+        Route::get('/monthly/invoices/{invoice}/payments', [PosController::class, 'invoicePayments'])->name('pos.monthly.invoices.payments');
         Route::post('/monthly/payments', [PosController::class, 'storePayment'])->name('pos.monthly.payments.store');
         Route::post('/monthly/payments/{payment}/void', [PosController::class, 'voidPayment'])->name('pos.monthly.payments.void');
 
@@ -99,12 +106,16 @@ Route::middleware('auth')->group(function () {
         Route::post('/router/test', [RouterSettingController::class, 'testConnection'])->name('settings.router.test');
         Route::post('/router/sync', [RouterSettingController::class, 'syncAll'])->name('settings.router.sync');
 
-        Route::get('/roles', function () {
-            return view('settings.roles');
-        })->name('settings.roles');
+        Route::get('/profile', [ProfileSettingController::class, 'index'])->name('settings.profile');
+        Route::put('/profile', [ProfileSettingController::class, 'updateProfile'])->name('settings.profile.update');
+        Route::put('/profile/password', [ProfileSettingController::class, 'updatePassword'])->name('settings.profile.password');
+        Route::post('/profile/branding', [ProfileSettingController::class, 'updateBranding'])->name('settings.profile.branding');
 
         Route::get('/templates', [RouterSettingController::class, 'templates'])->name('settings.templates');
         Route::post('/templates', [RouterSettingController::class, 'updateTemplates'])->name('settings.templates.update');
+
+        Route::get('/maintenance', [MaintenanceController::class, 'index'])->name('settings.maintenance');
+        Route::post('/maintenance/reset', [MaintenanceController::class, 'executeReset'])->name('settings.maintenance.reset');
     });
 
     // Audit Logs

@@ -1,0 +1,33 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mikrotik-management:latest
+    container_name: mikrotik_app
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    environment:
+      - APP_NAME=MikroTik Manager
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - APP_URL=http://localhost:8000
+      - DB_CONNECTION=sqlite
+      - DB_DATABASE=/var/www/html/database/database.sqlite
+      - SESSION_DRIVER=file
+      - CACHE_STORE=file
+      - QUEUE_CONNECTION=sync
+    volumes:
+      # Persistent SQLite database file
+      - ./database:/var/www/html/database
+      # Persistent logs and session data
+      - ./storage:/var/www/html/storage
+      # Persistent uploaded avatars & branding logos
+      - ./public/uploads:/var/www/html/public/uploads
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/login"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s

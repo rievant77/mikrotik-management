@@ -82,12 +82,24 @@
             </div>
         </div>
 
-        <!-- Daily Usage Trend Chart -->
+        <!-- Daily / Hourly Usage Trend Chart -->
         <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 shadow-xs">
-            <div class="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800 gap-2">
                 <div>
-                    <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Tren Konsumsi Data Harian (MB)</h3>
-                    <p class="text-[11px] text-zinc-400 mt-0.5">Grafik volume data unduh (Rx) dan unggah (Tx) per tanggal</p>
+                    <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">
+                        @if($isHourlyChart ?? false)
+                            Grafik Konsumsi Data Per-Jam (24 Jam: 00:00 - 23:00)
+                        @else
+                            Tren Konsumsi Data Harian (MB)
+                        @endif
+                    </h3>
+                    <p class="text-[11px] text-zinc-400 mt-0.5">
+                        @if($isHourlyChart ?? false)
+                            Distribusi volume data unduh (Rx) dan unggah (Tx) per-jam pada tanggal {{ $startDate->format('d M Y') }}
+                        @else
+                            Grafik volume data unduh (Rx) dan unggah (Tx) per tanggal
+                        @endif
+                    </p>
                 </div>
                 <div class="flex items-center gap-3 text-xs">
                     <span class="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium">

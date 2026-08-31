@@ -114,8 +114,19 @@
                         <input type="text" x-model="custForm.username" placeholder="e.g. budi-santoso" class="w-full px-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100">
                     </div>
                     <div>
-                        <label class="block font-medium text-zinc-700 dark:text-zinc-300 mb-1">Tarif Bulanan Kustom (Rp) *</label>
-                        <input type="number" x-model="custForm.price" required class="w-full px-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 font-mono font-bold">
+                        <label class="block font-medium text-zinc-700 dark:text-zinc-300 mb-1">Tarif Bulanan Kustom *</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-xs font-semibold text-zinc-400 select-none">Rp</span>
+                            <input 
+                                type="text" 
+                                inputmode="numeric"
+                                :value="formatNumber(custForm.monthly_price || custForm.price)" 
+                                @input="custForm.monthly_price = parseNumber($event.target.value); custForm.price = parseNumber($event.target.value); $event.target.value = formatNumber(custForm.monthly_price)" 
+                                required 
+                                class="w-full pl-9 pr-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 font-mono font-bold" 
+                                placeholder="100.000"
+                            >
+                        </div>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
@@ -163,12 +174,26 @@
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block font-medium text-zinc-700 dark:text-zinc-300 mb-1">Tarif Standar (Rp)</label>
-                        <input type="number" x-model="payForm.monthlyPrice" readonly class="w-full px-3 py-2 rounded-lg bg-zinc-100 dark:bg-zinc-700/50 border border-zinc-200 dark:border-zinc-700 text-zinc-500 font-mono">
+                        <label class="block font-medium text-zinc-700 dark:text-zinc-300 mb-1">Tarif Standar</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-xs font-semibold text-zinc-400 select-none">Rp</span>
+                            <input type="text" :value="formatNumber(payForm.monthlyPrice)" readonly class="w-full pl-9 pr-3 py-2 rounded-lg bg-zinc-100 dark:bg-zinc-700/50 border border-zinc-200 dark:border-zinc-700 text-zinc-500 font-mono">
+                        </div>
                     </div>
                     <div>
-                        <label class="block font-medium text-zinc-700 dark:text-zinc-300 mb-1">Nominal Dibayar (Rp) *</label>
-                        <input type="number" x-model="payForm.amountPaid" required class="w-full px-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 font-mono font-bold text-sm">
+                        <label class="block font-medium text-zinc-700 dark:text-zinc-300 mb-1">Nominal Dibayar *</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-xs font-semibold text-zinc-400 select-none">Rp</span>
+                            <input 
+                                type="text" 
+                                inputmode="numeric"
+                                :value="formatNumber(payForm.amountPaid)" 
+                                @input="payForm.amountPaid = parseNumber($event.target.value); $event.target.value = formatNumber(payForm.amountPaid)" 
+                                required 
+                                class="w-full pl-9 pr-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 font-mono font-bold text-sm" 
+                                placeholder="100.000"
+                            >
+                        </div>
                     </div>
                 </div>
 
@@ -365,6 +390,9 @@
                     .catch(err => {
                         window.showToast('Terjadi kesalahan koneksi', 'error');
                     });
+                },
+                formatRupiah(num) {
+                    return window.formatRupiah(num || 0);
                 }
             };
         }

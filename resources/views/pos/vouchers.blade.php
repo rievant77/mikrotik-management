@@ -66,7 +66,10 @@
     <script>
         function voucherRevenueLedger() {
             return {
-                records: @json($sales?->items() ?? $sales ?? [])
+                records: @json($sales?->items() ?? $sales ?? []),
+                formatRupiah(num) {
+                    return window.formatRupiah(num || 0);
+                }
             };
         }
     </script>

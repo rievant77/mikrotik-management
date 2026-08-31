@@ -21,9 +21,9 @@ class VoucherSale extends Model
     ];
 
     protected $casts = [
-        'cost_price' => 'decimal:2',
-        'selling_price' => 'decimal:2',
-        'profit' => 'decimal:2',
+        'cost_price' => 'float',
+        'selling_price' => 'float',
+        'profit' => 'float',
         'activated_at' => 'datetime',
     ];
 

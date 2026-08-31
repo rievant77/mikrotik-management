@@ -24,77 +24,87 @@
             </div>
         </div>
 
-        <!-- Metric Stat Cards Grid -->
+        <!-- Metric Stat Cards Grid: Non-Duplicated Core KPIs -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <!-- Metric 1: Online Users -->
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 shadow-xs transition-colors">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">User Online</span>
-                    <span class="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Live
-                    </span>
-                </div>
-                <div class="mt-2 flex items-baseline justify-between">
-                    <span class="text-3xl font-extrabold text-zinc-900 dark:text-zinc-100 tracking-tight" x-text="stats.onlineUsers">{{ $onlineUsersCount ?? 0 }}</span>
-                    <span class="text-xs text-zinc-400">/ {{ $totalHotspotUsers ?? 0 }} Total Hotspot</span>
+            <!-- Metric 1: Online Users & Active Sessions -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 shadow-xs transition-colors flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">User Online</span>
+                        <span class="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Live
+                        </span>
+                    </div>
+                    <div class="mt-2 flex items-baseline justify-between">
+                        <span class="text-3xl font-extrabold text-zinc-900 dark:text-zinc-100 tracking-tight" x-text="stats.onlineUsers">{{ $onlineUsersCount ?? 0 }}</span>
+                        <span class="text-xs text-zinc-400">/ {{ $totalHotspotUsers ?? 0 }} Total Akun</span>
+                    </div>
                 </div>
                 <div class="mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
-                    <span>Active Sessions: <strong class="text-zinc-700 dark:text-zinc-300" x-text="stats.activeDevices">{{ $activeSessionsCount ?? 0 }}</strong></span>
-                    <a href="{{ route('users.index') }}" class="text-zinc-700 dark:text-zinc-300 hover:underline">Lihat &rarr;</a>
+                    <span>Sesi Aktif: <strong class="text-zinc-700 dark:text-zinc-300" x-text="stats.activeDevices">{{ $activeSessionsCount ?? 0 }}</strong></span>
+                    <a href="{{ route('users.index') }}" class="text-zinc-700 dark:text-zinc-300 hover:underline font-medium">Lihat User &rarr;</a>
                 </div>
             </div>
 
-            <!-- Metric 2: Live Download Rate -->
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 shadow-xs transition-colors">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Traffic Download (Rx)</span>
-                    <svg class="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                    </svg>
-                </div>
-                <div class="mt-2 flex items-baseline justify-between">
-                    <span class="text-3xl font-extrabold text-zinc-900 dark:text-zinc-100 tracking-tight" x-text="stats.downloadRate + ' Mbps'">0.0 Mbps</span>
-                    <span class="text-xs text-emerald-600 dark:text-emerald-400">Throughput</span>
+            <!-- Metric 2: Today Total Data Consumption -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 shadow-xs transition-colors flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Pemakaian Hari Ini</span>
+                        <svg class="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                    </div>
+                    <div class="mt-2 flex items-baseline justify-between">
+                        <span class="text-3xl font-extrabold text-zinc-900 dark:text-zinc-100 tracking-tight" x-text="stats.todayData">{{ \App\Support\FormatHelper::formatBytes($todayUsage, 1) }}</span>
+                        <span class="text-xs text-zinc-400">Rx + Tx</span>
+                    </div>
                 </div>
                 <div class="mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
-                    <span>Upload: <strong class="text-zinc-700 dark:text-zinc-300" x-text="stats.uploadRate + ' Mbps'">0.0 Mbps</strong></span>
-                    <span>WAN / Hotspot</span>
+                    <span>Akumulasi Hari Ini</span>
+                    <a href="{{ route('users.historical') }}" class="text-zinc-700 dark:text-zinc-300 hover:underline font-medium">Histori &rarr;</a>
                 </div>
             </div>
 
-            <!-- Metric 3: Total Usage Today -->
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 shadow-xs transition-colors">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Pemakaian Hari Ini</span>
-                    <svg class="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                    </svg>
-                </div>
-                <div class="mt-2 flex items-baseline justify-between">
-                    <span class="text-3xl font-extrabold text-zinc-900 dark:text-zinc-100 tracking-tight">{{ \App\Support\FormatHelper::formatBytes($todayUsage, 1) }}</span>
-                    <span class="text-xs text-zinc-400">Rx + Tx</span>
+            <!-- Metric 3: Today Voucher Sales / Revenue -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 shadow-xs transition-colors flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Voucher Hari Ini</span>
+                        <svg class="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div class="mt-2 flex items-baseline justify-between">
+                        <span class="text-2xl font-extrabold text-zinc-900 dark:text-zinc-100 tracking-tight" x-text="stats.todayRevenueFormatted">{{ \App\Support\FormatHelper::formatRupiah($todayRevenue) }}</span>
+                        <span class="text-xs text-emerald-600 dark:text-emerald-400 font-medium font-mono" x-text="stats.todayVouchersSold + ' Vcr'">{{ $todayVouchersSold }} Vcr</span>
+                    </div>
                 </div>
                 <div class="mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
-                    <span>Total Hari Ini</span>
-                    <a href="{{ route('users.historical') }}" class="text-zinc-700 dark:text-zinc-300 hover:underline">Histori &rarr;</a>
+                    <span>Kasir & Billing</span>
+                    <a href="{{ route('pos.vouchers') }}" class="text-zinc-700 dark:text-zinc-300 hover:underline font-medium">Lihat POS &rarr;</a>
                 </div>
             </div>
 
-            <!-- Metric 4: Router Resource Health -->
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 shadow-xs transition-colors">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Router Status</span>
-                    <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-semibold {{ ($routerSetting && $routerSetting->last_successful_poll_at) ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' : 'bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 border border-zinc-500/20' }}">
-                        {{ $routerSetting->name ?? 'Router Offline' }}
-                    </span>
-                </div>
-                <div class="mt-2 flex items-baseline justify-between">
-                    <span class="text-3xl font-extrabold text-zinc-900 dark:text-zinc-100 tracking-tight" x-text="stats.cpuLoad + '%'">0%</span>
-                    <span class="text-xs text-zinc-400">CPU Load</span>
+            <!-- Metric 4: Router Connection & Gateway Status -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 shadow-xs transition-colors flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Router Gateway</span>
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold transition-colors"
+                            :class="routerInfo.is_online ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20'">
+                            <span class="w-1.5 h-1.5 rounded-full" :class="routerInfo.is_online ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'"></span>
+                            <span x-text="routerInfo.is_online ? 'Online' : 'Offline'">{{ $routerInfo['is_online'] ? 'Online' : 'Offline' }}</span>
+                        </span>
+                    </div>
+                    <div class="mt-2">
+                        <h4 class="text-xl font-extrabold text-zinc-900 dark:text-zinc-100 tracking-tight truncate" x-text="routerInfo.board_name || 'MikroTik'">{{ $routerInfo['board_name'] }}</h4>
+                        <span class="text-xs text-zinc-400 font-mono block mt-0.5" x-text="'IP: ' + routerInfo.host + ':' + routerInfo.api_port">IP: {{ $routerInfo['host'] }}:{{ $routerInfo['api_port'] }}</span>
+                    </div>
                 </div>
                 <div class="mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
-                    <span>Host: {{ $routerSetting->host ?? 'Belum diatur' }}</span>
-                    <a href="{{ route('settings.router') }}" class="text-zinc-700 dark:text-zinc-300 hover:underline">Setting &rarr;</a>
+                    <span class="truncate" x-text="'Uptime: ' + (routerInfo.uptime_formatted || routerInfo.uptime || '-')">Uptime: {{ $routerInfo['uptime_formatted'] }}</span>
+                    <a href="{{ route('settings.router') }}" class="text-zinc-700 dark:text-zinc-300 hover:underline shrink-0 font-medium">Setting &rarr;</a>
                 </div>
             </div>
         </div>
@@ -166,6 +176,136 @@
                 <div>
                     <span>Total Throughput Sesi: </span>
                     <strong class="text-zinc-700 dark:text-zinc-300 font-mono" x-text="((Number(stats.downloadRate) + Number(stats.uploadRate)).toFixed(2)) + ' Mbps'">0.00 Mbps</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Router System Health & Hardware Telemetry Panel -->
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 sm:p-6 shadow-xs">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-zinc-100 dark:border-zinc-800">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-300">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-sm sm:text-base font-bold text-zinc-900 dark:text-zinc-100">Kesehatan & Spesifikasi Hardware Router</h3>
+                        <p class="text-xs text-zinc-500 dark:text-zinc-400">Informasi resource, CPU, memori RAM, dan status koneksi API RouterOS</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold"
+                        :class="routerInfo.is_online ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20'">
+                        <span class="w-2 h-2 rounded-full" :class="routerInfo.is_online ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'"></span>
+                        <span x-text="routerInfo.is_online ? 'Terhubung (API Connected)' : 'Terputus (Disconnected)'">{{ $routerInfo['is_online'] ? 'Terhubung (API Connected)' : 'Terputus (Disconnected)' }}</span>
+                    </span>
+                    <a href="{{ route('settings.router') }}" class="p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors" title="Pengaturan Router">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 4 Telemetry Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-5">
+                <!-- 1. Identitas & Model Router -->
+                <div class="bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/80 dark:border-zinc-700/60 rounded-xl p-4 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between text-xs text-zinc-400 font-medium">
+                            <span>Model & Board</span>
+                            <svg class="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                            </svg>
+                        </div>
+                        <h4 class="text-base font-bold text-zinc-900 dark:text-zinc-100 mt-1.5 truncate" x-text="routerInfo.board_name || 'MikroTik'">{{ $routerInfo['board_name'] }}</h4>
+                        <div class="mt-2 space-y-1 text-xs">
+                            <div class="flex justify-between text-zinc-500 dark:text-zinc-400">
+                                <span>RouterOS:</span>
+                                <strong class="text-zinc-700 dark:text-zinc-300 font-mono" x-text="'v' + (routerInfo.version || '-')">v{{ $routerInfo['version'] }}</strong>
+                            </div>
+                            <div class="flex justify-between text-zinc-500 dark:text-zinc-400">
+                                <span>Architecture:</span>
+                                <span class="text-zinc-700 dark:text-zinc-300 font-mono" x-text="routerInfo.architecture || '-'">{{ $routerInfo['architecture'] ?? '-' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3 pt-2.5 border-t border-zinc-200/60 dark:border-zinc-700/60 text-[11px] text-zinc-500 dark:text-zinc-400 truncate">
+                        <span x-text="'Host: ' + routerInfo.host + ':' + routerInfo.api_port">Host: {{ $routerInfo['host'] }}:{{ $routerInfo['api_port'] }}</span>
+                    </div>
+                </div>
+
+                <!-- 2. CPU Load & Processor -->
+                <div class="bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/80 dark:border-zinc-700/60 rounded-xl p-4 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between text-xs text-zinc-400 font-medium">
+                            <span>Beban CPU</span>
+                            <span class="font-mono font-semibold" :class="routerInfo.cpu_load > 85 ? 'text-rose-500' : (routerInfo.cpu_load > 60 ? 'text-amber-500' : 'text-emerald-500')" x-text="routerInfo.cpu_load + '%'">{{ $routerInfo['cpu_load'] }}%</span>
+                        </div>
+                        <div class="mt-1 flex items-baseline gap-2">
+                            <h4 class="text-2xl font-extrabold text-zinc-900 dark:text-zinc-100 font-mono" x-text="routerInfo.cpu_load + '%'">{{ $routerInfo['cpu_load'] }}%</h4>
+                            <span class="text-xs text-zinc-400" x-text="(routerInfo.cpu_count || 1) + ' Core' + (routerInfo.cpu_freq ? ' @ ' + routerInfo.cpu_freq : '')">{{ $routerInfo['cpu_count'] }} Core</span>
+                        </div>
+                        <div class="w-full h-2 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden mt-3">
+                            <div class="h-full rounded-full transition-all duration-500"
+                                :class="routerInfo.cpu_load > 85 ? 'bg-rose-500' : (routerInfo.cpu_load > 60 ? 'bg-amber-500' : 'bg-emerald-500')"
+                                :style="'width: ' + Math.min(100, Math.max(2, routerInfo.cpu_load)) + '%'"></div>
+                        </div>
+                    </div>
+                    <div class="mt-3 pt-2.5 border-t border-zinc-200/60 dark:border-zinc-700/60 flex justify-between text-[11px] text-zinc-500 dark:text-zinc-400">
+                        <span>Status CPU:</span>
+                        <span class="font-medium" :class="routerInfo.cpu_load > 85 ? 'text-rose-500' : (routerInfo.cpu_load > 60 ? 'text-amber-500' : 'text-emerald-600 dark:text-emerald-400')" x-text="routerInfo.cpu_load > 85 ? 'Sangat Tinggi' : (routerInfo.cpu_load > 60 ? 'Sedang' : 'Normal / Sehat')">{{ $routerInfo['cpu_load'] > 85 ? 'Sangat Tinggi' : ($routerInfo['cpu_load'] > 60 ? 'Sedang' : 'Normal / Sehat') }}</span>
+                    </div>
+                </div>
+
+                <!-- 3. RAM / Memory Resource -->
+                <div class="bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/80 dark:border-zinc-700/60 rounded-xl p-4 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between text-xs text-zinc-400 font-medium">
+                            <span>Pemakaian Memori (RAM)</span>
+                            <span class="font-mono font-semibold text-zinc-700 dark:text-zinc-300" x-text="routerInfo.memory_percent + '%'">{{ $routerInfo['memory_percent'] }}%</span>
+                        </div>
+                        <div class="mt-1 flex items-baseline justify-between">
+                            <h4 class="text-lg font-bold text-zinc-900 dark:text-zinc-100 font-mono" x-text="routerInfo.free_memory">{{ $routerInfo['free_memory'] }}</h4>
+                            <span class="text-[11px] text-zinc-400">Free RAM</span>
+                        </div>
+                        <div class="w-full h-2 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden mt-3">
+                            <div class="h-full bg-indigo-500 rounded-full transition-all duration-500" :style="'width: ' + Math.min(100, Math.max(2, routerInfo.memory_percent)) + '%'"></div>
+                        </div>
+                    </div>
+                    <div class="mt-3 pt-2.5 border-t border-zinc-200/60 dark:border-zinc-700/60 flex justify-between text-[11px] text-zinc-500 dark:text-zinc-400">
+                        <span>Total: <strong class="text-zinc-700 dark:text-zinc-300 font-mono" x-text="routerInfo.total_memory">{{ $routerInfo['total_memory'] }}</strong></span>
+                        <span>Terpakai: <strong class="text-zinc-700 dark:text-zinc-300 font-mono" x-text="routerInfo.used_memory">{{ $routerInfo['used_memory'] }}</strong></span>
+                    </div>
+                </div>
+
+                <!-- 4. Uptime & Storage -->
+                <div class="bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/80 dark:border-zinc-700/60 rounded-xl p-4 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between text-xs text-zinc-400 font-medium">
+                            <span>Uptime & Storage</span>
+                            <svg class="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h4 class="text-base font-bold text-zinc-900 dark:text-zinc-100 mt-1.5 font-mono truncate" x-text="routerInfo.uptime_formatted || routerInfo.uptime || '-'">{{ $routerInfo['uptime_formatted'] ?? $routerInfo['uptime'] ?? '-' }}</h4>
+                        <div class="mt-2 space-y-1 text-xs">
+                            <div class="flex justify-between text-zinc-500 dark:text-zinc-400">
+                                <span>Free Disk:</span>
+                                <strong class="text-zinc-700 dark:text-zinc-300 font-mono" x-text="routerInfo.free_hdd || '-'">{{ $routerInfo['free_hdd'] }}</strong>
+                            </div>
+                            <div class="flex justify-between text-zinc-500 dark:text-zinc-400">
+                                <span>Total Disk:</span>
+                                <span class="text-zinc-700 dark:text-zinc-300 font-mono" x-text="routerInfo.total_hdd || '-'">{{ $routerInfo['total_hdd'] }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3 pt-2.5 border-t border-zinc-200/60 dark:border-zinc-700/60 flex justify-between text-[11px] text-zinc-500 dark:text-zinc-400">
+                        <span>Last Poll:</span>
+                        <span class="font-medium text-zinc-700 dark:text-zinc-300" x-text="lastPollTimestamp || routerInfo.last_poll">{{ $routerInfo['last_poll'] }}</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -273,14 +413,18 @@
                 isLiveActive: true,
                 pollTimer: null,
                 peakRx: 0,
+                lastPollTimestamp: null,
                 stats: {
                     onlineUsers: {{ $onlineUsersCount ?? 0 }},
                     activeDevices: {{ $activeSessionsCount ?? 0 }},
                     downloadRate: '0.0',
                     uploadRate: '0.0',
                     todayData: '{{ \App\Support\FormatHelper::formatBytes($todayUsage, 1) }}',
-                    cpuLoad: {{ ($routerSetting && $routerSetting->last_successful_poll_at) ? 5 : 0 }}
+                    todayRevenueFormatted: '{{ \App\Support\FormatHelper::formatRupiah($todayRevenue ?? 0) }}',
+                    todayVouchersSold: {{ $todayVouchersSold ?? 0 }},
+                    cpuLoad: {{ $routerInfo['cpu_load'] ?? 0 }}
                 },
+                routerInfo: @json($routerInfo ?? []),
                 topConsumers: @json($topConsumers ?? []),
                 recentUsers: @json($recentSessions ?? []),
                 chart: null,
@@ -422,7 +566,11 @@
                         this.stats.downloadRate = data.download_rate_mbps;
                         this.stats.uploadRate = data.upload_rate_mbps;
                         if (data.today_usage) this.stats.todayData = data.today_usage;
+                        if (data.today_revenue_formatted) this.stats.todayRevenueFormatted = data.today_revenue_formatted;
+                        if (data.today_vouchers_sold !== undefined) this.stats.todayVouchersSold = data.today_vouchers_sold;
                         if (data.cpu_load !== undefined) this.stats.cpuLoad = data.cpu_load;
+                        if (data.router_info) this.routerInfo = data.router_info;
+                        if (data.timestamp) this.lastPollTimestamp = data.timestamp;
                         if (data.top_consumers) this.topConsumers = data.top_consumers;
                         if (data.recent_users) this.recentUsers = data.recent_users;
 

@@ -22,10 +22,10 @@ class CashierShift extends Model
     protected $casts = [
         'opened_at' => 'datetime',
         'closed_at' => 'datetime',
-        'opening_cash' => 'decimal:2',
-        'expected_cash' => 'decimal:2',
-        'actual_cash' => 'decimal:2',
-        'discrepancy' => 'decimal:2',
+        'opening_cash' => 'float',
+        'expected_cash' => 'float',
+        'actual_cash' => 'float',
+        'discrepancy' => 'float',
     ];
 
     public function user(): BelongsTo

@@ -72,8 +72,19 @@
         <x-modal name="open-shift-modal" title="Buka Shift Kasir Baru">
             <form @submit.prevent="confirmOpenShift()" class="space-y-4 text-xs">
                 <div>
-                    <label class="block font-medium text-zinc-700 dark:text-zinc-300 mb-1">Modal Awal Kas di Laci (Rp) *</label>
-                    <input type="number" x-model="openingCash" required min="0" class="w-full px-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 font-mono font-bold" placeholder="200000">
+                    <label class="block font-medium text-zinc-700 dark:text-zinc-300 mb-1">Modal Awal Kas di Laci *</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-xs font-semibold text-zinc-400 select-none">Rp</span>
+                        <input 
+                            type="text" 
+                            inputmode="numeric"
+                            :value="formatNumber(openingCash)" 
+                            @input="openingCash = parseNumber($event.target.value); $event.target.value = formatNumber(openingCash)" 
+                            required 
+                            class="w-full pl-9 pr-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 font-mono font-bold" 
+                            placeholder="200.000"
+                        >
+                    </div>
                 </div>
                 <div class="flex justify-end gap-2 pt-4 border-t border-zinc-100 dark:border-zinc-800">
                     <button type="button" @click="$dispatch('close-modal', 'open-shift-modal')" class="px-4 py-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">Batal</button>
@@ -93,8 +104,19 @@
                 </div>
 
                 <div>
-                    <label class="block font-medium text-zinc-700 dark:text-zinc-300 mb-1">Uang Fisik Kas di Laci Saat Ini (Rp) *</label>
-                    <input type="number" x-model="actualCash" @input="calculateDiscrepancy()" required class="w-full px-3 py-2 text-sm font-mono font-bold rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100">
+                    <label class="block font-medium text-zinc-700 dark:text-zinc-300 mb-1">Uang Fisik Kas di Laci Saat Ini *</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-xs font-semibold text-zinc-400 select-none">Rp</span>
+                        <input 
+                            type="text" 
+                            inputmode="numeric"
+                            :value="formatNumber(actualCash)" 
+                            @input="actualCash = parseNumber($event.target.value); $event.target.value = formatNumber(actualCash); calculateDiscrepancy()" 
+                            required 
+                            class="w-full pl-9 pr-3 py-2 text-sm font-mono font-bold rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100" 
+                            placeholder="0"
+                        >
+                    </div>
                 </div>
 
                 <div class="p-3 rounded-lg border text-xs" :class="discrepancy === 0 ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-700 dark:text-emerald-400' : 'bg-rose-500/10 border-rose-500/20 text-rose-700 dark:text-rose-400'">
@@ -180,6 +202,9 @@
                     .catch(err => {
                         window.showToast('Terjadi kesalahan jaringan', 'error');
                     });
+                },
+                formatRupiah(num) {
+                    return window.formatRupiah(num || 0);
                 }
             };
         }

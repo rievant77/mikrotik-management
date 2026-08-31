@@ -43,13 +43,17 @@
                     <div>
                         <div class="flex items-center gap-2.5">
                             <h2 class="text-xl font-bold text-zinc-900 dark:text-zinc-100 font-mono">{{ $username }}</h2>
-                            @if($isOnline)
-                                <x-badge type="active" dot="true">Online</x-badge>
-                            @else
+                            <template x-if="isOnline">
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    Online
+                                </span>
+                            </template>
+                            <template x-if="!isOnline">
                                 <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400">
                                     Offline
                                 </span>
-                            @endif
+                            </template>
                         </div>
                         <div class="flex flex-wrap items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 mt-1">
                             <span>Profile: <strong class="text-zinc-800 dark:text-zinc-200">{{ $user?->profile?->name ?? ($primaryLiveSession['profile'] ?? 'Hotspot Profile') }}</strong></span>
@@ -79,9 +83,20 @@
                     </div>
                     <div>
                         <div class="text-zinc-400 text-[11px]">Uptime Sesi Aktif</div>
-                        <div class="font-mono font-semibold text-emerald-600 dark:text-emerald-400 mt-0.5">
+                        <div class="font-mono font-semibold text-emerald-600 dark:text-emerald-400 mt-0.5" x-text="isOnline ? liveUptime : '0s (Offline)'">
                             {{ $primaryLiveSession['uptime'] ?? '0s (Offline)' }}
                         </div>
+                        <template x-if="isOnline && hasLimit && remainingUptime">
+                            <div class="mt-1">
+                                <div class="flex items-center justify-between text-[10px] font-mono text-amber-600 dark:text-amber-400 font-semibold">
+                                    <span>⏳ Sisa: <span x-text="remainingUptime"></span></span>
+                                    <span class="text-zinc-400 font-normal" x-text="remainingPercent + '%'"></span>
+                                </div>
+                                <div class="w-full bg-zinc-200 dark:bg-zinc-700 rounded-full h-1 mt-0.5 overflow-hidden">
+                                    <div class="bg-amber-500 h-1 rounded-full transition-all duration-500" :style="'width: ' + remainingPercent + '%'"></div>
+                                </div>
+                            </div>
+                        </template>
                     </div>
                 </div>
             </div>
@@ -91,72 +106,248 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <!-- Live Transfer Rate -->
             <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-xs">
-                <span class="text-xs font-medium text-zinc-400 uppercase">Kecepatan Realtime</span>
-                <div class="mt-2 flex items-baseline gap-2">
-                    @if($isOnline && $primaryLiveSession)
-                        <span class="text-xl font-bold text-emerald-600 dark:text-emerald-400 font-mono whitespace-nowrap">
-                            ↓ {{ \App\Support\FormatHelper::formatBytes((($primaryLiveSession['rx-rate'] ?? 0) / 8), 1) }}/s
-                        </span>
-                        <span class="text-xs text-sky-600 dark:text-sky-400 font-mono whitespace-nowrap">
-                            ↑ {{ \App\Support\FormatHelper::formatBytes((($primaryLiveSession['tx-rate'] ?? 0) / 8), 1) }}/s
-                        </span>
-                    @else
-                        <span class="text-xl font-bold text-zinc-400 font-mono">0 B/s</span>
-                        <span class="text-xs text-zinc-400">Offline</span>
-                    @endif
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-medium text-zinc-400 uppercase">Kecepatan Realtime</span>
+                    <span class="w-2 h-2 rounded-full bg-emerald-500" :class="isOnline ? 'animate-ping' : 'opacity-0'"></span>
                 </div>
-                <p class="text-[11px] text-zinc-400 mt-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                <div class="mt-2 flex items-baseline gap-2">
+                    <template x-if="isOnline">
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-xl font-bold text-emerald-600 dark:text-emerald-400 font-mono whitespace-nowrap" x-text="'↓ ' + downloadSpeed">
+                                ↓ {{ \App\Support\FormatHelper::formatBytes((($primaryLiveSession['rx-rate'] ?? 0) / 8), 1) }}/s
+                            </span>
+                            <span class="text-xs text-sky-600 dark:text-sky-400 font-mono whitespace-nowrap" x-text="'↑ ' + uploadSpeed">
+                                ↑ {{ \App\Support\FormatHelper::formatBytes((($primaryLiveSession['tx-rate'] ?? 0) / 8), 1) }}/s
+                            </span>
+                        </div>
+                    </template>
+                    <template x-if="!isOnline">
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-xl font-bold text-zinc-400 font-mono">0 B/s</span>
+                            <span class="text-xs text-zinc-400">Offline</span>
+                        </div>
+                    </template>
+                </div>
+                <p class="text-[11px] text-zinc-400 mt-2 pt-2 border-t border-zinc-100 dark:border-zinc-800" x-text="isOnline ? 'Throughput aktif live MikroTik' : 'Tidak ada transfer data'">
                     {{ $isOnline ? 'Throughput aktif saat ini' : 'Tidak ada transfer data' }}
                 </p>
             </div>
 
-            <!-- Total Usage -->
+            <!-- Today Usage -->
             <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-xs">
-                <span class="text-xs font-medium text-zinc-400 uppercase">Total Pemakaian Kuota</span>
+                <span class="text-xs font-medium text-zinc-400 uppercase">Pemakaian Hari Ini</span>
+                <div class="mt-2">
+                    <span class="text-xl font-bold text-emerald-600 dark:text-emerald-400 font-mono">
+                        {{ \App\Support\FormatHelper::formatBytes($todayUsage, 2) }}
+                    </span>
+                </div>
+                <p class="text-[11px] text-zinc-400 mt-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                    Akumulasi data hari ini
+                </p>
+            </div>
+
+            <!-- Month Usage -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-xs">
+                <span class="text-xs font-medium text-zinc-400 uppercase">Pemakaian Bulan Ini</span>
+                <div class="mt-2">
+                    <span class="text-xl font-bold text-zinc-900 dark:text-zinc-100 font-mono">
+                        {{ \App\Support\FormatHelper::formatBytes($monthUsage, 2) }}
+                    </span>
+                </div>
+                <p class="text-[11px] text-zinc-400 mt-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                    {{ \App\Support\FormatHelper::formatMonthIndo(now()) }}
+                </p>
+            </div>
+
+            <!-- All-Time Usage -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-xs">
+                <span class="text-xs font-medium text-zinc-400 uppercase">Total Seluruh Waktu</span>
                 <div class="mt-2">
                     <span class="text-xl font-bold text-zinc-900 dark:text-zinc-100 font-mono">
                         {{ \App\Support\FormatHelper::formatBytes($totalBytesAllTime, 2) }}
                     </span>
                 </div>
                 <div class="flex items-center justify-between text-[11px] text-zinc-400 mt-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
-                    <span class="text-emerald-600 dark:text-emerald-400 font-medium">Rx: {{ \App\Support\FormatHelper::formatBytes($totalBytesOut, 1) }}</span>
-                    <span class="text-sky-600 dark:text-sky-400 font-medium">Tx: {{ \App\Support\FormatHelper::formatBytes($totalBytesIn, 1) }}</span>
+                    <span>Uptime: {{ \App\Support\FormatHelper::formatUptime($totalUptimeSeconds) }}</span>
+                    <span>{{ number_format($totalSessionsCount) }} Sesi</span>
                 </div>
-            </div>
-
-            <!-- Total Uptime -->
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-xs">
-                <span class="text-xs font-medium text-zinc-400 uppercase">Akumulasi Uptime</span>
-                <div class="mt-2">
-                    <span class="text-xl font-bold text-zinc-900 dark:text-zinc-100 font-mono">
-                        {{ \App\Support\FormatHelper::formatUptime($totalUptimeSeconds) }}
-                    </span>
-                </div>
-                <p class="text-[11px] text-zinc-400 mt-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
-                    Total durasi online tercatat
-                </p>
-            </div>
-
-            <!-- Total Sessions -->
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-xs">
-                <span class="text-xs font-medium text-zinc-400 uppercase">Total Sesi Login</span>
-                <div class="mt-2">
-                    <span class="text-xl font-bold text-zinc-900 dark:text-zinc-100 font-mono">
-                        {{ number_format($totalSessionsCount) }} Sesi
-                    </span>
-                </div>
-                <p class="text-[11px] text-zinc-400 mt-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
-                    Riwayat koneksi ke router
-                </p>
             </div>
         </div>
 
-        <!-- User Bandwidth Usage Chart (Last 14 Days) -->
+        <!-- FUP (Fair Usage Policy) Status Card (Rendered if FUP is configured) -->
+        <template x-if="fup && fup.fup_enabled">
+            <div class="rounded-xl border p-4 shadow-xs transition-colors"
+                :class="fup.fup_active ? 'bg-amber-500/10 border-amber-500/30 dark:bg-amber-950/30 dark:border-amber-800/40' : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800'">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="flex items-start gap-3">
+                        <div class="p-2 rounded-lg" :class="fup.fup_active ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400' : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'">
+                            <span class="text-xl" x-text="fup.fup_active ? '🐢' : '🚀'"></span>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="font-bold text-sm text-zinc-900 dark:text-zinc-100">
+                                    Fair Usage Policy (FUP)
+                                </h3>
+                                <template x-if="fup.fup_active">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30 animate-pulse">
+                                        FUP Throttled (<span x-text="fup.fup_rate_limit"></span>)
+                                    </span>
+                                </template>
+                                <template x-if="!fup.fup_active">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                                        Kecepatan Normal (<span x-text="fup.normal_rate_limit"></span>)
+                                    </span>
+                                </template>
+                            </div>
+                            <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                                <template x-if="fup.fup_active">
+                                    <span>Pemakaian telah melebihi batas <strong class="text-amber-600 dark:text-amber-400" x-text="fup.limit_formatted"></strong>. Kecepatan diturunkan otomatis ke <strong class="font-mono text-zinc-800 dark:text-zinc-200" x-text="fup.fup_rate_limit"></strong>.</span>
+                                </template>
+                                <template x-if="!fup.fup_active">
+                                    <span>Kuota FUP: <strong class="text-zinc-800 dark:text-zinc-200" x-text="fup.limit_formatted"></strong> • Kecepatan diturunkan ke <strong class="font-mono" x-text="fup.fup_rate_limit"></strong> jika kuota habis. Siklus reset: <span x-text="fup.reset_cycle"></span>.</span>
+                                </template>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3 sm:self-center">
+                        <div class="text-right">
+                            <span class="text-[11px] text-zinc-400 block">Pemakaian Kuota FUP</span>
+                            <span class="font-mono font-bold text-xs" :class="fup.fup_active ? 'text-amber-600 dark:text-amber-400' : 'text-zinc-800 dark:text-zinc-200'">
+                                <span x-text="fup.usage_formatted"></span> / <span x-text="fup.limit_formatted"></span> (<span x-text="fup.usage_percent + '%'"></span>)
+                            </span>
+                        </div>
+                        <template x-if="fup.fup_active || fup.usage_bytes > 0">
+                            <button 
+                                @click="resetFup()"
+                                :disabled="isResettingFup"
+                                class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-300 dark:border-zinc-700 transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                            >
+                                <span>🔄</span>
+                                <span x-text="isResettingFup ? 'Mereset...' : 'Reset FUP User'"></span>
+                            </button>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="w-full bg-zinc-200 dark:bg-zinc-700 rounded-full h-1.5 mt-3 overflow-hidden">
+                    <div 
+                        class="h-1.5 rounded-full transition-all duration-500" 
+                        :class="fup.fup_active ? 'bg-amber-500' : 'bg-emerald-500'" 
+                        :style="'width: ' + Math.min(100, fup.usage_percent) + '%'"
+                    ></div>
+                </div>
+            </div>
+        </template>
+
+        <!-- Filter & Periode Toolbar Card -->
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-xs space-y-3">
+            <form method="GET" action="{{ route('users.show', $username) }}" class="space-y-3">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-100 dark:border-zinc-800 pb-2.5">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                        </svg>
+                        <h3 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">Filter Periode & Riwayat</h3>
+                    </div>
+                    <span class="text-[11px] text-zinc-400">Menyesuaikan grafik, ringkasan, dan riwayat sesi</span>
+                </div>
+
+                <!-- Period Preset Chips -->
+                <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 text-xs -mx-1 px-1">
+                    @php
+                        $presets = [
+                            'today' => 'Hari Ini',
+                            'yesterday' => 'Kemarin',
+                            '7days' => '7 Hari',
+                            '14days' => '14 Hari',
+                            '30days' => '30 Hari',
+                            'this_month' => 'Bulan Ini',
+                            'all' => 'Semua Waktu',
+                            'custom' => 'Kustom Tanggal',
+                        ];
+                    @endphp
+                    @foreach($presets as $key => $label)
+                        <a 
+                            href="{{ route('users.show', array_merge(request()->except(['period', 'page']), ['username' => $username, 'period' => $key])) }}"
+                            class="shrink-0 px-3 py-1.5 rounded-lg font-medium transition-colors border {{ ($period ?? '14days') === $key ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 border-zinc-900 dark:border-zinc-100 font-semibold shadow-xs' : 'bg-zinc-50 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-700' }}"
+                        >
+                            {{ $label }}
+                        </a>
+                    @endforeach
+                </div>
+
+                <!-- Custom Date & Session Search Row (If Custom selected or always collapsible) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 pt-1">
+                    <div>
+                        <label class="block text-[10px] uppercase font-semibold text-zinc-400 mb-1">Dari Tanggal</label>
+                        <input 
+                            type="date" 
+                            name="start_date" 
+                            value="{{ $startDate ? $startDate->format('Y-m-d') : '' }}"
+                            class="w-full px-2.5 py-1.5 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:focus:ring-zinc-600"
+                        >
+                    </div>
+                    <div>
+                        <label class="block text-[10px] uppercase font-semibold text-zinc-400 mb-1">Sampai Tanggal</label>
+                        <input 
+                            type="date" 
+                            name="end_date" 
+                            value="{{ $endDate ? $endDate->format('Y-m-d') : '' }}"
+                            class="w-full px-2.5 py-1.5 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:focus:ring-zinc-600"
+                        >
+                    </div>
+                    <div>
+                        <label class="block text-[10px] uppercase font-semibold text-zinc-400 mb-1">Cari Device / IP / MAC</label>
+                        <input 
+                            type="text" 
+                            name="session_search" 
+                            value="{{ $sessionSearch ?? '' }}"
+                            placeholder="Nama HP, IP, atau MAC..."
+                            class="w-full px-2.5 py-1.5 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:focus:ring-zinc-600"
+                        >
+                    </div>
+                    <div class="flex items-end gap-2">
+                        <input type="hidden" name="period" value="custom">
+                        <button 
+                            type="submit" 
+                            class="flex-1 py-1.5 px-3 text-xs font-semibold rounded-lg bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 shadow-xs transition-colors"
+                        >
+                            Terapkan
+                        </button>
+                        @if(request()->hasAny(['start_date', 'end_date', 'session_search', 'session_status']) || ($period && $period !== '14days'))
+                            <a 
+                                href="{{ route('users.show', $username) }}" 
+                                class="py-1.5 px-2.5 text-xs font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
+                                title="Reset Filter"
+                            >
+                                Reset
+                            </a>
+                        @endif
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- User Bandwidth Usage Chart -->
         <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 shadow-xs">
-            <div class="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800 gap-2">
                 <div>
-                    <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Grafik Konsumsi Kuota User (14 Hari Terakhir)</h3>
-                    <p class="text-[11px] text-zinc-400 mt-0.5">Riwayat volume download dan upload per hari</p>
+                    <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">
+                        @if($isHourlyChart ?? false)
+                            Grafik Konsumsi Kuota User (24 Jam: 00:00 - 23:00)
+                        @else
+                            Grafik Konsumsi Kuota User ({{ count($chartCategories) }} Titik Waktu)
+                        @endif
+                    </h3>
+                    <p class="text-[11px] text-zinc-400 mt-0.5">
+                        @if($isHourlyChart ?? false)
+                            Distribusi volume unduh (Rx) dan unggah (Tx) per-jam pada tanggal {{ ($startDate ?? now())->format('d M Y') }}
+                        @else
+                            Riwayat volume download dan upload per hari sesuai filter periode
+                        @endif
+                    </p>
                 </div>
                 <div class="flex items-center gap-3 text-xs">
                     <span class="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium">
@@ -172,7 +363,7 @@
             </div>
         </div>
 
-        <!-- Live Active Session Table -->
+        <!-- Live Active Session Section -->
         <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden shadow-xs">
             <div class="px-5 py-3.5 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-800/20">
                 <div class="flex items-center gap-2">
@@ -185,13 +376,64 @@
             </div>
 
             @if($isOnline && count($liveSessions) > 0)
-                <div class="overflow-x-auto">
+                <!-- Mobile Cards for Live Sessions -->
+                <div class="block sm:hidden divide-y divide-zinc-100 dark:divide-zinc-800">
+                    @foreach($liveSessions as $live)
+                        <div class="p-4 space-y-2.5">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <div class="font-bold text-sm text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
+                                        <span>{{ ($live['device_type'] ?? '') === 'phone' ? '📱' : (($live['device_type'] ?? '') === 'laptop' ? '💻' : '📡') }}</span>
+                                        <span>{{ $live['device_display_name'] ?? ($live['device_name'] ?? 'Perangkat Hotspot') }}</span>
+                                    </div>
+                                    <div class="text-[11px] font-mono text-zinc-500 dark:text-zinc-400 mt-0.5">
+                                        {{ $live['address'] ?? '-' }} • {{ $live['mac-address'] ?? '-' }}
+                                    </div>
+                                </div>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                                    ● Live
+                                </span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800/80 text-xs">
+                                <div>
+                                    <span class="text-[10px] text-zinc-400 block">Live Speed</span>
+                                    <span class="font-mono text-emerald-600 dark:text-emerald-400 font-semibold">↓ {{ \App\Support\FormatHelper::formatBytes((($live['rx-rate'] ?? 0) / 8), 1) }}/s</span>
+                                    <span class="font-mono text-sky-600 dark:text-sky-400 text-[11px] ml-1">↑ {{ \App\Support\FormatHelper::formatBytes((($live['tx-rate'] ?? 0) / 8), 1) }}/s</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-[10px] text-zinc-400 block">Total Kuota / Uptime</span>
+                                    <span class="font-mono font-bold text-zinc-800 dark:text-zinc-200">{{ \App\Support\FormatHelper::formatBytes(((int)($live['bytes-in'] ?? 0)) + ((int)($live['bytes-out'] ?? 0)), 1) }}</span>
+                                    <div class="text-[10px] text-zinc-400 font-mono">{{ $live['uptime'] ?? '0s' }}</div>
+                                    @php
+                                        $liveProg = \App\Support\FormatHelper::getUptimeProgress($live['uptime'] ?? '0s', $user?->uptime_limit ?: ($user?->profile?->validity ?: ($live['limit-uptime'] ?? null)), $live['session-time-left'] ?? null);
+                                    @endphp
+                                    @if($liveProg['has_limit'] && $liveProg['remaining_formatted'])
+                                        <div class="text-[10px] font-mono text-amber-600 dark:text-amber-400 font-semibold">
+                                            ⏳ Sisa: {{ $liveProg['remaining_formatted'] }} ({{ $liveProg['remaining_percent'] }}%)
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="pt-2 border-t border-zinc-100 dark:border-zinc-800/80">
+                                <button 
+                                    @click="disconnectUser('{{ $username }}')" 
+                                    class="w-full py-2 text-xs font-semibold rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/50 hover:bg-rose-100 transition-colors"
+                                >
+                                    Putus Sesi Ini
+                                </button>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+
+                <!-- Desktop Table for Live Sessions -->
+                <div class="hidden sm:block overflow-x-auto">
                     <table class="w-full text-left text-xs">
                         <thead class="bg-zinc-50/80 dark:bg-zinc-800/50 text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase border-b border-zinc-200 dark:border-zinc-800">
                             <tr>
-                                <th class="py-3.5 px-4">Session ID / User</th>
+                                <th class="py-3.5 px-4">Perangkat / Session ID</th>
                                 <th class="py-3.5 px-4">IP / MAC Address</th>
-                                <th class="py-3.5 px-4">Uptime</th>
+                                <th class="py-3.5 px-4">Uptime & Sisa Waktu</th>
                                 <th class="py-3.5 px-4">Live Rate (Rx / Tx)</th>
                                 <th class="py-3.5 px-4">Total Data Sesi</th>
                                 <th class="py-3.5 px-4 text-right">Aksi</th>
@@ -199,17 +441,33 @@
                         </thead>
                         <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
                             @foreach($liveSessions as $live)
+                                @php
+                                    $liveProg = \App\Support\FormatHelper::getUptimeProgress($live['uptime'] ?? '0s', $user?->uptime_limit ?: ($user?->profile?->validity ?: ($live['limit-uptime'] ?? null)), $live['session-time-left'] ?? null);
+                                @endphp
                                 <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors">
                                     <td class="py-3.5 px-4">
-                                        <div class="font-mono font-semibold text-zinc-900 dark:text-zinc-100">{{ $live['.id'] ?? $username }}</div>
-                                        <div class="text-[10px] text-zinc-400">{{ $live['user'] ?? $username }}</div>
+                                        <div class="font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
+                                            <span>{{ ($live['device_type'] ?? '') === 'phone' ? '📱' : (($live['device_type'] ?? '') === 'laptop' ? '💻' : '📡') }}</span>
+                                            <span>{{ $live['device_display_name'] ?? ($live['device_name'] ?? 'Perangkat Hotspot') }}</span>
+                                        </div>
+                                        <div class="text-[10px] text-zinc-400 font-mono">{{ $live['.id'] ?? $username }}</div>
                                     </td>
                                     <td class="py-3.5 px-4 font-mono">
                                         <div class="text-zinc-800 dark:text-zinc-200">{{ $live['address'] ?? '-' }}</div>
                                         <div class="text-[10px] text-zinc-400">{{ $live['mac-address'] ?? '-' }}</div>
                                     </td>
-                                    <td class="py-3.5 px-4 font-mono font-medium text-emerald-600 dark:text-emerald-400">
-                                        {{ $live['uptime'] ?? '0s' }}
+                                    <td class="py-3.5 px-4 font-mono">
+                                        <div class="font-medium text-emerald-600 dark:text-emerald-400">
+                                            {{ $live['uptime'] ?? '0s' }}
+                                        </div>
+                                        @if($liveProg['has_limit'] && $liveProg['remaining_formatted'])
+                                            <div class="text-[10px] font-semibold text-amber-600 dark:text-amber-400 mt-0.5">
+                                                ⏳ Sisa: {{ $liveProg['remaining_formatted'] }} ({{ $liveProg['remaining_percent'] }}%)
+                                            </div>
+                                            <div class="w-24 bg-zinc-200 dark:bg-zinc-700 rounded-full h-1 mt-1 overflow-hidden">
+                                                <div class="bg-amber-500 h-1 rounded-full" style="width: {{ $liveProg['remaining_percent'] }}%"></div>
+                                            </div>
+                                        @endif
                                     </td>
                                     <td class="py-3.5 px-4 font-mono whitespace-nowrap">
                                         <div class="flex items-center gap-1.5">
@@ -237,15 +495,145 @@
             @endif
         </div>
 
-        <!-- Session History Ledger Table -->
+        <!-- Daily Usage History Section -->
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden shadow-xs">
+            <div class="px-5 py-3.5 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-800/20">
+                <h3 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">Histori Pemakaian Harian</h3>
+                <span class="text-[11px] text-zinc-400">{{ count($dailySummaries) }} Hari Terfilter</span>
+            </div>
+
+            @if(count($dailySummaries) > 0)
+                <!-- Mobile Cards for Daily Summaries -->
+                <div class="block sm:hidden divide-y divide-zinc-100 dark:divide-zinc-800">
+                    @foreach($dailySummaries as $day)
+                        <div class="p-4 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-1.5 font-bold text-sm text-zinc-900 dark:text-zinc-100">
+                                    <span>{{ \Carbon\Carbon::parse($day->usage_date)->format('d M Y') }}</span>
+                                    @if(\Carbon\Carbon::parse($day->usage_date)->isToday())
+                                        <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400">Hari Ini</span>
+                                    @endif
+                                </div>
+                                <span class="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                                    {{ \App\Support\FormatHelper::formatBytes($day->total_bytes, 1) }}
+                                </span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-zinc-100 dark:border-zinc-800/80">
+                                <div>
+                                    <span class="text-[10px] text-zinc-400 block">Throughput Rx / Tx</span>
+                                    <span class="font-mono text-emerald-600 dark:text-emerald-400">↓ {{ \App\Support\FormatHelper::formatBytes($day->total_bytes_out, 1) }}</span>
+                                    <span class="font-mono text-sky-600 dark:text-sky-400 ml-1">↑ {{ \App\Support\FormatHelper::formatBytes($day->total_bytes_in, 1) }}</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-[10px] text-zinc-400 block">Sesi & Durasi</span>
+                                    <span class="text-zinc-700 dark:text-zinc-300 font-medium">{{ $day->session_count ?: 1 }} Sesi • {{ \App\Support\FormatHelper::formatUptime($day->total_uptime_seconds) }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+
+                <!-- Desktop Table for Daily Summaries -->
+                <div class="hidden sm:block overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-zinc-50/80 dark:bg-zinc-800/50 text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase border-b border-zinc-200 dark:border-zinc-800">
+                            <tr>
+                                <th class="py-3.5 px-4">Tanggal</th>
+                                <th class="py-3.5 px-4">Jumlah Sesi</th>
+                                <th class="py-3.5 px-4">Durasi Uptime</th>
+                                <th class="py-3.5 px-4">Upload (Tx)</th>
+                                <th class="py-3.5 px-4">Download (Rx)</th>
+                                <th class="py-3.5 px-4 font-bold">Total Kuota</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
+                            @foreach($dailySummaries as $day)
+                                <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors">
+                                    <td class="py-3.5 px-4 font-semibold text-zinc-900 dark:text-zinc-100">
+                                        {{ \Carbon\Carbon::parse($day->usage_date)->format('d M Y') }}
+                                        @if(\Carbon\Carbon::parse($day->usage_date)->isToday())
+                                            <span class="ml-1.5 px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400">Hari Ini</span>
+                                        @endif
+                                    </td>
+                                    <td class="py-3.5 px-4 text-zinc-700 dark:text-zinc-300">
+                                        {{ $day->session_count ?: 1 }} Sesi
+                                    </td>
+                                    <td class="py-3.5 px-4 font-mono text-zinc-500">
+                                        {{ \App\Support\FormatHelper::formatUptime($day->total_uptime_seconds) }}
+                                    </td>
+                                    <td class="py-3.5 px-4 font-mono text-sky-600 dark:text-sky-400">
+                                        ↑ {{ \App\Support\FormatHelper::formatBytes($day->total_bytes_in, 1) }}
+                                    </td>
+                                    <td class="py-3.5 px-4 font-mono text-emerald-600 dark:text-emerald-400">
+                                        ↓ {{ \App\Support\FormatHelper::formatBytes($day->total_bytes_out, 1) }}
+                                    </td>
+                                    <td class="py-3.5 px-4 font-mono font-bold text-zinc-900 dark:text-zinc-100">
+                                        {{ \App\Support\FormatHelper::formatBytes($day->total_bytes, 1) }}
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @else
+                <div class="p-8 text-center text-xs text-zinc-400">
+                    Belum ada catatan riwayat pemakaian harian pada periode ini.
+                </div>
+            @endif
+        </div>
+
+        <!-- Session History Ledger Section -->
         <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden shadow-xs">
             <div class="px-5 py-3.5 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-800/20">
                 <h3 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">Riwayat Sesi Login Sebelumnya</h3>
-                <span class="text-[11px] text-zinc-400">{{ count($pastSessions) }} Sesi Terakhir</span>
+                <span class="text-[11px] text-zinc-400">{{ count($pastSessions) }} Sesi Ditemukan</span>
             </div>
 
             @if(count($pastSessions) > 0)
-                <div class="overflow-x-auto">
+                <!-- Mobile Cards for Past Sessions -->
+                <div class="block sm:hidden divide-y divide-zinc-100 dark:divide-zinc-800">
+                    @foreach($pastSessions as $session)
+                        <div class="p-4 space-y-2.5">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <div class="font-bold text-sm text-zinc-900 dark:text-zinc-100">
+                                        {{ $session->hostname ?: ($session->device_name ?: 'Unknown Device') }}
+                                    </div>
+                                    <div class="text-[11px] font-mono text-zinc-500 dark:text-zinc-400 mt-0.5">
+                                        {{ $session->ip_address ?: '-' }} • {{ $session->mac_address ?: '-' }}
+                                    </div>
+                                </div>
+                                <div>
+                                    @if($session->status === 'active')
+                                        <x-badge type="active" dot="true">Aktif</x-badge>
+                                    @else
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400">
+                                            Ended
+                                        </span>
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-zinc-100 dark:border-zinc-800/80">
+                                <div>
+                                    <span class="text-[10px] text-zinc-400 block">Waktu Sesi</span>
+                                    <div class="text-zinc-700 dark:text-zinc-300">
+                                        {{ $session->started_at ? \Carbon\Carbon::parse($session->started_at)->format('d M, H:i') : '-' }}
+                                        &rarr;
+                                        {{ $session->ended_at ? \Carbon\Carbon::parse($session->ended_at)->format('H:i') : 'Now' }}
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-[10px] text-zinc-400 block">Rx / Tx</span>
+                                    <span class="font-mono text-emerald-600 dark:text-emerald-400">↓ {{ \App\Support\FormatHelper::formatBytes($session->total_bytes_out, 1) }}</span>
+                                    <span class="font-mono text-sky-600 dark:text-sky-400 ml-1">↑ {{ \App\Support\FormatHelper::formatBytes($session->total_bytes_in, 1) }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+
+                <!-- Desktop Table for Past Sessions -->
+                <div class="hidden sm:block overflow-x-auto">
                     <table class="w-full text-left text-xs">
                         <thead class="bg-zinc-50/80 dark:bg-zinc-800/50 text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase border-b border-zinc-200 dark:border-zinc-800">
                             <tr>
@@ -296,7 +684,7 @@
                 </div>
             @else
                 <div class="p-8 text-center text-xs text-zinc-400">
-                    Belum ada riwayat sesi login sebelumnya untuk user ini.
+                    Belum ada riwayat sesi login yang cocok dengan filter.
                 </div>
             @endif
         </div>
@@ -306,11 +694,53 @@
     <script>
         function userDetailComponent() {
             return {
+                isOnline: @json($isOnline),
+                downloadSpeed: '{{ \App\Support\FormatHelper::formatBytes((($primaryLiveSession["rx-rate"] ?? 0) / 8), 1) }}/s',
+                uploadSpeed: '{{ \App\Support\FormatHelper::formatBytes((($primaryLiveSession["tx-rate"] ?? 0) / 8), 1) }}/s',
+                liveUptime: '{{ $primaryLiveSession["uptime"] ?? "0s (Offline)" }}',
+                hasLimit: @json($uptimeProgress['has_limit'] ?? false),
+                limitUptime: '{{ $uptimeProgress["limit_formatted"] ?? "" }}',
+                remainingUptime: '{{ $uptimeProgress["remaining_formatted"] ?? "" }}',
+                remainingPercent: {{ $uptimeProgress['remaining_percent'] ?? 100 }},
+                fup: @json($fupProgress ?? null),
+                isResettingFup: false,
+                pollTimer: null,
                 chartCategories: @json($chartCategories ?? []),
                 chartRxSeries: @json($chartRxSeries ?? []),
                 chartTxSeries: @json($chartTxSeries ?? []),
                 init() {
                     this.renderChart();
+                    this.startPolling();
+                },
+                startPolling() {
+                    if (this.pollTimer) clearInterval(this.pollTimer);
+                    this.pollTimer = setInterval(() => {
+                        fetch('{{ route("users.user.live", $username) }}?_t=' + Date.now(), {
+                            cache: 'no-store',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Cache-Control': 'no-cache',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            }
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data) {
+                                this.isOnline = data.is_online;
+                                this.downloadSpeed = data.download_speed;
+                                this.uploadSpeed = data.upload_speed;
+                                this.liveUptime = data.uptime;
+                                this.hasLimit = data.has_limit;
+                                this.limitUptime = data.limit_uptime;
+                                this.remainingUptime = data.remaining_uptime;
+                                this.remainingPercent = data.remaining_percentage;
+                                if (data.fup) {
+                                    this.fup = data.fup;
+                                }
+                            }
+                        })
+                        .catch(() => {});
+                    }, 2500);
                 },
                 renderChart() {
                     const el = document.getElementById('userDailyTrendChart');
@@ -412,6 +842,49 @@
                     })
                     .catch(() => {
                         alert('Gagal memutus user.');
+                    });
+                },
+                resetFup() {
+                    if (!confirm('Apakah Anda yakin ingin mereset kuota FUP dan mengembalikan kecepatan user ini ke normal?')) return;
+                    this.isResettingFup = true;
+                    fetch('{{ route("users.reset-fup", $username) }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        this.isResettingFup = false;
+                        if (data.success) {
+                            if (window.showToast) {
+                                window.showToast(data.message, 'success');
+                            } else {
+                                alert(data.message);
+                            }
+                            if (this.fup) {
+                                this.fup.fup_active = false;
+                                this.fup.usage_bytes = 0;
+                                this.fup.usage_formatted = '0 B';
+                                this.fup.usage_percent = 0;
+                            }
+                        } else {
+                            if (window.showToast) {
+                                window.showToast(data.message || 'Gagal mereset FUP', 'error');
+                            } else {
+                                alert(data.message || 'Gagal mereset FUP');
+                            }
+                        }
+                    })
+                    .catch(() => {
+                        this.isResettingFup = false;
+                        if (window.showToast) {
+                            window.showToast('Gagal mereset FUP', 'error');
+                        } else {
+                            alert('Gagal mereset FUP');
+                        }
                     });
                 }
             };

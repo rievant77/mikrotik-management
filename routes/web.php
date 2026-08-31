@@ -33,24 +33,33 @@ Route::middleware('auth')->group(function () {
         Route::get('/api/live', [UserController::class, 'liveData'])->name('users.live');
         Route::get('/historical', [UserController::class, 'historical'])->name('users.historical');
         Route::get('/{username}', [UserController::class, 'show'])->name('users.show');
+        Route::get('/{username}/live', [UserController::class, 'userLiveData'])->name('users.user.live');
         Route::post('/{username}/disconnect', [UserController::class, 'disconnect'])->name('users.disconnect');
+        Route::post('/{username}/reset-fup', [UserController::class, 'resetFup'])->name('users.reset-fup');
     });
 
     // Devices / Sessions
     Route::get('/devices', [DeviceController::class, 'index'])->name('devices.index');
     Route::get('/api/devices/live', [DeviceController::class, 'liveData'])->name('devices.live');
+    Route::get('/api/devices/{mac}/detail', [DeviceController::class, 'detail'])->name('devices.detail');
+    Route::post('/api/devices/action/make-static', [DeviceController::class, 'actionMakeStatic'])->name('devices.action.make-static');
+    Route::post('/api/devices/action/ip-binding', [DeviceController::class, 'actionSetIpBinding'])->name('devices.action.ip-binding');
+    Route::post('/api/devices/action/kick', [DeviceController::class, 'actionKick'])->name('devices.action.kick');
+    Route::post('/api/devices/action/comment', [DeviceController::class, 'actionSetComment'])->name('devices.action.comment');
 
     // Hotspot
     Route::prefix('hotspot')->group(function () {
         Route::get('/profiles', [HotspotProfileController::class, 'index'])->name('hotspot.profiles');
         Route::post('/profiles', [HotspotProfileController::class, 'store'])->name('hotspot.profiles.store');
         Route::post('/profiles/sync', [HotspotProfileController::class, 'syncFromRouter'])->name('hotspot.profiles.sync');
+        Route::post('/profiles/{profile}/toggle', [HotspotProfileController::class, 'toggleStatus'])->name('hotspot.profiles.toggle');
         Route::put('/profiles/{profile}', [HotspotProfileController::class, 'update'])->name('hotspot.profiles.update');
         Route::delete('/profiles/{profile}', [HotspotProfileController::class, 'destroy'])->name('hotspot.profiles.destroy');
 
         Route::get('/users', [HotspotUserController::class, 'index'])->name('hotspot.users');
         Route::post('/users', [HotspotUserController::class, 'store'])->name('hotspot.users.store');
         Route::post('/users/sync', [HotspotUserController::class, 'syncFromRouter'])->name('hotspot.users.sync');
+        Route::post('/users/{user}/toggle', [HotspotUserController::class, 'toggleStatus'])->name('hotspot.users.toggle');
         Route::put('/users/{user}', [HotspotUserController::class, 'update'])->name('hotspot.users.update');
         Route::delete('/users/{user}', [HotspotUserController::class, 'destroy'])->name('hotspot.users.destroy');
 
@@ -58,7 +67,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/generate', [VoucherController::class, 'generateBatch'])->name('hotspot.generate.batch');
     });
 
-    // Voucher Printing
+    // Voucher Inventory & Printing
+    Route::get('/vouchers', [VoucherController::class, 'index'])->name('vouchers.index');
+    Route::post('/vouchers/batch-delete', [VoucherController::class, 'destroyBatch'])->name('vouchers.batch-delete');
     Route::prefix('vouchers/print')->group(function () {
         Route::get('/58mm', [VoucherController::class, 'print58mm'])->name('vouchers.print.58mm');
         Route::get('/80mm', [VoucherController::class, 'print80mm'])->name('vouchers.print.80mm');
@@ -92,9 +103,8 @@ Route::middleware('auth')->group(function () {
             return view('settings.roles');
         })->name('settings.roles');
 
-        Route::get('/templates', function () {
-            return view('settings.templates');
-        })->name('settings.templates');
+        Route::get('/templates', [RouterSettingController::class, 'templates'])->name('settings.templates');
+        Route::post('/templates', [RouterSettingController::class, 'updateTemplates'])->name('settings.templates.update');
     });
 
     // Audit Logs

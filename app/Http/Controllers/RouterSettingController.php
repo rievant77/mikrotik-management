@@ -104,17 +104,28 @@ class RouterSettingController extends Controller
         foreach ($profiles as $p) {
             $name = $p['name'] ?? null;
             if (!$name || $name === 'default') continue;
-            \App\Models\HotspotProfile::updateOrCreate(
-                ['name' => $name],
-                [
+            $rawShared = $p['shared-users'] ?? 1;
+            $sharedUsers = ($rawShared === 'unlimited' || $rawShared === '0' || (int)$rawShared === 0) ? 0 : (int)$rawShared;
+
+            $existing = \App\Models\HotspotProfile::where('name', $name)->first();
+            if ($existing) {
+                // Update technical router parameters ONLY; preserve configured selling_price, cost_price, validity, expired_mode
+                $existing->update([
                     'rate_limit' => $p['rate-limit'] ?? null,
-                    'shared_users' => isset($p['shared-users']) ? (int)$p['shared-users'] : 1,
-                    'selling_price' => 5000,
-                    'cost_price' => 2500,
-                    'validity' => '3 Jam',
+                    'shared_users' => $sharedUsers,
+                ]);
+            } else {
+                \App\Models\HotspotProfile::create([
+                    'name' => $name,
+                    'rate_limit' => $p['rate-limit'] ?? null,
+                    'shared_users' => $sharedUsers,
+                    'selling_price' => 0,
+                    'cost_price' => 0,
+                    'validity' => 'Unlimited',
                     'expired_mode' => 'Remove',
-                ]
-            );
+                    'is_active' => true,
+                ]);
+            }
             $profilesSynced++;
         }
 
@@ -126,6 +137,7 @@ class RouterSettingController extends Controller
             if (!$uname || $uname === 'default-trial') continue;
             $profileName = $u['profile'] ?? null;
             $prof = $profileName ? \App\Models\HotspotProfile::where('name', $profileName)->first() : null;
+            $isDisabled = isset($u['disabled']) && in_array(strtolower((string)$u['disabled']), ['true', 'yes', '1'], true);
 
             \App\Models\HotspotUser::updateOrCreate(
                 ['username' => $uname],
@@ -134,7 +146,7 @@ class RouterSettingController extends Controller
                     'profile_id' => $prof?->id,
                     'uptime_limit' => $u['limit-uptime'] ?? null,
                     'comment' => $u['comment'] ?? null,
-                    'is_active' => true,
+                    'is_active' => !$isDisabled,
                 ]
             );
             $usersSynced++;
@@ -152,6 +164,41 @@ class RouterSettingController extends Controller
             'collector' => $collectorResult,
             'router_info' => $conn,
             'message' => "Sinkronisasi berhasil: {$profilesSynced} profil, {$usersSynced} user, {$sessionCount} sesi aktif."
+        ]);
+    }
+
+    public function templates(): View
+    {
+        $setting = RouterSetting::where('is_active', true)->first();
+        return view('settings.templates', compact('setting'));
+    }
+
+    public function updateTemplates(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'hotspot_name' => 'required|string|max:150',
+            'login_url' => 'nullable|string|max:150',
+            'footer_text' => 'nullable|string|max:255',
+        ]);
+
+        $setting = RouterSetting::where('is_active', true)->first();
+        if (!$setting) {
+            $setting = RouterSetting::create([
+                'name' => 'CCR1009-Core',
+                'host' => '192.168.88.1',
+                'api_port' => 8728,
+                'username' => 'api_admin',
+                'password' => 'admin',
+                'is_active' => true,
+            ]);
+        }
+
+        $setting->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Template voucher & branding berhasil disimpan',
+            'setting' => $setting
         ]);
     }
 }

@@ -20,7 +20,7 @@ class MonthlyCustomer extends Model
     ];
 
     protected $casts = [
-        'monthly_price' => 'decimal:2',
+        'monthly_price' => 'float',
         'billing_day' => 'integer',
         'is_active' => 'boolean',
     ];

@@ -23,8 +23,8 @@ class MonthlyPayment extends Model
     protected $casts = [
         'billing_month' => 'date',
         'paid_at' => 'date',
-        'monthly_price' => 'decimal:2',
-        'amount_paid' => 'decimal:2',
+        'monthly_price' => 'float',
+        'amount_paid' => 'float',
     ];
 
     public function customer(): BelongsTo

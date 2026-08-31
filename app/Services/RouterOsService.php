@@ -395,10 +395,36 @@ class RouterOsService
     }
 
     /**
+     * Get list of Hotspot Servers from MikroTik (/ip/hotspot/print).
+     */
+    public function getHotspotServers(): array
+    {
+        $client = $this->getClient();
+        if (!$client) {
+            return [];
+        }
+
+        try {
+            $query = new Query('/ip/hotspot/print');
+            return $client->query($query)->read();
+        } catch (Exception $e) {
+            Log::warning("RouterOS getHotspotServers error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
      * Add user to MikroTik Hotspot.
      */
-    public function addHotspotUser(string $username, string $password, ?string $profile = null, ?string $limitUptime = null, ?string $comment = null): bool
-    {
+    public function addHotspotUser(
+        string $username,
+        string $password,
+        ?string $profile = null,
+        ?string $limitUptime = null,
+        ?string $comment = null,
+        ?string $server = null,
+        ?string $limitBytesTotal = null
+    ): bool {
         $client = $this->getClient();
         if (!$client) {
             return false;
@@ -409,11 +435,17 @@ class RouterOsService
                 ->equal('name', $username)
                 ->equal('password', $password);
 
+            if ($server && $server !== 'all' && $server !== 'ALL') {
+                $query->equal('server', $server);
+            }
             if ($profile) {
                 $query->equal('profile', $profile);
             }
             if ($limitUptime) {
                 $query->equal('limit-uptime', $limitUptime);
+            }
+            if ($limitBytesTotal) {
+                $query->equal('limit-bytes-total', $limitBytesTotal);
             }
             if ($comment) {
                 $query->equal('comment', $comment);
@@ -430,7 +462,7 @@ class RouterOsService
     /**
      * Add profile to MikroTik Hotspot.
      */
-    public function addHotspotProfile(string $name, ?string $rateLimit = null, ?int $sharedUsers = 1): bool
+    public function addHotspotProfile(string $name, ?string $rateLimit = null, int|string|null $sharedUsers = 1): bool
     {
         $client = $this->getClient();
         if (!$client) {
@@ -438,9 +470,11 @@ class RouterOsService
         }
 
         try {
+            $sharedVal = (empty($sharedUsers) || $sharedUsers === 'unlimited' || (int)$sharedUsers === 0) ? 'unlimited' : (string)$sharedUsers;
+
             $query = (new Query('/ip/hotspot/user/profile/add'))
                 ->equal('name', $name)
-                ->equal('shared-users', (string) ($sharedUsers ?: 1));
+                ->equal('shared-users', $sharedVal);
 
             if ($rateLimit) {
                 $query->equal('rate-limit', $rateLimit);
@@ -450,6 +484,192 @@ class RouterOsService
             return true;
         } catch (Exception $e) {
             Log::error("RouterOS addHotspotProfile error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Remove user from MikroTik Hotspot.
+     */
+    public function removeHotspotUser(string $username): bool
+    {
+        $client = $this->getClient();
+        if (!$client) {
+            return false;
+        }
+
+        try {
+            // Also disconnect active session if currently online
+            $this->disconnectHotspotUser($username);
+
+            $findQuery = (new Query('/ip/hotspot/user/print'))->where('name', $username);
+            $users = $client->query($findQuery)->read();
+
+            foreach ($users as $u) {
+                if (isset($u['.id'])) {
+                    $removeQuery = (new Query('/ip/hotspot/user/remove'))->equal('.id', $u['.id']);
+                    $client->query($removeQuery)->read();
+                }
+            }
+
+            return true;
+        } catch (Exception $e) {
+            Log::error("RouterOS removeHotspotUser error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Enable or Disable user on MikroTik Hotspot.
+     */
+    public function setHotspotUserStatus(string $username, bool $enabled): bool
+    {
+        $client = $this->getClient();
+        if (!$client) {
+            return false;
+        }
+
+        try {
+            if (!$enabled) {
+                // Kick out active session immediately if disabled
+                $this->disconnectHotspotUser($username);
+            }
+
+            $findQuery = (new Query('/ip/hotspot/user/print'))->where('name', $username);
+            $users = $client->query($findQuery)->read();
+
+            foreach ($users as $u) {
+                if (isset($u['.id'])) {
+                    $setQuery = (new Query('/ip/hotspot/user/set'))
+                        ->equal('.id', $u['.id'])
+                        ->equal('disabled', $enabled ? 'no' : 'yes');
+                    $client->query($setQuery)->read();
+                }
+            }
+
+            return true;
+        } catch (Exception $e) {
+            Log::error("RouterOS setHotspotUserStatus error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Update user on MikroTik Hotspot.
+     */
+    public function updateHotspotUser(string $username, array $params): bool
+    {
+        $client = $this->getClient();
+        if (!$client) {
+            return false;
+        }
+
+        try {
+            $findQuery = (new Query('/ip/hotspot/user/print'))->where('name', $username);
+            $users = $client->query($findQuery)->read();
+
+            foreach ($users as $u) {
+                if (isset($u['.id'])) {
+                    $setQuery = (new Query('/ip/hotspot/user/set'))->equal('.id', $u['.id']);
+
+                    if (isset($params['password'])) {
+                        $setQuery->equal('password', $params['password']);
+                    }
+                    if (isset($params['profile'])) {
+                        $setQuery->equal('profile', $params['profile']);
+                    }
+                    if (isset($params['uptime_limit'])) {
+                        $setQuery->equal('limit-uptime', $params['uptime_limit'] ?: '0s');
+                    }
+                    if (isset($params['comment'])) {
+                        $setQuery->equal('comment', $params['comment']);
+                    }
+                    if (isset($params['is_active'])) {
+                        $setQuery->equal('disabled', $params['is_active'] ? 'no' : 'yes');
+                    }
+
+                    $client->query($setQuery)->read();
+                }
+            }
+
+            return true;
+        } catch (Exception $e) {
+            Log::error("RouterOS updateHotspotUser error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Update simple queue rate limit for dynamic FUP throttling on MikroTik.
+     */
+    public function updateSimpleQueueRateLimit(string $targetName, string $rateLimit): bool
+    {
+        $client = $this->getClient();
+        if (!$client) {
+            return false;
+        }
+
+        try {
+            $queues = $client->query(new Query('/queue/simple/print'))->read();
+            $targetUpper = strtoupper($targetName);
+
+            foreach ($queues as $q) {
+                $qName = $q['name'] ?? '';
+                $qTarget = $q['target'] ?? '';
+                $isMatch = ($qName === $targetName)
+                    || (str_contains(strtoupper($qName), $targetUpper))
+                    || ($qTarget === $targetName);
+
+                if ($isMatch && isset($q['.id'])) {
+                    $setQuery = (new Query('/queue/simple/set'))
+                        ->equal('.id', $q['.id'])
+                        ->equal('max-limit', $rateLimit);
+                    $client->query($setQuery)->read();
+                    return true;
+                }
+            }
+
+            return false;
+        } catch (Exception $e) {
+            Log::error("RouterOS updateSimpleQueueRateLimit error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Update profile on MikroTik Hotspot.
+     */
+    public function updateHotspotProfile(string $name, array $params): bool
+    {
+        $client = $this->getClient();
+        if (!$client) {
+            return false;
+        }
+
+        try {
+            $findQuery = (new Query('/ip/hotspot/user/profile/print'))->where('name', $name);
+            $profiles = $client->query($findQuery)->read();
+
+            foreach ($profiles as $p) {
+                if (isset($p['.id'])) {
+                    $setQuery = (new Query('/ip/hotspot/user/profile/set'))->equal('.id', $p['.id']);
+
+                    if (array_key_exists('rate_limit', $params)) {
+                        $setQuery->equal('rate-limit', $params['rate_limit'] ?: '');
+                    }
+                    if (array_key_exists('shared_users', $params)) {
+                        $sUsers = $params['shared_users'];
+                        $sharedVal = (empty($sUsers) || $sUsers === 'unlimited' || (int)$sUsers === 0) ? 'unlimited' : (string)$sUsers;
+                        $setQuery->equal('shared-users', $sharedVal);
+                    }
+
+                    $client->query($setQuery)->read();
+                }
+            }
+
+            return true;
+        } catch (Exception $e) {
+            Log::error("RouterOS updateHotspotProfile error: " . $e->getMessage());
             return false;
         }
     }
@@ -481,4 +701,187 @@ class RouterOsService
             return false;
         }
     }
+
+    /**
+     * Make a DHCP lease static by MAC address.
+     */
+    public function makeDhcpLeaseStatic(string $macAddress, ?string $ip = null, ?string $comment = null): bool
+    {
+        $client = $this->getClient();
+        if (!$client) {
+            return false;
+        }
+
+        try {
+            $cleanMac = strtoupper(trim($macAddress));
+            $leases = $this->getDhcpLeases();
+
+            foreach ($leases as $l) {
+                $leaseMac = strtoupper($l['mac-address'] ?? ($l['active-mac-address'] ?? ''));
+                if ($leaseMac === $cleanMac && isset($l['.id'])) {
+                    // If dynamic, make static
+                    if (($l['dynamic'] ?? '') === 'true' || ($l['dynamic'] ?? false) === true) {
+                        $makeStaticQuery = (new Query('/ip/dhcp-server/lease/make-static'))->equal('.id', $l['.id']);
+                        $client->query($makeStaticQuery)->read();
+                    }
+
+                    if ($comment !== null) {
+                        $setQuery = (new Query('/ip/dhcp-server/lease/set'))
+                            ->equal('.id', $l['.id'])
+                            ->equal('comment', $comment);
+                        $client->query($setQuery)->read();
+                    }
+
+                    return true;
+                }
+            }
+
+            // If lease does not exist, add as static lease if IP is provided
+            if ($ip) {
+                $addQuery = (new Query('/ip/dhcp-server/lease/add'))
+                    ->equal('mac-address', $cleanMac)
+                    ->equal('address', $ip)
+                    ->equal('comment', $comment ?: 'Static Device');
+                $client->query($addQuery)->read();
+                return true;
+            }
+
+            return false;
+        } catch (Exception $e) {
+            Log::error("RouterOS makeDhcpLeaseStatic error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Get IP binding status for a MAC address.
+     */
+    public function getHotspotIpBinding(string $macAddress): ?array
+    {
+        $client = $this->getClient();
+        if (!$client) {
+            return null;
+        }
+
+        try {
+            $cleanMac = strtoupper(trim($macAddress));
+            $query = new Query('/ip/hotspot/ip-binding/print');
+            $bindings = $client->query($query)->read();
+
+            foreach ($bindings as $b) {
+                $bMac = strtoupper($b['mac-address'] ?? '');
+                if ($bMac === $cleanMac) {
+                    return $b;
+                }
+            }
+
+            return null;
+        } catch (Exception $e) {
+            Log::error("RouterOS getHotspotIpBinding error: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Set or toggle Hotspot IP Binding (bypassed, blocked, regular).
+     */
+    public function setHotspotIpBinding(string $macAddress, string $type = 'bypassed', ?string $comment = null): bool
+    {
+        $client = $this->getClient();
+        if (!$client) {
+            return false;
+        }
+
+        try {
+            $cleanMac = strtoupper(trim($macAddress));
+            $existing = $this->getHotspotIpBinding($cleanMac);
+
+            if ($existing && isset($existing['.id'])) {
+                $setQuery = (new Query('/ip/hotspot/ip-binding/set'))
+                    ->equal('.id', $existing['.id'])
+                    ->equal('type', $type);
+
+                if ($comment !== null) {
+                    $setQuery->equal('comment', $comment);
+                }
+
+                $client->query($setQuery)->read();
+            } else {
+                $addQuery = (new Query('/ip/hotspot/ip-binding/add'))
+                    ->equal('mac-address', $cleanMac)
+                    ->equal('type', $type);
+
+                if ($comment !== null) {
+                    $addQuery->equal('comment', $comment);
+                }
+
+                $client->query($addQuery)->read();
+            }
+
+            return true;
+        } catch (Exception $e) {
+            Log::error("RouterOS setHotspotIpBinding error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Remove Hotspot IP Binding for a MAC address.
+     */
+    public function removeHotspotIpBinding(string $macAddress): bool
+    {
+        $client = $this->getClient();
+        if (!$client) {
+            return false;
+        }
+
+        try {
+            $cleanMac = strtoupper(trim($macAddress));
+            $existing = $this->getHotspotIpBinding($cleanMac);
+
+            if ($existing && isset($existing['.id'])) {
+                $removeQuery = (new Query('/ip/hotspot/ip-binding/remove'))->equal('.id', $existing['.id']);
+                $client->query($removeQuery)->read();
+                return true;
+            }
+
+            return false;
+        } catch (Exception $e) {
+            Log::error("RouterOS removeHotspotIpBinding error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Update comment / alias on a DHCP Lease.
+     */
+    public function setDhcpLeaseComment(string $macAddress, string $comment): bool
+    {
+        $client = $this->getClient();
+        if (!$client) {
+            return false;
+        }
+
+        try {
+            $cleanMac = strtoupper(trim($macAddress));
+            $leases = $this->getDhcpLeases();
+
+            foreach ($leases as $l) {
+                $leaseMac = strtoupper($l['mac-address'] ?? ($l['active-mac-address'] ?? ''));
+                if ($leaseMac === $cleanMac && isset($l['.id'])) {
+                    $setQuery = (new Query('/ip/dhcp-server/lease/set'))
+                        ->equal('.id', $l['.id'])
+                        ->equal('comment', $comment);
+                    $client->query($setQuery)->read();
+                    return true;
+                }
+            }
+
+            return false;
+        } catch (Exception $e) {
+            Log::error("RouterOS setDhcpLeaseComment error: " . $e->getMessage());
+            return false;
+        }
+    }
 }
+

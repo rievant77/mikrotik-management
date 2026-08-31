@@ -23,15 +23,26 @@ class VoucherBatchService
      */
     public function generate(array $params): array
     {
-        $profileName = $params['profile'] ?? 'Paket-3Jam';
-        $qty = min(1000, max(1, (int) ($params['qty'] ?? 10)));
+        $profileName = $params['profile'] ?? 'default';
+        $server = $params['server'] ?? 'all';
+        $qty = min(1000, max(1, (int) ($params['qty'] ?? 5)));
         $credentialMode = $params['credentialMode'] ?? 'same'; // same or different
         $charSet = $params['charSet'] ?? 'numeric'; // numeric, lowercase, uppercase, mixed
-        $prefix = $params['prefix'] ?? 'VC-';
+        $prefix = $params['prefix'] ?? '';
         $length = max(3, min(12, (int) ($params['length'] ?? 5)));
+        $timeLimitRaw = $params['timeLimit'] ?? null;
+        $dataLimitRaw = $params['dataLimit'] ?? null;
+        $userComment = trim($params['comment'] ?? '');
 
         $profile = HotspotProfile::where('name', $profileName)->first();
         $generatedVouchers = [];
+
+        // Parse Time Limit & Data Limit
+        $uptimeLimit = $timeLimitRaw ? \App\Support\FormatHelper::parseValidityToRouterTime($timeLimitRaw) : (\App\Support\FormatHelper::parseValidityToRouterTime($profile?->validity) ?? null);
+        $bytesLimit = $dataLimitRaw ? \App\Support\FormatHelper::parseBytesLimit($dataLimitRaw) : null;
+
+        $batchTag = 'Batch ' . date('Y-m-d H:i');
+        $finalComment = $userComment !== '' ? $userComment : ($batchTag . ' ' . $profileName);
 
         DB::beginTransaction();
 
@@ -50,8 +61,8 @@ class VoucherBatchService
                     'profile_id' => $profile?->id,
                     'username' => $code,
                     'password' => $password,
-                    'uptime_limit' => $profile?->validity ?? '3h',
-                    'comment' => 'Batch ' . date('Y-m-d H:i') . ' ' . $profileName,
+                    'uptime_limit' => $uptimeLimit,
+                    'comment' => $finalComment,
                     'is_active' => true,
                 ]);
 
@@ -60,8 +71,10 @@ class VoucherBatchService
                     $code,
                     $password,
                     $profileName,
-                    $profile?->validity,
-                    'Voucher ' . $profileName
+                    $uptimeLimit,
+                    $finalComment,
+                    $server,
+                    $bytesLimit
                 );
 
                 $generatedVouchers[] = [
@@ -69,8 +82,11 @@ class VoucherBatchService
                     'username' => $code,
                     'password' => $password,
                     'profile' => $profileName,
+                    'server' => $server,
                     'price' => $profile ? $profile->selling_price : 3000,
-                    'validity' => $profile ? $profile->validity : '3 Jam',
+                    'validity' => $profile ? $profile->validity : ($uptimeLimit ?: '-'),
+                    'time_limit' => $uptimeLimit,
+                    'data_limit' => $bytesLimit,
                 ];
             }
 
@@ -81,8 +97,13 @@ class VoucherBatchService
                 'entity_type' => 'HotspotUser',
                 'new_values' => [
                     'qty' => $qty,
+                    'server' => $server,
                     'profile' => $profileName,
                     'prefix' => $prefix,
+                    'batch' => $batchTag,
+                    'time_limit' => $uptimeLimit,
+                    'data_limit' => $bytesLimit,
+                    'comment' => $finalComment,
                 ],
                 'ip_address' => request()->ip() ?? '127.0.0.1',
                 'user_agent' => request()->userAgent() ?? 'System',
@@ -94,6 +115,7 @@ class VoucherBatchService
             return [
                 'success' => true,
                 'count' => count($generatedVouchers),
+                'batch' => $batchTag,
                 'vouchers' => $generatedVouchers,
             ];
         } catch (Exception $e) {

@@ -110,7 +110,9 @@ class CollectorService
                     ->latest()
                     ->first();
 
+                $isNewSession = false;
                 if (!$session) {
+                    $isNewSession = true;
                     // New session started
                     $session = HotspotSession::create([
                         'hotspot_user_id' => $hotspotUser?->id,
@@ -138,12 +140,18 @@ class CollectorService
                 $seenSessionIds[] = $session->id;
 
                 // Calculate Deltas (handle router reboot or counter reset)
-                $deltaIn = ($bytesIn >= $session->last_bytes_in) ? ($bytesIn - $session->last_bytes_in) : $bytesIn;
-                $deltaOut = ($bytesOut >= $session->last_bytes_out) ? ($bytesOut - $session->last_bytes_out) : $bytesOut;
+                if ($isNewSession) {
+                    $deltaIn = $bytesIn;
+                    $deltaOut = $bytesOut;
+                    $timeDiff = max(1, $uptimeSeconds);
+                } else {
+                    $deltaIn = ($bytesIn >= $session->last_bytes_in) ? ($bytesIn - $session->last_bytes_in) : $bytesIn;
+                    $deltaOut = ($bytesOut >= $session->last_bytes_out) ? ($bytesOut - $session->last_bytes_out) : $bytesOut;
+                    $timeDiff = max(1, $now->diffInSeconds($session->last_seen_at));
+                }
 
-                $timeDiff = max(1, $now->diffInSeconds($session->last_seen_at));
-                $uploadBps = (int) (($deltaIn * 8) / $timeDiff);
-                $downloadBps = (int) (($deltaOut * 8) / $timeDiff);
+                $uploadBps = (int) (($deltaIn * 8) / max(1, $timeDiff));
+                $downloadBps = (int) (($deltaOut * 8) / max(1, $timeDiff));
 
                 // Record Snapshot (Idempotent per collector_run_id + session_id)
                 UsageSnapshot::create([
@@ -164,8 +172,8 @@ class CollectorService
                 $sessionUpdate = [
                     'last_bytes_in' => $bytesIn,
                     'last_bytes_out' => $bytesOut,
-                    'total_bytes_in' => $session->total_bytes_in + $deltaIn,
-                    'total_bytes_out' => $session->total_bytes_out + $deltaOut,
+                    'total_bytes_in' => $isNewSession ? $bytesIn : ($session->total_bytes_in + $deltaIn),
+                    'total_bytes_out' => $isNewSession ? $bytesOut : ($session->total_bytes_out + $deltaOut),
                     'current_rx_bps' => $downloadBps,
                     'current_tx_bps' => $uploadBps,
                     'last_seen_at' => $now,
@@ -180,6 +188,15 @@ class CollectorService
 
                 // Accumulate Daily Summary
                 $this->accumulateDailySummary($hotspotUser, $username, $now->toDateString(), $deltaIn, $deltaOut, $timeDiff);
+
+                // Evaluate FUP (Fair Usage Policy) Bandwidth Management
+                if ($hotspotUser) {
+                    try {
+                        app(FupManagementService::class)->evaluateUserFup($hotspotUser, ($deltaIn + $deltaOut), $this->routerOs);
+                    } catch (\Throwable $e) {
+                        Log::warning("FUP evaluation error for {$username}: " . $e->getMessage());
+                    }
+                }
 
                 $processedCount++;
             }
@@ -196,6 +213,13 @@ class CollectorService
                 ]);
 
             DB::commit();
+
+            // Sweep and execute Expired Mode for finished vouchers/users
+            try {
+                app(VoucherExpiryService::class)->sweepExpiredUsers($this->routerOs);
+            } catch (\Throwable $e) {
+                Log::warning("Expired users sweep error: " . $e->getMessage());
+            }
 
             // Update Router status
             RouterSetting::where('is_active', true)->update([
@@ -228,23 +252,32 @@ class CollectorService
     }
 
     /**
-     * Trigger Voucher First-Activation Revenue:
+     * Trigger Voucher First-Activation Revenue & Compute Validity Expired Timestamp:
      * Only records transaction when a voucher is first activated on MikroTik (PRD Section 5.11.1).
      */
     protected function handleVoucherFirstActivation(?HotspotUser $user, string $username, Carbon $activatedAt, ?CashierShift $shift): void
     {
-        // Check if already recorded
+        $profile = $user?->profile;
+        if (!$profile) {
+            $profile = HotspotProfile::first();
+        }
+
+        // Set expired_at calendar timestamp if user/profile has validity limit
+        if ($user && !$user->expired_at) {
+            $validityRaw = $user->uptime_limit ?: ($profile?->validity ?: null);
+            $validitySeconds = \App\Support\FormatHelper::parseUptime(\App\Support\FormatHelper::parseValidityToRouterTime($validityRaw));
+            if ($validitySeconds > 0) {
+                $user->update(['expired_at' => $activatedAt->copy()->addSeconds($validitySeconds)]);
+            }
+        }
+
+        // Check if already recorded in sales
         $exists = VoucherSale::where('username', $username)
             ->where('status', 'completed')
             ->exists();
 
         if ($exists) {
             return;
-        }
-
-        $profile = $user?->profile;
-        if (!$profile) {
-            $profile = HotspotProfile::first();
         }
 
         $cost = $profile ? (float) $profile->cost_price : 1500;

@@ -31,6 +31,17 @@ if ! grep -q "APP_KEY=base64:" /var/www/html/.env; then
 fi
 
 # 5. Run Database Migrations
+if [ "$DB_CONNECTION" = "mysql" ]; then
+    echo "==> Checking MySQL connection..."
+    max_tries=30
+    count=0
+    until php -r "try { new PDO('mysql:host='.getenv('DB_HOST').';port='.(getenv('DB_PORT') ?: 3306).';dbname='.getenv('DB_DATABASE'), getenv('DB_USERNAME'), getenv('DB_PASSWORD')); exit(0); } catch(Exception \$e) { exit(1); }" 2>/dev/null || [ $count -ge $max_tries ]; do
+        echo "==> Waiting for MySQL database to become available ($count/$max_tries)..."
+        sleep 2
+        count=$((count+1))
+    done
+fi
+
 echo "==> Running database migrations..."
 php /var/www/html/artisan migrate --force
 

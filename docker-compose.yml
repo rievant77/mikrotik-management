@@ -7,19 +7,23 @@ services:
     container_name: mikrotik_app
     restart: unless-stopped
     ports:
-      - "8000:80"
+      - "${APP_PORT:-8000}:80"
     environment:
-      - APP_NAME=MikroTik Manager
-      - APP_ENV=production
-      - APP_DEBUG=false
-      - APP_URL=http://localhost:8000
-      - DB_CONNECTION=sqlite
-      - DB_DATABASE=/var/www/html/database/database.sqlite
-      - SESSION_DRIVER=file
-      - CACHE_STORE=file
-      - QUEUE_CONNECTION=sync
+      - APP_NAME=${APP_NAME:-MikroTik Manager}
+      - APP_ENV=${APP_ENV:-production}
+      - APP_DEBUG=${APP_DEBUG:-false}
+      - APP_URL=${APP_URL:-http://localhost:8000}
+      - DB_CONNECTION=${DB_CONNECTION:-mysql}
+      - DB_HOST=${DB_HOST:-127.0.0.1}
+      - DB_PORT=${DB_PORT:-3306}
+      - DB_DATABASE=${DB_DATABASE:-mikrotikman}
+      - DB_USERNAME=${DB_USERNAME:-root}
+      - DB_PASSWORD=${DB_PASSWORD:-}
+      - SESSION_DRIVER=${SESSION_DRIVER:-file}
+      - CACHE_STORE=${CACHE_STORE:-file}
+      - QUEUE_CONNECTION=${QUEUE_CONNECTION:-database}
     volumes:
-      # Persistent SQLite database file
+      # Persistent SQLite database file (used if DB_CONNECTION=sqlite)
       - ./database:/var/www/html/database
       # Persistent logs and session data
       - ./storage:/var/www/html/storage
@@ -31,3 +35,11 @@ services:
       timeout: 10s
       retries: 3
       start_period: 20s
+    # Uncomment networks section below if sharing network with existing MySQL container:
+    # networks:
+    #   - shared-mysql-net
+
+# networks:
+#   shared-mysql-net:
+#     external: true
+#     name: existing_docker_network_name

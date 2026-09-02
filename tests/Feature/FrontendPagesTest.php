@@ -51,6 +51,7 @@ class FrontendPagesTest extends TestCase
             '/users/historical',
             '/users/budi-santoso',
             '/devices',
+            '/traffic-analytics',
             '/hotspot/profiles',
             '/hotspot/users',
             '/hotspot/generate',

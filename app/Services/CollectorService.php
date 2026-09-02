@@ -221,6 +221,13 @@ class CollectorService
                 Log::warning("Expired users sweep error: " . $e->getMessage());
             }
 
+            // Record hourly traffic category snapshot if available
+            try {
+                (new TrafficAnalyticsService($this->routerOs))->recordHourlySnapshot();
+            } catch (\Throwable $e) {
+                // Non-blocking
+            }
+
             // Update Router status
             RouterSetting::where('is_active', true)->update([
                 'last_successful_poll_at' => $now,

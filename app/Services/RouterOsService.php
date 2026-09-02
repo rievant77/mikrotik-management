@@ -955,6 +955,303 @@ class RouterOsService
             return false;
         }
     }
+
+    /**
+     * Get live traffic category stats from MikroTik Mangle Rules.
+     */
+    public function getTrafficCategoryMangles(): array
+    {
+        $client = $this->getClient();
+        if (!$client) {
+            return [];
+        }
+
+        try {
+            $rules = $client->query(new Query('/ip/firewall/mangle/print'))->read();
+            $results = [];
+
+            foreach ($rules as $r) {
+                $comment = $r['comment'] ?? '';
+                if (str_starts_with($comment, '[AGY-TRAFFIC-')) {
+                    $results[] = [
+                        'id' => $r['.id'] ?? '',
+                        'comment' => $comment,
+                        'bytes' => (int) ($r['bytes'] ?? 0),
+                        'packets' => (int) ($r['packets'] ?? 0),
+                        'disabled' => ($r['disabled'] ?? 'false') === 'true',
+                    ];
+                }
+            }
+
+            return $results;
+        } catch (Exception $e) {
+            Log::warning("RouterOS getTrafficCategoryMangles error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Deploy non-intrusive traffic monitoring mangle rules to MikroTik.
+     */
+    public function deployTrafficMangleRules(): array
+    {
+        $client = $this->getClient();
+        if (!$client) {
+            return [
+                'success' => false,
+                'message' => 'Gagal terhubung ke router MikroTik.',
+                'deployed_count' => 0,
+            ];
+        }
+
+        $predefinedRules = [
+            // Video Streaming
+            [
+                'comment' => '[AGY-TRAFFIC-VIDEO] YouTube & Google Video',
+                'tls-host' => '*googlevideo.com,*youtube.com,*ytimg.com,*youtu.be',
+                'category' => 'video',
+                'platform' => 'YouTube',
+            ],
+            [
+                'comment' => '[AGY-TRAFFIC-VIDEO] TikTok Video',
+                'tls-host' => '*tiktokcdn.com,*tiktokv.com,*byteoversea.com,*musical.ly,*tiktok.com',
+                'category' => 'video',
+                'platform' => 'TikTok',
+            ],
+            [
+                'comment' => '[AGY-TRAFFIC-VIDEO] Netflix',
+                'tls-host' => '*netflix.com,*nflxvideo.net,*nflxext.com,*nflximg.net',
+                'category' => 'video',
+                'platform' => 'Netflix',
+            ],
+            [
+                'comment' => '[AGY-TRAFFIC-VIDEO] Vidio & Local OTT',
+                'tls-host' => '*vidio.com,*rctiplus.com,*visionplus.id,*maxstream.tv',
+                'category' => 'video',
+                'platform' => 'Vidio & OTT',
+            ],
+
+            // Social Media & Messaging
+            [
+                'comment' => '[AGY-TRAFFIC-SOSMED] WhatsApp & Call',
+                'tls-host' => '*whatsapp.net,*whatsapp.com',
+                'category' => 'social_media',
+                'platform' => 'WhatsApp',
+            ],
+            [
+                'comment' => '[AGY-TRAFFIC-SOSMED] Instagram & Facebook',
+                'tls-host' => '*instagram.com,*cdninstagram.com,*fbcdn.net,*facebook.com,*facebook.net',
+                'category' => 'social_media',
+                'platform' => 'Instagram & FB',
+            ],
+            [
+                'comment' => '[AGY-TRAFFIC-SOSMED] Telegram',
+                'tls-host' => '*telegram.org,*t.me,*telegram.me',
+                'category' => 'social_media',
+                'platform' => 'Telegram',
+            ],
+            [
+                'comment' => '[AGY-TRAFFIC-SOSMED] Twitter / X & Threads',
+                'tls-host' => '*twimg.com,*twitter.com,*x.com,*threads.net',
+                'category' => 'social_media',
+                'platform' => 'Twitter / X',
+            ],
+
+            // Online Games
+            [
+                'comment' => '[AGY-TRAFFIC-GAMING] Mobile Legends: Bang Bang',
+                'tls-host' => '*mobilelegends.com,*moonton.com,*youngjoygame.com',
+                'category' => 'gaming',
+                'platform' => 'Mobile Legends',
+            ],
+            [
+                'comment' => '[AGY-TRAFFIC-GAMING] Free Fire & Garena',
+                'tls-host' => '*freefiremobile.com,*garena.com,*garenanow.com',
+                'category' => 'gaming',
+                'platform' => 'Free Fire',
+            ],
+            [
+                'comment' => '[AGY-TRAFFIC-GAMING] PUBG Mobile',
+                'tls-host' => '*pubgmobile.com,*proximabeta.com',
+                'category' => 'gaming',
+                'platform' => 'PUBG Mobile',
+            ],
+            [
+                'comment' => '[AGY-TRAFFIC-GAMING] Roblox & Steam',
+                'tls-host' => '*roblox.com,*rbxcdn.com,*steampowered.com,*steamcommunity.com',
+                'category' => 'gaming',
+                'platform' => 'Roblox & Steam',
+            ],
+
+            // Cloud & Work / Meet
+            [
+                'comment' => '[AGY-TRAFFIC-CLOUD] Zoom & Google Meet',
+                'tls-host' => '*zoom.us,*zoom.com,*meet.google.com',
+                'category' => 'cloud_work',
+                'platform' => 'Zoom & Meet',
+            ],
+            [
+                'comment' => '[AGY-TRAFFIC-CLOUD] Google Drive & Cloud Storage',
+                'tls-host' => '*drive.google.com,*onedrive.live.com,*dropbox.com',
+                'category' => 'cloud_work',
+                'platform' => 'Cloud Drive',
+            ],
+
+            // Web Browsing & E-Commerce
+            [
+                'comment' => '[AGY-TRAFFIC-BROWSING] Shopee & Tokopedia',
+                'tls-host' => '*shopee.co.id,*shopeemobile.com,*tokopedia.com,*tokopedia.net',
+                'category' => 'browsing',
+                'platform' => 'E-Commerce',
+            ],
+            [
+                'comment' => '[AGY-TRAFFIC-BROWSING] General Web Browsing',
+                'category' => 'browsing',
+                'platform' => 'Web Browsing',
+            ],
+        ];
+
+        try {
+            // Get existing rules to avoid duplicate insertion
+            $existing = $client->query(new Query('/ip/firewall/mangle/print'))->read();
+            $existingComments = array_column($existing, 'comment');
+
+            $deployed = 0;
+
+            foreach ($predefinedRules as $rule) {
+                if (!in_array($rule['comment'], $existingComments)) {
+                    $q = (new Query('/ip/firewall/mangle/add'))
+                        ->equal('chain', 'forward')
+                        ->equal('action', 'passthrough')
+                        ->equal('passthrough', 'yes')
+                        ->equal('comment', $rule['comment']);
+
+                    if (!empty($rule['tls-host'])) {
+                        $q->equal('protocol', 'tcp')
+                          ->equal('tls-host', $rule['tls-host']);
+                    }
+
+                    $client->query($q)->read();
+                    $deployed++;
+                }
+            }
+
+            return [
+                'success' => true,
+                'message' => $deployed > 0 
+                    ? "Berhasil memasang {$deployed} rule filter trafik di MikroTik!" 
+                    : "Seluruh rule filter trafik sudah terpasang di MikroTik.",
+                'deployed_count' => $deployed,
+            ];
+        } catch (Exception $e) {
+            Log::error("RouterOS deployTrafficMangleRules error: " . $e->getMessage());
+            return [
+                'success' => false,
+                'message' => 'Gagal menerapkan rule: ' . $e->getMessage(),
+                'deployed_count' => 0,
+            ];
+        }
+    }
+
+    /**
+     * Reset traffic category mangle counters in MikroTik.
+     */
+    public function resetTrafficCategoryCounters(): bool
+    {
+        $client = $this->getClient();
+        if (!$client) {
+            return false;
+        }
+
+        try {
+            $rules = $client->query(new Query('/ip/firewall/mangle/print'))->read();
+
+            foreach ($rules as $r) {
+                $comment = $r['comment'] ?? '';
+                if (str_starts_with($comment, '[AGY-TRAFFIC-') && isset($r['.id'])) {
+                    $resetQ = (new Query('/ip/firewall/mangle/reset-counters'))->equal('.id', $r['.id']);
+                    $client->query($resetQ)->read();
+                }
+            }
+
+            return true;
+        } catch (Exception $e) {
+            Log::error("RouterOS resetTrafficCategoryCounters error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Fetch active firewall connections for a specific source IP.
+     */
+    public function getDeviceActiveConnections(string $ip): array
+    {
+        $client = $this->getClient();
+        if (!$client || empty($ip) || $ip === '-') {
+            return [];
+        }
+
+        try {
+            // Read active connections from MikroTik without incompatible regex operators
+            $query = new Query('/ip/firewall/connection/print');
+            $connections = $client->query($query)->read();
+            $results = [];
+
+            foreach ($connections as $c) {
+                $src = $c['src-address'] ?? '';
+                // Match source IP
+                if (str_starts_with($src, $ip . ':') || str_starts_with($src, $ip . ' ') || $src === $ip) {
+                    $results[] = [
+                        'id' => $c['.id'] ?? '',
+                        'protocol' => strtolower($c['protocol'] ?? 'tcp'),
+                        'src_address' => $src,
+                        'dst_address' => $c['dst-address'] ?? '',
+                        'reply_src_address' => $c['reply-src-address'] ?? '',
+                        'reply_dst_address' => $c['reply-dst-address'] ?? '',
+                        'tcp_state' => strtolower($c['tcp-state'] ?? ($c['protocol'] ?? 'active')),
+                        'orig_bytes' => (int) ($c['orig-bytes'] ?? 0),
+                        'repl_bytes' => (int) ($c['repl-bytes'] ?? 0),
+                        'timeout' => $c['timeout'] ?? '',
+                    ];
+                }
+            }
+
+            return $results;
+        } catch (Exception $e) {
+            Log::warning("RouterOS getDeviceActiveConnections error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Fetch DNS cache map from MikroTik (IP => Domain Name lookup).
+     */
+    public function getDnsCacheMap(): array
+    {
+        $client = $this->getClient();
+        if (!$client) {
+            return [];
+        }
+
+        try {
+            $cache = $client->query(new Query('/ip/dns/cache/print'))->read();
+            $map = [];
+
+            foreach ($cache as $entry) {
+                $domain = $entry['name'] ?? null;
+                $data = $entry['data'] ?? ($entry['address'] ?? null);
+
+                if ($domain && $data) {
+                    $map[$data] = $domain;
+                }
+            }
+
+            return $map;
+        } catch (Exception $e) {
+            Log::warning("RouterOS getDnsCacheMap error: " . $e->getMessage());
+            return [];
+        }
+    }
 }
 
 

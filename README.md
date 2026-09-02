@@ -255,6 +255,7 @@ php artisan schedule:list
 | **Dashboard** | `/` | Pantau grafik real-time traffic download/upload, status router CPU & memori, dan 5 pemakai bandwidth teratas. |
 | **Online Users** | `/users` | Lihat daftar user yang sedang aktif terhubung, IP, MAC address, kuota terpakai, dan tombol *Kick / Putus Koneksi*. |
 | **Live Devices** | `/devices` | Pantau seluruh perangkat di jaringan (DHCP Lease, IP Binding, MAC address, hostname). |
+| **Analisis Trafik** | `/traffic-analytics` | Klasifikasi pemakaian bandwidth user (Streaming Video, Sosmed & Chat, Game Online, Cloud/Browsing), Donut Chart & Hourly Trend. |
 | **Generate Voucher** | `/hotspot/generate` | Buat voucher massal berdasarkan profil paket yang dipilih, panjang kode, awalan (prefix), dan opsi cetak langsung. |
 | **Daftar Voucher** | `/vouchers` | Kelola stok voucher, filter berdasarkan status (*unused*, *active*, *expired*), batch ID, dan cetak ulang thermal. |
 | **Profil Paket Hotspot** | `/hotspot/profiles` | Atur nama paket, masa aktif (*validity*), batas kecepatan (*rate limit*), batas kuota FUP, harga jual, dan harga modal. |

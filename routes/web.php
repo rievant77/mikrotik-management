@@ -11,6 +11,7 @@ use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\ProfileSettingController;
 use App\Http\Controllers\RouterSettingController;
+use App\Http\Controllers\TrafficAnalyticsController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VoucherController;
 use Illuminate\Support\Facades\Route;
@@ -50,6 +51,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/api/devices/action/ip-binding', [DeviceController::class, 'actionSetIpBinding'])->name('devices.action.ip-binding');
     Route::post('/api/devices/action/kick', [DeviceController::class, 'actionKick'])->name('devices.action.kick');
     Route::post('/api/devices/action/comment', [DeviceController::class, 'actionSetComment'])->name('devices.action.comment');
+    Route::get('/api/devices/{mac}/web-activity', [DeviceController::class, 'deviceWebActivity'])->name('devices.web-activity');
+
+    // Traffic & Application Analytics
+    Route::get('/traffic-analytics', [TrafficAnalyticsController::class, 'index'])->name('traffic.index');
+    Route::get('/api/traffic-analytics/live', [TrafficAnalyticsController::class, 'liveData'])->name('traffic.live');
+    Route::post('/api/traffic-analytics/deploy-rules', [TrafficAnalyticsController::class, 'deployRules'])->name('traffic.deploy');
+    Route::post('/api/traffic-analytics/reset-counters', [TrafficAnalyticsController::class, 'resetCounters'])->name('traffic.reset-counters');
 
     // Hotspot
     Route::prefix('hotspot')->group(function () {

@@ -167,6 +167,13 @@ class GlobalSearchController extends Controller
                 'keywords' => 'perangkat ip mac binding bypass dhcp lease',
             ],
             [
+                'title' => 'Analisis Trafik & Konten Aplikasi',
+                'description' => 'Klasifikasi pemakaian bandwidth user (Video, Sosmed, Gaming, Cloud, Browsing)',
+                'url' => route('traffic.index'),
+                'icon' => 'traffic',
+                'keywords' => 'traffic analisis konten video youtube tiktok sosmed game mlbb browsing',
+            ],
+            [
                 'title' => 'Daftar Voucher & Stok',
                 'description' => 'Kelola voucher hotspot, filter batch, dan cetak',
                 'url' => route('vouchers.index'),

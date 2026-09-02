@@ -358,4 +358,20 @@ class DeviceController extends Controller
             'message' => $success ? 'Nama / Catatan perangkat berhasil disimpan.' : 'Gagal menyimpan catatan perangkat.',
         ]);
     }
+
+    /**
+     * Get live and historical web activity for a specific device.
+     */
+    public function deviceWebActivity(Request $request, string $mac, \App\Services\WebHistoryService $webHistoryService): \Illuminate\Http\JsonResponse
+    {
+        $ip = $request->input('ip');
+        $username = $request->input('username');
+
+        $data = $webHistoryService->getDeviceWebActivity($mac, $ip, $username);
+
+        return response()->json([
+            'success' => true,
+            'data' => $data,
+        ]);
+    }
 }

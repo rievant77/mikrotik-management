@@ -508,6 +508,19 @@
                         </button>
                         <button 
                             type="button"
+                            @click="activeModalTab = 'web'; loadWebActivity()" 
+                            :class="activeModalTab === 'web' ? 'border-zinc-900 text-zinc-900 dark:border-zinc-100 dark:text-zinc-100 font-bold' : 'border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200'"
+                            class="py-2 px-3.5 border-b-2 transition-colors flex items-center gap-1.5"
+                        >
+                            <span>🌐</span> Aktivitas Web
+                            <span 
+                                x-show="webActivityData && webActivityData.live_count > 0"
+                                class="px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 font-semibold"
+                                x-text="webActivityData ? webActivityData.live_count : ''"
+                            ></span>
+                        </button>
+                        <button 
+                            type="button"
                             @click="activeModalTab = 'actions'" 
                             :class="activeModalTab === 'actions' ? 'border-zinc-900 text-zinc-900 dark:border-zinc-100 dark:text-zinc-100 font-bold' : 'border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200'"
                             class="py-2 px-3.5 border-b-2 transition-colors flex items-center gap-1.5"
@@ -723,13 +736,110 @@
                                     class="flex-1 px-3 py-1.5 text-xs rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-400"
                                 >
                                 <button 
-                                    type="button"
-                                    @click="doSaveComment()"
+                                    type="button" 
+                                    @click="doSaveComment()" 
                                     :disabled="actionLoading || !deviceAliasInput"
                                     class="px-3.5 py-1.5 rounded-lg font-semibold text-xs bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 transition-colors shrink-0"
                                 >
                                     Simpan
                                 </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 4: Aktivitas & Riwayat Web -->
+                    <div x-show="activeModalTab === 'web'" class="space-y-4 text-xs">
+                        <!-- Loading State -->
+                        <div x-show="loadingWebActivity" class="py-8 text-center text-zinc-400">
+                            <span class="inline-block animate-spin text-lg">⏳</span>
+                            <p class="mt-2 text-xs">Mengambil data koneksi & riwayat web dari MikroTik...</p>
+                        </div>
+
+                        <div x-show="!loadingWebActivity && webActivityData" class="space-y-4">
+                            <!-- Section 1: Live Active Web Connections -->
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                        <span class="font-bold text-zinc-900 dark:text-zinc-100">Koneksi & Web Sedang Terhubung:</span>
+                                    </div>
+                                    <button 
+                                        type="button" 
+                                        @click="loadWebActivity()" 
+                                        class="text-[11px] font-semibold text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1"
+                                    >
+                                        <span>🔄</span> Segarkan Live
+                                    </button>
+                                </div>
+
+                                <div class="max-h-48 overflow-y-auto space-y-1.5 pr-0.5 no-scrollbar">
+                                    <template x-for="(conn, idx) in (webActivityData?.live_connections || [])" :key="idx">
+                                        <div class="p-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200 dark:border-zinc-700/80 flex items-center justify-between gap-3 text-xs">
+                                            <div class="flex items-center gap-2.5 min-w-0">
+                                                <div class="w-7 h-7 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-sm shrink-0">
+                                                    <span x-text="conn.icon"></span>
+                                                </div>
+                                                <div class="min-w-0">
+                                                    <div class="flex items-center gap-1.5">
+                                                        <span class="font-bold text-zinc-900 dark:text-zinc-100 truncate" x-text="conn.domain"></span>
+                                                        <span class="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300" x-text="conn.category_label"></span>
+                                                    </div>
+                                                    <div class="text-[10px] text-zinc-400 font-mono" x-text="conn.dst_ip + ':' + conn.port + ' (' + conn.protocol + ' ' + conn.state + ')'"></div>
+                                                </div>
+                                            </div>
+                                            <div class="text-right shrink-0">
+                                                <div class="font-mono font-bold text-zinc-800 dark:text-zinc-200 text-xs" x-text="conn.total_bytes_formatted"></div>
+                                                <div class="text-[10px] text-zinc-400" x-text="'↓' + conn.bytes_out_formatted + ' ↑' + conn.bytes_in_formatted"></div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                    <template x-if="!webActivityData?.live_connections || webActivityData.live_connections.length === 0">
+                                        <div class="py-4 text-center text-zinc-400 bg-zinc-50 dark:bg-zinc-800/20 rounded-lg border border-dashed border-zinc-200 dark:border-zinc-700 text-xs">
+                                            Tidak ada koneksi web aktif yang terdeteksi saat ini.
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+
+                            <!-- Section 2: Visited Web History -->
+                            <div class="space-y-2 pt-2 border-t border-zinc-200 dark:border-zinc-800">
+                                <div class="flex items-center justify-between gap-2">
+                                    <span class="font-bold text-zinc-900 dark:text-zinc-100">📜 Riwayat Website yang Pernah Diakses:</span>
+                                    <input 
+                                        type="text" 
+                                        x-model="webSearch" 
+                                        placeholder="Cari domain..." 
+                                        class="px-2.5 py-1 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 focus:outline-none w-36 sm:w-44"
+                                    >
+                                </div>
+
+                                <div class="max-h-56 overflow-y-auto space-y-1.5 pr-0.5 no-scrollbar">
+                                    <template x-for="item in filteredWebHistory" :key="item.id">
+                                        <div class="p-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200 dark:border-zinc-700/80 flex items-center justify-between gap-3 text-xs">
+                                            <div class="flex items-center gap-2.5 min-w-0">
+                                                <div class="w-7 h-7 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-sm shrink-0">
+                                                    <span x-text="item.icon"></span>
+                                                </div>
+                                                <div class="min-w-0">
+                                                    <div class="flex items-center gap-1.5">
+                                                        <span class="font-bold text-zinc-900 dark:text-zinc-100 truncate" x-text="item.domain"></span>
+                                                        <span class="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300" x-text="item.category_label"></span>
+                                                    </div>
+                                                    <div class="text-[10px] text-zinc-400 mt-0.5" x-text="'Terakhir: ' + item.last_seen_formatted + ' (' + item.last_seen_datetime + ')'"></div>
+                                                </div>
+                                            </div>
+                                            <div class="text-right shrink-0">
+                                                <div class="font-semibold text-zinc-800 dark:text-zinc-200 text-xs" x-text="item.hit_count + 'x diakses'"></div>
+                                                <div class="text-[10px] text-zinc-400 font-mono" x-text="item.total_bytes_formatted"></div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                    <template x-if="filteredWebHistory.length === 0">
+                                        <div class="py-6 text-center text-zinc-400 bg-zinc-50 dark:bg-zinc-800/20 rounded-lg border border-dashed border-zinc-200 dark:border-zinc-700 text-xs">
+                                            Belum ada riwayat web yang tersimpan untuk perangkat ini.
+                                        </div>
+                                    </template>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -770,6 +880,9 @@
                 actionLoading: false,
                 isLiveActive: true,
                 pollTimer: null,
+                webActivityData: null,
+                loadingWebActivity: false,
+                webSearch: '',
                 devices: @json($devices),
                 stats: @json($stats),
                 init() {
@@ -870,6 +983,49 @@
                             this.loadingDetail = false;
                         });
                     }
+                    // Reset and preload web activity data
+                    this.webActivityData = null;
+                    this.webSearch = '';
+                    this.loadWebActivity();
+                },
+                get filteredWebHistory() {
+                    if (!this.webActivityData || !Array.isArray(this.webActivityData.history)) {
+                        return [];
+                    }
+                    if (!this.webSearch) {
+                        return this.webActivityData.history;
+                    }
+                    const q = this.webSearch.toLowerCase();
+                    return this.webActivityData.history.filter(h => {
+                        return (h.domain && h.domain.toLowerCase().includes(q)) ||
+                               (h.site_name && h.site_name.toLowerCase().includes(q)) ||
+                               (h.category_label && h.category_label.toLowerCase().includes(q));
+                    });
+                },
+                loadWebActivity() {
+                    if (!this.selectedDevice) return;
+                    this.loadingWebActivity = true;
+
+                    const mac = encodeURIComponent(this.selectedDevice.mac_address || '');
+                    const ip = encodeURIComponent(this.selectedDevice.ip_address || '');
+                    const user = encodeURIComponent(this.selectedDevice.username || '');
+
+                    fetch(`/api/devices/${mac}/web-activity?ip=${ip}&username=${user}&_t=` + Date.now(), {
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        this.loadingWebActivity = false;
+                        if (data && data.success) {
+                            this.webActivityData = data.data;
+                        }
+                    })
+                    .catch(() => {
+                        this.loadingWebActivity = false;
+                    });
                 },
                 doMakeStatic() {
                     if (!this.selectedDevice || this.actionLoading) return;

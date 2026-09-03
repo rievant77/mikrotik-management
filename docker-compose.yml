@@ -39,7 +39,7 @@ services:
     networks:
       - shared-mysql-net
 
- networks:
-   shared-mysql-net:
-     external: true
-     name: existing_docker_network_name
+networks:
+  shared-mysql-net:
+    external: true
+    name: existing_docker_network_name

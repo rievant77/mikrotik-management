@@ -34,24 +34,36 @@ FROM php:8.2-fpm-alpine
 
 LABEL maintainer="MikroTik Hotspot Manager"
 
-# Install System Packages, Nginx, Supervisor, SQLite & Build Dependencies
+# Install System Packages, Nginx, Supervisor, SQLite & Runtime Libraries
 RUN apk add --no-cache \
     nginx \
     supervisor \
     sqlite \
-    sqlite-dev \
     curl \
-    libpng-dev \
-    libjpeg-turbo-dev \
-    freetype-dev \
-    libzip-dev \
-    oniguruma-dev \
-    icu-dev \
     tzdata \
-    ca-certificates
+    ca-certificates \
+    freetype \
+    libjpeg-turbo \
+    libpng \
+    libzip \
+    icu-libs \
+    oniguruma \
+    sqlite-libs
 
-# Install & Configure PHP Extensions
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+# Install Build Dependencies & Compile PHP Extensions
+RUN apk add --no-cache --virtual .build-deps \
+    $PHPIZE_DEPS \
+    linux-headers \
+    freetype-dev \
+    libjpeg-turbo-dev \
+    libpng-dev \
+    libzip-dev \
+    icu-dev \
+    oniguruma-dev \
+    sqlite-dev \
+    zlib-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-configure intl \
     && docker-php-ext-install -j$(nproc) \
         pdo_mysql \
         pdo_sqlite \
@@ -62,7 +74,8 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
         bcmath \
         opcache \
         sockets \
-        pcntl
+        pcntl \
+    && apk del .build-deps
 
 # Set working directory
 WORKDIR /var/www/html

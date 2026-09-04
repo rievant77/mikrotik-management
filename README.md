@@ -115,7 +115,7 @@ docker compose up -d --build
 ### 2. Akses Aplikasi
 Buka browser di:
 ```text
-http://localhost:8000
+http://localhost:8085
 ```
 
 ### 3. Keunggulan Setup Docker Ini:

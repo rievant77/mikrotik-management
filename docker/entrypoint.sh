@@ -1,36 +1,45 @@
 #!/bin/sh
-set -e
 
 echo "==> Starting MikroTik Management Container..."
 
-# 1. Ensure .env exists
+# 1. Ensure system runtime & log directories exist (Critical for Alpine Nginx & Supervisord)
+mkdir -p /run/nginx /var/log/nginx /var/lib/nginx/tmp /var/log/supervisor
+chown -R www-data:www-data /run/nginx /var/log/nginx /var/lib/nginx /var/log/supervisor 2>/dev/null || true
+chmod -R 775 /run/nginx /var/log/nginx /var/lib/nginx /var/log/supervisor 2>/dev/null || true
+
+# 2. Ensure .env exists
 if [ ! -f /var/www/html/.env ]; then
     echo "==> Creating .env from .env.example..."
     cp /var/www/html/.env.example /var/www/html/.env
 fi
 
-# 2. Ensure SQLite database directory & file exist
+# 3. Ensure SQLite database directory & file exist
 mkdir -p /var/www/html/database
 if [ ! -f /var/www/html/database/database.sqlite ]; then
     echo "==> Initializing SQLite database file..."
     touch /var/www/html/database/database.sqlite
 fi
 
-# 3. Ensure upload & cache directories exist
+# 4. Ensure upload, cache, session & log directories exist
 mkdir -p /var/www/html/public/uploads/avatars
 mkdir -p /var/www/html/public/uploads/branding
-mkdir -p /var/www/html/storage/framework/cache
+mkdir -p /var/www/html/storage/framework/cache/data
 mkdir -p /var/www/html/storage/framework/sessions
 mkdir -p /var/www/html/storage/framework/views
 mkdir -p /var/www/html/storage/logs
+mkdir -p /var/www/html/bootstrap/cache
 
-# 4. Generate Application Key if not present
-if ! grep -q "APP_KEY=base64:" /var/www/html/.env; then
+# 5. Fix permissions before artisan commands
+chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database /var/www/html/public/uploads /var/www/html/.env 2>/dev/null || true
+chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database /var/www/html/public/uploads 2>/dev/null || true
+
+# 6. Generate Application Key if not present
+if [ -z "$APP_KEY" ] && ! grep -q "APP_KEY=base64:" /var/www/html/.env 2>/dev/null; then
     echo "==> Generating Application Key..."
-    php /var/www/html/artisan key:generate --force
+    php /var/www/html/artisan key:generate --force || true
 fi
 
-# 5. Run Database Migrations
+# 7. Run Database Migrations & Seeds
 if [ "$DB_CONNECTION" = "mysql" ]; then
     echo "==> Checking MySQL connection..."
     max_tries=30
@@ -43,21 +52,23 @@ if [ "$DB_CONNECTION" = "mysql" ]; then
 fi
 
 echo "==> Running database migrations..."
-php /var/www/html/artisan migrate --force
+php /var/www/html/artisan migrate --force || true
 
-# 6. Ensure Storage Symlink
-php /var/www/html/artisan storage:link || true
+echo "==> Seeding initial administrator account if needed..."
+php /var/www/html/artisan db:seed --force 2>/dev/null || true
 
-# 7. Optimize Cache in Production
+# 8. Ensure Storage Symlink
+php /var/www/html/artisan storage:link 2>/dev/null || true
+
+# 9. Optimize Cache in Production
 if [ "$APP_ENV" = "production" ]; then
     echo "==> Optimizing configuration & route cache..."
-    php /var/www/html/artisan config:cache || true
-    php /var/www/html/artisan route:cache || true
-    php /var/www/html/artisan view:cache || true
+    php /var/www/html/artisan config:cache 2>/dev/null || true
+    php /var/www/html/artisan route:cache 2>/dev/null || true
+    php /var/www/html/artisan view:cache 2>/dev/null || true
 fi
 
-# 8. Set File Permissions
-echo "==> Adjusting permissions for www-data..."
+# 10. Ensure Final Ownership & Permissions
 chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database /var/www/html/public/uploads
 chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database /var/www/html/public/uploads
 

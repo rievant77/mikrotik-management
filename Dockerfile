@@ -96,10 +96,17 @@ RUN chmod +x /docker/entrypoint.sh
 
 # Create necessary runtime directories and set ownership
 RUN mkdir -p /var/www/html/database \
+    /var/www/html/storage/framework/cache/data \
+    /var/www/html/storage/framework/sessions \
+    /var/www/html/storage/framework/views \
     /var/www/html/storage/logs \
     /var/www/html/public/uploads \
     /var/log/supervisor \
-    && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database /var/www/html/public/uploads
+    /run/nginx \
+    /var/log/nginx \
+    /var/lib/nginx/tmp \
+    && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database /var/www/html/public/uploads /run/nginx /var/log/nginx /var/lib/nginx /var/log/supervisor \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database /var/www/html/public/uploads /run/nginx /var/log/nginx /var/lib/nginx /var/log/supervisor
 
 # Expose HTTP port
 EXPOSE 80

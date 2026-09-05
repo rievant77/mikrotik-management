@@ -2,34 +2,57 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile
-    image: mikrotik-management:latest
-    container_name: mikrotik_app
-    restart: unless-stopped
-    ports:
-      - "${APP_PORT:-9000}:80"
+      dockerfile: docker/php/Dockerfile
     environment:
-      - APP_NAME=${APP_NAME:-MikroTik Manager}
-      - APP_ENV=${APP_ENV:-production}
-      - APP_DEBUG=${APP_DEBUG:-false}
-      - APP_URL=${APP_URL:-http://localhost:9000}
-      - DB_CONNECTION=${DB_CONNECTION:-sqlite}
-      - DB_DATABASE=${DB_DATABASE:-/var/www/html/database/database.sqlite}
-      - SESSION_DRIVER=${SESSION_DRIVER:-file}
-      - CACHE_STORE=${CACHE_STORE:-file}
-      - QUEUE_CONNECTION=${QUEUE_CONNECTION:-database}
+      APP_ENV: production
+      APP_DEBUG: "false"
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: sari-pratama-mandiri
+      DB_USERNAME: rievant77
+      DB_PASSWORD: "@Terbuka32100"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - laravel-network
+
+  nginx:
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile
+    ports:
+      - "9000:80"
+    depends_on:
+      - app
+    restart: unless-stopped
+    networks:
+      - laravel-network
+
+  mysql:
+    image: mysql:8.3
+    environment:
+      MYSQL_DATABASE: sari-pratama-mandiri
+      MYSQL_USER: rievant77
+      MYSQL_PASSWORD: "@Terbuka32100"
+      MYSQL_ROOT_PASSWORD: "@Terbuka32100"
     volumes:
-      # Persistent SQLite database file (used if DB_CONNECTION=sqlite)
-      - ./database:/var/www/html/database
-      # Persistent logs and session data
-      - ./storage:/var/www/html/storage
-      # Persistent uploaded avatars & branding logos
-      - ./public/uploads:/var/www/html/public/uploads
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "curl -fL http://localhost/login || curl -fL http://localhost/ || exit 1"]
-      interval: 20s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p@Terbuka32100"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - laravel-network
 
+volumes:
+  mysql_data:
 
+networks:
+  laravel-network:
+    driver: bridge

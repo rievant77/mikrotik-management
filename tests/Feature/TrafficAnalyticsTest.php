@@ -45,12 +45,28 @@ class TrafficAnalyticsTest extends TestCase
                 'is_rules_installed',
                 'total_traffic_bytes',
                 'formatted_total_traffic',
-                'categories',
+                'categories' => [
+                    'video',
+                    'social_media',
+                    'gaming',
+                    'browsing',
+                ],
                 'platforms',
-                'donut_chart',
-                'hourly_chart',
+                'donut_chart' => [
+                    'labels',
+                    'series',
+                    'colors',
+                ],
+                'hourly_chart' => [
+                    'categories',
+                    'series',
+                ],
             ],
         ]);
+
+        $data = $res->json('data');
+        $this->assertCount(4, $data['hourly_chart']['series']);
+        $this->assertCount(4, $data['donut_chart']['labels']);
     }
 
     public function test_traffic_deploy_rules_api(): void

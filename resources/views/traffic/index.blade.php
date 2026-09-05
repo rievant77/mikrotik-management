@@ -118,7 +118,7 @@
                     <div class="text-2xl font-bold text-zinc-900 dark:text-zinc-100" x-text="analytics.categories.browsing.formatted_bytes || '0 B'"></div>
                     <div class="flex items-center justify-between mt-1">
                         <span class="text-xs font-semibold text-amber-600 dark:text-amber-400" x-text="(analytics.categories.browsing.percentage || 0) + '% dari total'"></span>
-                        <span class="text-[11px] text-zinc-400">Google, Zoom, Web</span>
+                        <span class="text-[11px] text-zinc-400">Google, Zoom, Drive, Web</span>
                     </div>
                 </div>
             </div>
@@ -273,11 +273,73 @@
                 isResetting: false,
                 donutChartInstance: null,
                 hourlyChartInstance: null,
+                pollTimer: null,
+                currentPeriod: '{{ $period }}',
 
                 init() {
                     this.$nextTick(() => {
                         this.renderCharts();
                     });
+
+                    // Real-time polling every 5 seconds
+                    this.pollTimer = setInterval(() => {
+                        this.fetchLiveData();
+                    }, 5000);
+                },
+
+                destroy() {
+                    if (this.pollTimer) {
+                        clearInterval(this.pollTimer);
+                        this.pollTimer = null;
+                    }
+                },
+
+                fetchLiveData() {
+                    fetch(`{{ route('traffic.live') }}?period=${this.currentPeriod}`)
+                        .then(res => res.json())
+                        .then(res => {
+                            if (res.success && res.data) {
+                                this.analytics = res.data;
+                                this.updateCharts();
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Error fetching live traffic data:', err);
+                        });
+                },
+
+                updateCharts() {
+                    if (this.donutChartInstance && this.analytics.donut_chart) {
+                        const series = this.analytics.donut_chart.series.length > 0 ? this.analytics.donut_chart.series : [45, 25, 15, 15];
+                        const labels = this.analytics.donut_chart.labels.length > 0 ? this.analytics.donut_chart.labels : ['Video', 'Sosmed', 'Gaming', 'Web/Cloud'];
+                        const colors = this.analytics.donut_chart.colors.length > 0 ? this.analytics.donut_chart.colors : ['#f43f5e', '#3b82f6', '#10b981', '#f59e0b'];
+
+                        this.donutChartInstance.updateOptions({
+                            labels: labels,
+                            colors: colors,
+                            plotOptions: {
+                                pie: {
+                                    donut: {
+                                        labels: {
+                                            total: {
+                                                formatter: () => this.analytics.formatted_total_traffic || '0 B',
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }, false, true);
+                        this.donutChartInstance.updateSeries(series);
+                    }
+
+                    if (this.hourlyChartInstance && this.analytics.hourly_chart) {
+                        this.hourlyChartInstance.updateOptions({
+                            xaxis: {
+                                categories: this.analytics.hourly_chart.categories,
+                            }
+                        }, false, true);
+                        this.hourlyChartInstance.updateSeries(this.analytics.hourly_chart.series);
+                    }
                 },
 
                 renderCharts() {
@@ -288,8 +350,8 @@
 
                         const isDark = document.documentElement.classList.contains('dark');
                         const options = {
-                            series: this.analytics.donut_chart.series.length > 0 ? this.analytics.donut_chart.series : [50, 25, 15, 10],
-                            labels: this.analytics.donut_chart.labels.length > 0 ? this.analytics.donut_chart.labels : ['Video', 'Sosmed', 'Gaming', 'Web'],
+                            series: this.analytics.donut_chart.series.length > 0 ? this.analytics.donut_chart.series : [45, 25, 15, 15],
+                            labels: this.analytics.donut_chart.labels.length > 0 ? this.analytics.donut_chart.labels : ['Video', 'Sosmed', 'Gaming', 'Web/Cloud'],
                             colors: this.analytics.donut_chart.colors.length > 0 ? this.analytics.donut_chart.colors : ['#f43f5e', '#3b82f6', '#10b981', '#f59e0b'],
                             chart: {
                                 type: 'donut',

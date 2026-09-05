@@ -991,7 +991,7 @@ class RouterOsService
     }
 
     /**
-     * Deploy non-intrusive traffic monitoring mangle rules to MikroTik.
+     * Deploy non-intrusive traffic monitoring mangle rules to MikroTik using Connection Marking, QUIC UDP 443 & Address-Lists.
      */
     public function deployTrafficMangleRules(): array
     {
@@ -1004,143 +1004,309 @@ class RouterOsService
             ];
         }
 
-        $predefinedRules = [
-            // Video Streaming
+        $definitions = [
+            // 1. Video Streaming
             [
+                'mark' => 'agy_cm_youtube',
                 'comment' => '[AGY-TRAFFIC-VIDEO] YouTube & Google Video',
-                'tls-host' => '*googlevideo.com,*youtube.com,*ytimg.com,*youtu.be',
                 'category' => 'video',
-                'platform' => 'YouTube',
+                'address_list' => 'agy_list_youtube',
+                'fqdn_domains' => ['youtube.com', 'googlevideo.com', 'ytimg.com', 'youtu.be', 'ggpht.com', 'youtubei.googleapis.com'],
+                'tls_host' => '*googlevideo.com,*youtube.com,*ytimg.com,*youtu.be,*ggpht.com,*gvt1.com,*youtubei.googleapis.com',
+                'quic' => true,
             ],
             [
+                'mark' => 'agy_cm_tiktok',
                 'comment' => '[AGY-TRAFFIC-VIDEO] TikTok Video',
-                'tls-host' => '*tiktokcdn.com,*tiktokv.com,*byteoversea.com,*musical.ly,*tiktok.com',
                 'category' => 'video',
-                'platform' => 'TikTok',
+                'address_list' => 'agy_list_tiktok',
+                'fqdn_domains' => ['tiktok.com', 'tiktokcdn.com', 'byteoversea.com', 'ibytedtos.com', 'musical.ly'],
+                'tls_host' => '*tiktokcdn.com,*tiktokv.com,*byteoversea.com,*musical.ly,*tiktok.com,*ibytedtos.com',
+                'quic' => true,
             ],
             [
+                'mark' => 'agy_cm_netflix',
                 'comment' => '[AGY-TRAFFIC-VIDEO] Netflix',
-                'tls-host' => '*netflix.com,*nflxvideo.net,*nflxext.com,*nflximg.net',
                 'category' => 'video',
-                'platform' => 'Netflix',
+                'address_list' => 'agy_list_netflix',
+                'fqdn_domains' => ['netflix.com', 'nflxvideo.net', 'nflxext.com', 'nflximg.net'],
+                'tls_host' => '*netflix.com,*nflxvideo.net,*nflxext.com,*nflximg.net',
             ],
             [
+                'mark' => 'agy_cm_vidio',
                 'comment' => '[AGY-TRAFFIC-VIDEO] Vidio & Local OTT',
-                'tls-host' => '*vidio.com,*rctiplus.com,*visionplus.id,*maxstream.tv',
                 'category' => 'video',
-                'platform' => 'Vidio & OTT',
+                'address_list' => 'agy_list_vidio',
+                'fqdn_domains' => ['vidio.com', 'rctiplus.com', 'visionplus.id', 'maxstream.tv', 'hotstar.com'],
+                'tls_host' => '*vidio.com,*rctiplus.com,*visionplus.id,*maxstream.tv,*hotstar.com',
             ],
 
-            // Social Media & Messaging
+            // 2. Social Media & Messaging
             [
+                'mark' => 'agy_cm_whatsapp',
                 'comment' => '[AGY-TRAFFIC-SOSMED] WhatsApp & Call',
-                'tls-host' => '*whatsapp.net,*whatsapp.com',
                 'category' => 'social_media',
-                'platform' => 'WhatsApp',
+                'address_list' => 'agy_list_whatsapp',
+                'fqdn_domains' => ['whatsapp.com', 'whatsapp.net'],
+                'tls_host' => '*whatsapp.net,*whatsapp.com',
+                'tcp_port' => '5222,5223,5228,4244',
+                'udp_port' => '3478,5349',
             ],
             [
+                'mark' => 'agy_cm_meta',
                 'comment' => '[AGY-TRAFFIC-SOSMED] Instagram & Facebook',
-                'tls-host' => '*instagram.com,*cdninstagram.com,*fbcdn.net,*facebook.com,*facebook.net',
                 'category' => 'social_media',
-                'platform' => 'Instagram & FB',
+                'address_list' => 'agy_list_meta',
+                'fqdn_domains' => ['instagram.com', 'cdninstagram.com', 'facebook.com', 'fbcdn.net'],
+                'tls_host' => '*instagram.com,*cdninstagram.com,*fbcdn.net,*facebook.com,*facebook.net',
+                'quic' => true,
             ],
             [
+                'mark' => 'agy_cm_telegram',
                 'comment' => '[AGY-TRAFFIC-SOSMED] Telegram',
-                'tls-host' => '*telegram.org,*t.me,*telegram.me',
                 'category' => 'social_media',
-                'platform' => 'Telegram',
+                'address_list' => 'agy_list_telegram',
+                'fqdn_domains' => ['telegram.org', 't.me', 'telegram.me'],
+                'tls_host' => '*telegram.org,*t.me,*telegram.me',
+                'tcp_port' => '443,80,5222',
             ],
             [
+                'mark' => 'agy_cm_twitter',
                 'comment' => '[AGY-TRAFFIC-SOSMED] Twitter / X & Threads',
-                'tls-host' => '*twimg.com,*twitter.com,*x.com,*threads.net',
                 'category' => 'social_media',
-                'platform' => 'Twitter / X',
+                'address_list' => 'agy_list_twitter',
+                'fqdn_domains' => ['twitter.com', 'x.com', 'twimg.com', 'threads.net'],
+                'tls_host' => '*twimg.com,*twitter.com,*x.com,*threads.net',
             ],
 
-            // Online Games
+            // 3. Online Games
             [
+                'mark' => 'agy_cm_mlbb',
                 'comment' => '[AGY-TRAFFIC-GAMING] Mobile Legends: Bang Bang',
-                'tls-host' => '*mobilelegends.com,*moonton.com,*youngjoygame.com',
                 'category' => 'gaming',
-                'platform' => 'Mobile Legends',
+                'address_list' => 'agy_list_mlbb',
+                'fqdn_domains' => ['mobilelegends.com', 'moonton.com'],
+                'tls_host' => '*mobilelegends.com,*moonton.com,*youngjoygame.com',
+                'udp_port' => '5000-5200,5500-5700,30000-30200,10003',
+                'tcp_port' => '5000-5200,5500-5700,30000-30200',
             ],
             [
+                'mark' => 'agy_cm_freefire',
                 'comment' => '[AGY-TRAFFIC-GAMING] Free Fire & Garena',
-                'tls-host' => '*freefiremobile.com,*garena.com,*garenanow.com',
                 'category' => 'gaming',
-                'platform' => 'Free Fire',
+                'address_list' => 'agy_list_freefire',
+                'fqdn_domains' => ['freefiremobile.com', 'garena.com'],
+                'tls_host' => '*freefiremobile.com,*garena.com,*garenanow.com',
+                'udp_port' => '10000-10010,7006,39003',
+                'tcp_port' => '10000-10010,7006',
             ],
             [
+                'mark' => 'agy_cm_pubg',
                 'comment' => '[AGY-TRAFFIC-GAMING] PUBG Mobile',
-                'tls-host' => '*pubgmobile.com,*proximabeta.com',
                 'category' => 'gaming',
-                'platform' => 'PUBG Mobile',
+                'address_list' => 'agy_list_pubg',
+                'fqdn_domains' => ['pubgmobile.com', 'proximabeta.com'],
+                'tls_host' => '*pubgmobile.com,*proximabeta.com',
+                'udp_port' => '17500,18081,10012,20000-20002',
+                'tcp_port' => '17500,18081',
             ],
             [
+                'mark' => 'agy_cm_roblox_steam',
                 'comment' => '[AGY-TRAFFIC-GAMING] Roblox & Steam',
-                'tls-host' => '*roblox.com,*rbxcdn.com,*steampowered.com,*steamcommunity.com',
                 'category' => 'gaming',
-                'platform' => 'Roblox & Steam',
+                'address_list' => 'agy_list_roblox_steam',
+                'fqdn_domains' => ['roblox.com', 'steampowered.com', 'steamcommunity.com'],
+                'tls_host' => '*roblox.com,*rbxcdn.com,*steampowered.com,*steamcommunity.com',
+                'udp_port' => '27015-27030,27036-27037',
             ],
 
-            // Cloud & Work / Meet
+            // 4. Cloud & Work / Meet
             [
+                'mark' => 'agy_cm_zoom_meet',
                 'comment' => '[AGY-TRAFFIC-CLOUD] Zoom & Google Meet',
-                'tls-host' => '*zoom.us,*zoom.com,*meet.google.com',
                 'category' => 'cloud_work',
-                'platform' => 'Zoom & Meet',
+                'address_list' => 'agy_list_zoom_meet',
+                'fqdn_domains' => ['zoom.us', 'zoom.com', 'meet.google.com', 'teams.microsoft.com'],
+                'tls_host' => '*zoom.us,*zoom.com,*meet.google.com,*teams.microsoft.com',
+                'udp_port' => '8801,8802,3478-3481',
             ],
             [
+                'mark' => 'agy_cm_cloud_drive',
                 'comment' => '[AGY-TRAFFIC-CLOUD] Google Drive & Cloud Storage',
-                'tls-host' => '*drive.google.com,*onedrive.live.com,*dropbox.com',
                 'category' => 'cloud_work',
-                'platform' => 'Cloud Drive',
+                'address_list' => 'agy_list_drive',
+                'fqdn_domains' => ['drive.google.com', 'onedrive.live.com', 'dropbox.com'],
+                'tls_host' => '*drive.google.com,*onedrive.live.com,*dropbox.com,*icloud.com',
             ],
 
-            // Web Browsing & E-Commerce
+            // 5. Web Browsing & E-Commerce
             [
+                'mark' => 'agy_cm_ecommerce',
                 'comment' => '[AGY-TRAFFIC-BROWSING] Shopee & Tokopedia',
-                'tls-host' => '*shopee.co.id,*shopeemobile.com,*tokopedia.com,*tokopedia.net',
                 'category' => 'browsing',
-                'platform' => 'E-Commerce',
-            ],
-            [
-                'comment' => '[AGY-TRAFFIC-BROWSING] General Web Browsing',
-                'category' => 'browsing',
-                'platform' => 'Web Browsing',
+                'address_list' => 'agy_list_ecommerce',
+                'fqdn_domains' => ['shopee.co.id', 'tokopedia.com', 'lazada.co.id', 'bukalapak.com'],
+                'tls_host' => '*shopee.co.id,*shopeemobile.com,*tokopedia.com,*tokopedia.net,*lazada.co.id,*bukalapak.com',
             ],
         ];
 
         try {
-            // Get existing rules to avoid duplicate insertion
+            // 1. Clean existing AGY mangle rules to ensure clean order & no duplicates
             $existing = $client->query(new Query('/ip/firewall/mangle/print'))->read();
-            $existingComments = array_column($existing, 'comment');
+            foreach ($existing as $ex) {
+                $c = $ex['comment'] ?? '';
+                if ((str_starts_with($c, '[AGY-MARK') || str_starts_with($c, '[AGY-TRAFFIC-') || str_starts_with($c, '[AGY-ADDR')) && isset($ex['.id'])) {
+                    $delQ = (new Query('/ip/firewall/mangle/remove'))->equal('.id', $ex['.id']);
+                    $client->query($delQ)->read();
+                }
+            }
+
+            // 2. Clean and populate FQDN Address-Lists in MikroTik
+            $existingAddressList = $client->query(new Query('/ip/firewall/address-list/print'))->read();
+            foreach ($existingAddressList as $al) {
+                $listName = $al['list'] ?? '';
+                $comment = $al['comment'] ?? '';
+                if ((str_starts_with($listName, 'agy_list_') || str_starts_with($comment, '[AGY-')) && isset($al['.id'])) {
+                    $delAl = (new Query('/ip/firewall/address-list/remove'))->equal('.id', $al['.id']);
+                    $client->query($delAl)->read();
+                }
+            }
 
             $deployed = 0;
 
-            foreach ($predefinedRules as $rule) {
-                if (!in_array($rule['comment'], $existingComments)) {
-                    $q = (new Query('/ip/firewall/mangle/add'))
-                        ->equal('chain', 'forward')
-                        ->equal('action', 'passthrough')
-                        ->equal('passthrough', 'yes')
-                        ->equal('comment', $rule['comment']);
-
-                    if (!empty($rule['tls-host'])) {
-                        $q->equal('protocol', 'tcp')
-                          ->equal('tls-host', $rule['tls-host']);
+            // Seed static FQDN domains into address-lists
+            foreach ($definitions as $item) {
+                if (!empty($item['address_list']) && !empty($item['fqdn_domains'])) {
+                    foreach ($item['fqdn_domains'] as $dom) {
+                        $qAddList = (new Query('/ip/firewall/address-list/add'))
+                            ->equal('list', $item['address_list'])
+                            ->equal('address', $dom)
+                            ->equal('comment', "[AGY-FQDN] {$dom}");
+                        $client->query($qAddList)->read();
+                        $deployed++;
                     }
+                }
+            }
 
-                    $client->query($q)->read();
+            // 3. Add Dynamic Address-List Learning from TLS SNI
+            foreach ($definitions as $item) {
+                if (!empty($item['tls_host']) && !empty($item['address_list'])) {
+                    $qLearn = (new Query('/ip/firewall/mangle/add'))
+                        ->equal('chain', 'forward')
+                        ->equal('protocol', 'tcp')
+                        ->equal('tls-host', $item['tls_host'])
+                        ->equal('action', 'add-dst-to-address-list')
+                        ->equal('address-list', $item['address_list'])
+                        ->equal('address-list-timeout', '1d')
+                        ->equal('passthrough', 'yes')
+                        ->equal('comment', "[AGY-ADDR-TLS] {$item['comment']}");
+                    $client->query($qLearn)->read();
                     $deployed++;
                 }
             }
 
+            // 4. Add Mark-Connection Classification Rules (TLS SNI + Address-List + QUIC UDP 443 + Ports)
+            foreach ($definitions as $item) {
+                $markName = $item['mark'];
+                $addrList = $item['address_list'] ?? null;
+
+                // A. TLS Host matcher
+                if (!empty($item['tls_host'])) {
+                    $qTls = (new Query('/ip/firewall/mangle/add'))
+                        ->equal('chain', 'forward')
+                        ->equal('protocol', 'tcp')
+                        ->equal('tls-host', $item['tls_host'])
+                        ->equal('action', 'mark-connection')
+                        ->equal('new-connection-mark', $markName)
+                        ->equal('passthrough', 'yes')
+                        ->equal('comment', "[AGY-MARK-TLS] {$item['comment']}");
+                    $client->query($qTls)->read();
+                    $deployed++;
+                }
+
+                // B. QUIC (HTTP/3 over UDP port 443) for modern browsers & YouTube
+                if (!empty($item['quic']) && $addrList) {
+                    $qQuic = (new Query('/ip/firewall/mangle/add'))
+                        ->equal('chain', 'forward')
+                        ->equal('protocol', 'udp')
+                        ->equal('dst-port', '443')
+                        ->equal('dst-address-list', $addrList)
+                        ->equal('action', 'mark-connection')
+                        ->equal('new-connection-mark', $markName)
+                        ->equal('passthrough', 'yes')
+                        ->equal('comment', "[AGY-MARK-QUIC] {$item['comment']}");
+                    $client->query($qQuic)->read();
+                    $deployed++;
+                }
+
+                // C. Destination Address-List (TCP)
+                if ($addrList) {
+                    $qDstTcp = (new Query('/ip/firewall/mangle/add'))
+                        ->equal('chain', 'forward')
+                        ->equal('protocol', 'tcp')
+                        ->equal('dst-address-list', $addrList)
+                        ->equal('action', 'mark-connection')
+                        ->equal('new-connection-mark', $markName)
+                        ->equal('passthrough', 'yes')
+                        ->equal('comment', "[AGY-MARK-DST] {$item['comment']}");
+                    $client->query($qDstTcp)->read();
+                    $deployed++;
+                }
+
+                // D. UDP Port matcher (for Gaming / VoIP / Meet)
+                if (!empty($item['udp_port'])) {
+                    $qUdp = (new Query('/ip/firewall/mangle/add'))
+                        ->equal('chain', 'forward')
+                        ->equal('protocol', 'udp')
+                        ->equal('dst-port', $item['udp_port'])
+                        ->equal('action', 'mark-connection')
+                        ->equal('new-connection-mark', $markName)
+                        ->equal('passthrough', 'yes')
+                        ->equal('comment', "[AGY-MARK-UDP] {$item['comment']}");
+                    $client->query($qUdp)->read();
+                    $deployed++;
+                }
+
+                // E. TCP Port matcher
+                if (!empty($item['tcp_port'])) {
+                    $qTcp = (new Query('/ip/firewall/mangle/add'))
+                        ->equal('chain', 'forward')
+                        ->equal('protocol', 'tcp')
+                        ->equal('dst-port', $item['tcp_port'])
+                        ->equal('action', 'mark-connection')
+                        ->equal('new-connection-mark', $markName)
+                        ->equal('passthrough', 'yes')
+                        ->equal('comment', "[AGY-MARK-PORT] {$item['comment']}");
+                    $client->query($qTcp)->read();
+                    $deployed++;
+                }
+            }
+
+            // 5. Add Accounting Counter Rules (Reads Connection-Marks to count ALL packets in stream)
+            foreach ($definitions as $item) {
+                $qCount = (new Query('/ip/firewall/mangle/add'))
+                    ->equal('chain', 'forward')
+                    ->equal('connection-mark', $item['mark'])
+                    ->equal('action', 'passthrough')
+                    ->equal('passthrough', 'yes')
+                    ->equal('comment', $item['comment']);
+                $client->query($qCount)->read();
+                $deployed++;
+            }
+
+            // 6. Add Catch-All General Web Browsing Rule
+            $qCatchAll = (new Query('/ip/firewall/mangle/add'))
+                ->equal('chain', 'forward')
+                ->equal('connection-mark', 'no-mark')
+                ->equal('action', 'passthrough')
+                ->equal('passthrough', 'yes')
+                ->equal('comment', '[AGY-TRAFFIC-BROWSING] General Web Browsing');
+            $client->query($qCatchAll)->read();
+            $deployed++;
+
             return [
                 'success' => true,
-                'message' => $deployed > 0 
-                    ? "Berhasil memasang {$deployed} rule filter trafik di MikroTik!" 
-                    : "Seluruh rule filter trafik sudah terpasang di MikroTik.",
+                'message' => "Berhasil memasang {$deployed} filter trafik cerdas (QUIC UDP 443 + TLS + Address-Lists) di MikroTik!",
                 'deployed_count' => $deployed,
             ];
         } catch (Exception $e) {
@@ -1168,7 +1334,7 @@ class RouterOsService
 
             foreach ($rules as $r) {
                 $comment = $r['comment'] ?? '';
-                if (str_starts_with($comment, '[AGY-TRAFFIC-') && isset($r['.id'])) {
+                if ((str_starts_with($comment, '[AGY-TRAFFIC-') || str_starts_with($comment, '[AGY-MARK')) && isset($r['.id'])) {
                     $resetQ = (new Query('/ip/firewall/mangle/reset-counters'))->equal('.id', $r['.id']);
                     $client->query($resetQ)->read();
                 }

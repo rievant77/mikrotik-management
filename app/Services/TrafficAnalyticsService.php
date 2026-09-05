@@ -24,7 +24,7 @@ class TrafficAnalyticsService
         $mangleStats = $this->routerOs->getTrafficCategoryMangles();
         $isRulesInstalled = !empty($mangleStats);
 
-        // Predefined category mappings
+        // Predefined 4 primary category mappings for KPI cards & Charts
         $categories = [
             'video' => [
                 'name' => 'Streaming Video',
@@ -32,7 +32,6 @@ class TrafficAnalyticsService
                 'color' => '#f43f5e', // rose-500
                 'bytes' => 0,
                 'packets' => 0,
-                'platforms' => [],
             ],
             'social_media' => [
                 'name' => 'Sosial Media & Chat',
@@ -40,7 +39,6 @@ class TrafficAnalyticsService
                 'color' => '#3b82f6', // blue-500
                 'bytes' => 0,
                 'packets' => 0,
-                'platforms' => [],
             ],
             'gaming' => [
                 'name' => 'Online Gaming',
@@ -48,24 +46,22 @@ class TrafficAnalyticsService
                 'color' => '#10b981', // emerald-500
                 'bytes' => 0,
                 'packets' => 0,
-                'platforms' => [],
-            ],
-            'cloud_work' => [
-                'name' => 'Cloud & Kerja / Belajar',
-                'icon' => 'cloud',
-                'color' => '#8b5cf6', // violet-500
-                'bytes' => 0,
-                'packets' => 0,
-                'platforms' => [],
             ],
             'browsing' => [
-                'name' => 'Web Browsing & E-Commerce',
+                'name' => 'Cloud & Browsing',
                 'icon' => 'browsing',
                 'color' => '#f59e0b', // amber-500
                 'bytes' => 0,
                 'packets' => 0,
-                'platforms' => [],
             ],
+        ];
+
+        $categoryDisplayNames = [
+            'video' => 'Streaming Video',
+            'social_media' => 'Sosial Media & Chat',
+            'gaming' => 'Online Gaming',
+            'cloud_work' => 'Cloud & Kerja / Belajar',
+            'browsing' => 'Web & E-Commerce',
         ];
 
         $platformsList = [];
@@ -89,16 +85,18 @@ class TrafficAnalyticsService
                 $parts = explode(']', $comment);
                 $platformName = isset($parts[1]) ? trim($parts[1]) : 'Unknown';
 
-                if (isset($categories[$catKey])) {
-                    $categories[$catKey]['bytes'] += $bytes;
-                    $categories[$catKey]['packets'] += $packets;
+                // Aggregate into 4 primary KPI categories
+                $kpiKey = ($catKey === 'cloud_work') ? 'browsing' : $catKey;
+                if (isset($categories[$kpiKey])) {
+                    $categories[$kpiKey]['bytes'] += $bytes;
+                    $categories[$kpiKey]['packets'] += $packets;
                 }
 
                 $totalBytesAll += $bytes;
 
                 $platformsList[] = [
                     'platform' => $platformName,
-                    'category' => $categories[$catKey]['name'] ?? 'Other',
+                    'category' => $categoryDisplayNames[$catKey] ?? 'Web & Browsing',
                     'category_key' => $catKey,
                     'bytes' => $bytes,
                     'packets' => $packets,
@@ -112,14 +110,15 @@ class TrafficAnalyticsService
             if ($dbStats->isNotEmpty()) {
                 foreach ($dbStats as $stat) {
                     $catKey = $stat->category;
-                    if (isset($categories[$catKey])) {
-                        $categories[$catKey]['bytes'] += $stat->total_bytes;
+                    $kpiKey = ($catKey === 'cloud_work') ? 'browsing' : $catKey;
+                    if (isset($categories[$kpiKey])) {
+                        $categories[$kpiKey]['bytes'] += $stat->total_bytes;
                     }
                     $totalBytesAll += $stat->total_bytes;
 
                     $platformsList[] = [
                         'platform' => $stat->platform,
-                        'category' => $categories[$catKey]['name'] ?? 'Other',
+                        'category' => $categoryDisplayNames[$catKey] ?? 'Web & Browsing',
                         'category_key' => $catKey,
                         'bytes' => $stat->total_bytes,
                         'packets' => 0,
@@ -136,19 +135,18 @@ class TrafficAnalyticsService
 
                 if ($sessionTotalBytes > 0) {
                     $totalBytesAll = $sessionTotalBytes;
-                    // Proportional distribution baseline
-                    $categories['video']['bytes'] = (int) ($sessionTotalBytes * 0.50);
+                    // Proportional distribution baseline for 4 primary categories
+                    $categories['video']['bytes'] = (int) ($sessionTotalBytes * 0.45);
                     $categories['social_media']['bytes'] = (int) ($sessionTotalBytes * 0.25);
-                    $categories['gaming']['bytes'] = (int) ($sessionTotalBytes * 0.12);
-                    $categories['cloud_work']['bytes'] = (int) ($sessionTotalBytes * 0.08);
-                    $categories['browsing']['bytes'] = (int) ($sessionTotalBytes * 0.05);
+                    $categories['gaming']['bytes'] = (int) ($sessionTotalBytes * 0.15);
+                    $categories['browsing']['bytes'] = (int) ($sessionTotalBytes * 0.15);
 
                     $platformsList = [
-                        ['platform' => 'YouTube & TikTok Video', 'category' => 'Streaming Video', 'category_key' => 'video', 'bytes' => (int)($sessionTotalBytes * 0.50), 'formatted_bytes' => FormatHelper::formatBytes((int)($sessionTotalBytes * 0.50))],
+                        ['platform' => 'YouTube & TikTok Video', 'category' => 'Streaming Video', 'category_key' => 'video', 'bytes' => (int)($sessionTotalBytes * 0.45), 'formatted_bytes' => FormatHelper::formatBytes((int)($sessionTotalBytes * 0.45))],
                         ['platform' => 'WhatsApp & Instagram', 'category' => 'Sosial Media & Chat', 'category_key' => 'social_media', 'bytes' => (int)($sessionTotalBytes * 0.25), 'formatted_bytes' => FormatHelper::formatBytes((int)($sessionTotalBytes * 0.25))],
-                        ['platform' => 'Mobile Legends & Games', 'category' => 'Online Gaming', 'category_key' => 'gaming', 'bytes' => (int)($sessionTotalBytes * 0.12), 'formatted_bytes' => FormatHelper::formatBytes((int)($sessionTotalBytes * 0.12))],
+                        ['platform' => 'Mobile Legends & Games', 'category' => 'Online Gaming', 'category_key' => 'gaming', 'bytes' => (int)($sessionTotalBytes * 0.15), 'formatted_bytes' => FormatHelper::formatBytes((int)($sessionTotalBytes * 0.15))],
                         ['platform' => 'Google Drive & Meet', 'category' => 'Cloud & Kerja / Belajar', 'category_key' => 'cloud_work', 'bytes' => (int)($sessionTotalBytes * 0.08), 'formatted_bytes' => FormatHelper::formatBytes((int)($sessionTotalBytes * 0.08))],
-                        ['platform' => 'Web Browsing & E-Commerce', 'category' => 'Web Browsing & E-Commerce', 'category_key' => 'browsing', 'bytes' => (int)($sessionTotalBytes * 0.05), 'formatted_bytes' => FormatHelper::formatBytes((int)($sessionTotalBytes * 0.05))],
+                        ['platform' => 'Web Browsing & E-Commerce', 'category' => 'Web & E-Commerce', 'category_key' => 'browsing', 'bytes' => (int)($sessionTotalBytes * 0.07), 'formatted_bytes' => FormatHelper::formatBytes((int)($sessionTotalBytes * 0.07))],
                     ];
                 }
             }
@@ -163,11 +161,9 @@ class TrafficAnalyticsService
             $cat['formatted_bytes'] = FormatHelper::formatBytes($cat['bytes']);
             $cat['percentage'] = $totalBytesAll > 0 ? round(($cat['bytes'] / $totalBytesAll) * 100, 1) : 0;
 
-            if ($cat['bytes'] > 0 || !$isRulesInstalled) {
-                $chartLabels[] = $cat['name'];
-                $chartSeries[] = (int) round($cat['bytes'] / (1024 * 1024)); // in MB
-                $chartColors[] = $cat['color'];
-            }
+            $chartLabels[] = $cat['name'];
+            $chartSeries[] = max(1, (int) round($cat['bytes'] / (1024 * 1024))); // in MB
+            $chartColors[] = $cat['color'];
         }
 
         // Sort platforms by total bytes descending
@@ -249,7 +245,7 @@ class TrafficAnalyticsService
                 $series[0]['data'][$h] = (int) round(120 * $multiplier);
                 $series[1]['data'][$h] = (int) round(70 * $multiplier);
                 $series[2]['data'][$h] = (int) round(40 * $multiplier);
-                $series[3]['data'][$h] = (int) round(25 * $multiplier);
+                $series[3]['data'][$h] = (int) round(35 * $multiplier);
             }
         }
 

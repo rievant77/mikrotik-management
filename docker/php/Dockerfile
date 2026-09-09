@@ -1,33 +1,32 @@
-FROM php:8.3-fpm
+FROM php:8.3-fpm-alpine
 
-RUN apt-get update && apt-get install -y \
+RUN apk update && apk add --no-cache \
     git \
     curl \
     unzip \
     libpng-dev \
-    libjpeg62-turbo-dev \
-    libfreetype6-dev \
-    libonig-dev \
-    libxml2-dev \
+    libjpeg-turbo-dev \
+    freetype-dev \
     libzip-dev \
-    libicu-dev \
-    default-mysql-client \
+    icu-dev \
+    oniguruma-dev \
+    mysql-client \
+    linux-headers \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip intl \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    && docker-php-ext-install -j$(nproc) pdo pdo_mysql mbstring exif pcntl bcmath gd zip intl sockets \
+    && rm -rf /var/cache/apk/*
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-COPY composer.json ./
-RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --no-scripts
+COPY composer.json composer.lock* ./
+RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --no-scripts || true
 
 COPY . .
 
 RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 775 storage bootstrap/cache || true
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache || true
 
 EXPOSE 9000
 CMD ["php-fpm"]

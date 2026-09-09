@@ -3,56 +3,22 @@ services:
     build:
       context: .
       dockerfile: docker/php/Dockerfile
-    environment:
-      APP_ENV: production
-      APP_DEBUG: "false"
-      DB_HOST: mysql
-      DB_PORT: 3306
-      DB_DATABASE: sari-pratama-mandiri
-      DB_USERNAME: rievant77
-      DB_PASSWORD: "@Terbuka32100"
-    depends_on:
-      mysql:
-        condition: service_healthy
+    container_name: mikrotik-app
     restart: unless-stopped
-    networks:
-      - laravel-network
-
-  nginx:
-    build:
-      context: .
-      dockerfile: docker/nginx/Dockerfile
-    ports:
-      - "9000:80"
-    depends_on:
-      - app
-    restart: unless-stopped
-    networks:
-      - laravel-network
-
-  mysql:
-    image: mysql:8.3
-    environment:
-      MYSQL_DATABASE: sari-pratama-mandiri
-      MYSQL_USER: rievant77
-      MYSQL_PASSWORD: "@Terbuka32100"
-      MYSQL_ROOT_PASSWORD: "@Terbuka32100"
     volumes:
-      - mysql_data:/var/lib/mysql
-    ports:
-      - "3306:3306"
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p@Terbuka32100"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      - .:/var/www/html
+    environment:
+      APP_ENV: ${APP_ENV:-production}
+      APP_DEBUG: ${APP_DEBUG:-false}
+      DB_CONNECTION: mysql
+      DB_HOST: ${DB_HOST:-mysql}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_DATABASE: ${DB_DATABASE:-sari-pratama-mandiri}
+      DB_USERNAME: ${DB_USERNAME:-rievant77}
+      DB_PASSWORD: ${DB_PASSWORD}
     networks:
-      - laravel-network
-
-volumes:
-  mysql_data:
+      - shared
 
 networks:
-  laravel-network:
-    driver: bridge
+  shared:
+    external: true

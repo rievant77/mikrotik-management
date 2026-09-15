@@ -37,24 +37,20 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-# 1. Install Composer dependencies
-COPY composer.json composer.lock* ./
-RUN composer install --no-dev --no-interaction --prefer-dist --no-scripts --no-autoloader
-
-# 2. Salin seluruh source code aplikasi
+# 1. Salin seluruh source code aplikasi
 COPY . .
 
-# 3. Salin hasil compile Vite dari Stage 1 & simpan backup di /opt/build
+# 2. Salin hasil compile Vite dari Stage 1 & simpan backup di /opt/build
 COPY --from=frontend /app/public/build /opt/build
 COPY --from=frontend /app/public/build /var/www/html/public/build
 
-# 4. Finalisasi Autoloader & simpan backup vendor di /opt/vendor
-RUN composer dump-autoload --optimize \
+# 3. Install dependensi Composer & simpan backup vendor di /opt/vendor
+RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --no-scripts \
     && cp -r vendor /opt/vendor \
     && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# 5. Entrypoint script
+# 4. Entrypoint script
 COPY docker/php/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 

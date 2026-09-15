@@ -12,7 +12,22 @@ services:
     networks:
       - shared
 
+  # Nginx Sidecar (Pola 1: Penyaji HTTP & static files untuk Nginx Proxy Manager)
+  web:
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile
+    container_name: mikrotik-web
+    restart: unless-stopped
+    volumes:
+      - .:/var/www/html:ro
+    depends_on:
+      - app
+    networks:
+      - shared
+
   # Background worker untuk polling RouterOS & reset FUP (reuse image yang sama)
+
   scheduler:
     build:
       context: .

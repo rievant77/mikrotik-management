@@ -13,9 +13,9 @@ COPY public ./public
 RUN npm run build
 
 # ==========================================
-# STAGE 2: FrankenPHP Production Runtime
+# STAGE 2: FrankenPHP Production Runtime (PHP 8.4)
 # ==========================================
-FROM dunglas/frankenphp:1-php8.3-alpine
+FROM dunglas/frankenphp:1-php8.4-alpine
 
 ENV SERVER_NAME=":80"
 ENV COMPOSER_ALLOW_SUPERUSER=1

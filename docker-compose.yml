@@ -7,18 +7,29 @@ services:
     restart: unless-stopped
     volumes:
       - .:/var/www/html
-    environment:
-      APP_ENV: ${APP_ENV:-production}
-      APP_DEBUG: ${APP_DEBUG:-false}
-      DB_CONNECTION: mysql
-      DB_HOST: ${DB_HOST:-mysql}
-      DB_PORT: ${DB_PORT:-3306}
-      DB_DATABASE: ${DB_DATABASE:-mikrotikman}
-      DB_USERNAME: ${DB_USERNAME:-root}
-      DB_PASSWORD: ${DB_PASSWORD:-@Terbuka32100}
+    env_file:
+      - .env
+    networks:
+      - shared
+
+  # Background worker untuk polling RouterOS & reset FUP (reuse image yang sama)
+  scheduler:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: mikrotik-scheduler
+    restart: unless-stopped
+    volumes:
+      - .:/var/www/html
+    env_file:
+      - .env
+    command: ["php", "artisan", "schedule:work"]
+    depends_on:
+      - app
     networks:
       - shared
 
 networks:
   shared:
     external: true
+

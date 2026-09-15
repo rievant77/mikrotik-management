@@ -17,23 +17,27 @@ RUN npm run build
 # ==========================================
 FROM php:8.3-fpm-alpine
 
+# Install system dependencies & PHP extensions (termasuk curl, xml, sockets)
 RUN apk update && apk add --no-cache \
     git \
     curl \
+    curl-dev \
     unzip \
     libpng-dev \
     libjpeg-turbo-dev \
     freetype-dev \
     libzip-dev \
+    libxml2-dev \
     icu-dev \
     oniguruma-dev \
     mysql-client \
     linux-headers \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) pdo pdo_mysql mbstring exif pcntl bcmath gd zip intl sockets \
+    && docker-php-ext-install -j$(nproc) pdo pdo_mysql mbstring exif pcntl bcmath gd zip intl sockets curl xml \
     && rm -rf /var/cache/apk/*
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+ENV COMPOSER_ALLOW_SUPERUSER=1
 
 WORKDIR /var/www/html
 
@@ -45,7 +49,7 @@ COPY --from=frontend /app/public/build /opt/build
 COPY --from=frontend /app/public/build /var/www/html/public/build
 
 # 3. Install dependensi Composer & simpan backup vendor di /opt/vendor
-RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --no-scripts \
+RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --no-scripts --ignore-platform-reqs \
     && cp -r vendor /opt/vendor \
     && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache

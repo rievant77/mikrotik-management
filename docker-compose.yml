@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: docker/php/Dockerfile
+    image: mikrotik-app:latest
     container_name: mikrotik-app
     restart: unless-stopped
     volumes:
@@ -12,11 +13,9 @@ services:
     networks:
       - shared
 
-  # Background worker scheduler MikroTik
+  # Background worker scheduler MikroTik (Reuse image dari service app agar tidak build 2x)
   scheduler:
-    build:
-      context: .
-      dockerfile: docker/php/Dockerfile
+    image: mikrotik-app:latest
     container_name: mikrotik-scheduler
     restart: unless-stopped
     volumes:

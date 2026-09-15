@@ -10,6 +10,8 @@ use App\Models\HotspotUser;
 use App\Models\RouterSetting;
 use App\Models\UsageSnapshot;
 use App\Models\VoucherSale;
+use App\Support\FormatHelper;
+use App\Support\DeviceHelper;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Cache;
@@ -24,14 +26,6 @@ class CollectorService
     public function __construct(?RouterOsService $routerOs = null)
     {
         $this->routerOs = $routerOs ?? new RouterOsService();
-    }
-
-    /**
-     * Alias for collect()
-     */
-    public function collectActiveSessions(): array
-    {
-        return $this->collect();
     }
 
     /**
@@ -98,7 +92,7 @@ class CollectorService
                 $bytesIn = (int) ($raw['bytes-in'] ?? 0);
                 $bytesOut = (int) ($raw['bytes-out'] ?? 0);
                 $uptimeStr = $raw['uptime'] ?? '0s';
-                $uptimeSeconds = $this->parseUptime($uptimeStr);
+                $uptimeSeconds = FormatHelper::parseUptime($uptimeStr);
 
                 // Find or link with HotspotUser
                 $hotspotUser = HotspotUser::where('username', $username)->first();
@@ -333,19 +327,5 @@ class CollectorService
         $summary->increment('total_bytes_out', $deltaOut);
         $summary->increment('total_bytes', $deltaIn + $deltaOut);
         $summary->increment('total_uptime_seconds', $uptimeDelta);
-    }
-
-    /**
-     * Parse RouterOS uptime string (e.g. "1w2d3h4m5s", "4h12m30s", "48m10s") into seconds.
-     */
-    public function parseUptime(string $uptime): int
-    {
-        $seconds = 0;
-        if (preg_match('/(\d+)w/', $uptime, $m)) $seconds += (int)$m[1] * 7 * 86400;
-        if (preg_match('/(\d+)d/', $uptime, $m)) $seconds += (int)$m[1] * 86400;
-        if (preg_match('/(\d+)h/', $uptime, $m)) $seconds += (int)$m[1] * 3600;
-        if (preg_match('/(\d+)m/', $uptime, $m)) $seconds += (int)$m[1] * 60;
-        if (preg_match('/(\d+)s/', $uptime, $m)) $seconds += (int)$m[1];
-        return $seconds;
     }
 }

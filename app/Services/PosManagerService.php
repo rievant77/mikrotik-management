@@ -163,14 +163,6 @@ class PosManagerService
     }
 
     /**
-     * Get POS financial overview for specified month.
-     */
-    public function getOverview(?string $month = null): array
-    {
-        return $this->getDetailedDashboardAnalytics($month);
-    }
-
-    /**
      * Batch or single generate monthly invoices for a given period (e.g. 2026-08).
      */
     public function generateMonthlyInvoices(string $billingMonth, ?array $customerIds = null): array

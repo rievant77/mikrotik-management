@@ -51,22 +51,7 @@ class UserController extends Controller
      */
     protected function mapActiveSessions(array $rawSessions, RouterOsService $routerOs): \Illuminate\Support\Collection
     {
-        $dhcpLeases = [];
-        try {
-            $dhcpLeases = $routerOs->getDhcpLeases();
-        } catch (\Throwable $e) {
-            $dhcpLeases = [];
-        }
-
-        $leaseMap = [];
-        foreach ($dhcpLeases as $lease) {
-            $lHost = $lease['host-name'] ?? ($lease['comment'] ?? null);
-            $lMac = !empty($lease['mac-address']) ? strtoupper($lease['mac-address']) : (!empty($lease['active-mac-address']) ? strtoupper($lease['active-mac-address']) : null);
-            $lIp = $lease['address'] ?? ($lease['active-address'] ?? null);
-            if ($lMac && $lHost) $leaseMap[$lMac] = $lHost;
-            if ($lIp && $lHost) $leaseMap[$lIp] = $lHost;
-        }
-
+        $leaseMap = $this->getDhcpLeaseMap($routerOs);
         $hotspotUsers = HotspotUser::with('profile')->get()->keyBy('username');
 
         return collect($rawSessions)->map(function ($raw, $idx) use ($hotspotUsers, $leaseMap) {
@@ -148,19 +133,7 @@ class UserController extends Controller
         $isOnline = !empty($liveSessions);
 
         // Resolve device name for live session if available
-        $dhcpLeases = [];
-        try {
-            $dhcpLeases = $routerOs->getDhcpLeases();
-        } catch (\Throwable $e) {}
-
-        $leaseMap = [];
-        foreach ($dhcpLeases as $lease) {
-            $lHost = $lease['host-name'] ?? ($lease['comment'] ?? null);
-            $lMac = !empty($lease['mac-address']) ? strtoupper($lease['mac-address']) : (!empty($lease['active-mac-address']) ? strtoupper($lease['active-mac-address']) : null);
-            $lIp = $lease['address'] ?? ($lease['active-address'] ?? null);
-            if ($lMac && $lHost) $leaseMap[$lMac] = $lHost;
-            if ($lIp && $lHost) $leaseMap[$lIp] = $lHost;
-        }
+        $leaseMap = $this->getDhcpLeaseMap($routerOs);
 
         $liveSessions = collect($liveSessions)->map(function ($live, $idx) use ($username, $leaseMap) {
             $mac = $live['mac-address'] ?? '-';
@@ -730,5 +703,26 @@ class UserController extends Controller
             'success' => true,
             'message' => "Kuota FUP dan kecepatan untuk {$username} berhasil di-reset normal kembali.",
         ]);
+    }
+
+    /**
+     * Build map of MAC & IP to host-name from MikroTik DHCP leases.
+     */
+    protected function getDhcpLeaseMap(RouterOsService $routerOs): array
+    {
+        // ponytail: consolidated DHCP lease hostname mapping
+        $leaseMap = [];
+        try {
+            $dhcpLeases = $routerOs->getDhcpLeases();
+            foreach ($dhcpLeases as $lease) {
+                $lHost = $lease['host-name'] ?? ($lease['comment'] ?? null);
+                $lMac = !empty($lease['mac-address']) ? strtoupper($lease['mac-address']) : (!empty($lease['active-mac-address']) ? strtoupper($lease['active-mac-address']) : null);
+                $lIp = $lease['address'] ?? ($lease['active-address'] ?? null);
+                if ($lMac && $lHost) $leaseMap[$lMac] = $lHost;
+                if ($lIp && $lHost) $leaseMap[$lIp] = $lHost;
+            }
+        } catch (\Throwable $e) {}
+
+        return $leaseMap;
     }
 }

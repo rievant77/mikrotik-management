@@ -13,9 +13,9 @@ services:
       DB_CONNECTION: mysql
       DB_HOST: ${DB_HOST:-mysql}
       DB_PORT: ${DB_PORT:-3306}
-      DB_DATABASE: ${DB_DATABASE:-sari-pratama-mandiri}
-      DB_USERNAME: ${DB_USERNAME:-rievant77}
-      DB_PASSWORD: ${DB_PASSWORD}
+      DB_DATABASE: ${DB_DATABASE:-mikrotikman}
+      DB_USERNAME: ${DB_USERNAME:-root}
+      DB_PASSWORD: ${DB_PASSWORD:-@Terbuka32100}
     networks:
       - shared
 

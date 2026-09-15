@@ -32,29 +32,12 @@ class FormatHelper
     }
 
     /**
-     * Format month year in Indonesian without ext-intl.
+     * Format month year in Indonesian using Carbon native locale.
      */
     public static function formatMonthIndo(\Carbon\CarbonInterface $date): string
     {
-        $months = [
-            1 => 'Januari',
-            2 => 'Februari',
-            3 => 'Maret',
-            4 => 'April',
-            5 => 'Mei',
-            6 => 'Juni',
-            7 => 'Juli',
-            8 => 'Agustus',
-            9 => 'September',
-            10 => 'Oktober',
-            11 => 'November',
-            12 => 'Desember',
-        ];
-
-        $m = (int) $date->format('n');
-        $monthName = $months[$m] ?? $date->format('F');
-
-        return $monthName . ' ' . $date->format('Y');
+        // ponytail: native Carbon translatedFormat replaces 20-line manual lookup table
+        return $date->locale('id')->translatedFormat('F Y');
     }
 
     /**

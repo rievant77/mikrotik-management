@@ -207,86 +207,58 @@ class VoucherController extends Controller
     public function printGrid(Request $request): View
     {
         $batch = $request->get('batch');
-        $idsParam = $request->get('ids');
-        $usersParam = $request->get('users');
-        $limit = max(1, min(500, (int) $request->get('limit', 100)));
+        $vouchers = $this->getVouchersForPrint($request, 100);
         $routerSetting = \App\Models\RouterSetting::where('is_active', true)->first();
-
-        $query = HotspotUser::with('profile');
-
-        if ($idsParam) {
-            $ids = is_array($idsParam) ? $idsParam : explode(',', $idsParam);
-            $query->whereIn('id', array_filter($ids));
-        } elseif ($usersParam) {
-            $users = is_array($usersParam) ? $usersParam : explode(',', $usersParam);
-            $query->whereIn('username', array_filter($users));
-        } elseif ($batch) {
-            $query->where('comment', 'like', "%{$batch}%");
-        }
-
-        $vouchers = $query->latest()->limit($limit)->get();
 
         return view('vouchers.print-grid', compact('vouchers', 'batch', 'routerSetting'));
     }
 
     public function print58mm(Request $request): View
     {
-        $username = $request->get('user');
-        $idsParam = $request->get('ids');
-        $usersParam = $request->get('users');
-        $batch = $request->get('batch');
+        $vouchers = $this->getVouchersForPrint($request, 1);
         $routerSetting = \App\Models\RouterSetting::where('is_active', true)->first();
-
-        $query = HotspotUser::with('profile');
-
-        if ($idsParam) {
-            $ids = is_array($idsParam) ? $idsParam : explode(',', $idsParam);
-            $query->whereIn('id', array_filter($ids));
-            $vouchers = $query->latest()->get();
-        } elseif ($usersParam) {
-            $users = is_array($usersParam) ? $usersParam : explode(',', $usersParam);
-            $query->whereIn('username', array_filter($users));
-            $vouchers = $query->latest()->get();
-        } elseif ($batch) {
-            $query->where('comment', 'like', "%{$batch}%");
-            $vouchers = $query->latest()->limit(100)->get();
-        } elseif ($username) {
-            $vouchers = $query->where('username', $username)->get();
-        } else {
-            $vouchers = $query->latest()->limit(1)->get();
-        }
 
         return view('vouchers.print-58mm', compact('vouchers', 'routerSetting'));
     }
 
     public function print80mm(Request $request): View
     {
+        $vouchers = $this->getVouchersForPrint($request, 1);
+        $routerSetting = \App\Models\RouterSetting::where('is_active', true)->first();
+
+        return view('vouchers.print-80mm', compact('vouchers', 'routerSetting'));
+    }
+
+    /**
+     * Helper to resolve vouchers for printing based on user, ids, or batch params.
+     */
+    protected function getVouchersForPrint(Request $request, int $defaultLimit = 1): \Illuminate\Database\Eloquent\Collection
+    {
+        // ponytail: consolidated voucher print querying across 58mm, 80mm, and grid views
         $username = $request->get('user');
         $idsParam = $request->get('ids');
         $usersParam = $request->get('users');
         $batch = $request->get('batch');
-        $routerSetting = \App\Models\RouterSetting::where('is_active', true)->first();
+        $limit = max(1, min(500, (int) $request->get('limit', $defaultLimit)));
 
         $query = HotspotUser::with('profile');
 
         if ($idsParam) {
-            $ids = is_array($idsParam) ? $idsParam : explode(',', $idsParam);
-            $query->whereIn('id', array_filter($ids));
-            $vouchers = $query->latest()->get();
-        } elseif ($usersParam) {
-            $users = is_array($usersParam) ? $usersParam : explode(',', $usersParam);
-            $query->whereIn('username', array_filter($users));
-            $vouchers = $query->latest()->get();
-        } elseif ($batch) {
-            $query->where('comment', 'like', "%{$batch}%");
-            $vouchers = $query->latest()->limit(100)->get();
-        } elseif ($username) {
-            $vouchers = $query->where('username', $username)->get();
-        } else {
-            $vouchers = $query->latest()->limit(1)->get();
+            $ids = is_array($idsParam) ? $idsParam : explode(',', (string) $idsParam);
+            return $query->whereIn('id', array_filter($ids))->latest()->get();
+        }
+        if ($usersParam) {
+            $users = is_array($usersParam) ? $usersParam : explode(',', (string) $usersParam);
+            return $query->whereIn('username', array_filter($users))->latest()->get();
+        }
+        if ($batch) {
+            return $query->where('comment', 'like', "%{$batch}%")->latest()->limit($request->has('limit') ? $limit : 100)->get();
+        }
+        if ($username) {
+            return $query->where('username', $username)->get();
         }
 
-        return view('vouchers.print-80mm', compact('vouchers', 'routerSetting'));
+        return $query->latest()->limit($limit)->get();
     }
 }
 

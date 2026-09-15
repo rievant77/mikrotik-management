@@ -23,7 +23,7 @@ class PosController extends Controller
 
     public function index(Request $request): View
     {
-        $overview = $this->posService->getOverview($request->month);
+        $overview = $this->posService->getDetailedDashboardAnalytics($request->month);
         $recentVouchers = VoucherSale::where('status', 'completed')->latest('activated_at')->limit(5)->get();
         $recentPayments = MonthlyPayment::with('customer')->where('status', '<>', 'void')->latest('paid_at')->limit(5)->get();
 

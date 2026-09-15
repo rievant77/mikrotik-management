@@ -44,11 +44,13 @@ RUN composer install --no-dev --no-interaction --prefer-dist --no-scripts --no-a
 # 2. Salin seluruh source code aplikasi
 COPY . .
 
-# 3. Salin hasil compile Vite dari Stage 1
+# 3. Salin hasil compile Vite dari Stage 1 & simpan backup di /opt/build
+COPY --from=frontend /app/public/build /opt/build
 COPY --from=frontend /app/public/build /var/www/html/public/build
 
-# 4. Finalisasi Autoloader & Permissions (Ponytail: minimum & clean)
+# 4. Finalisasi Autoloader & simpan backup vendor di /opt/vendor
 RUN composer dump-autoload --optimize \
+    && cp -r vendor /opt/vendor \
     && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 

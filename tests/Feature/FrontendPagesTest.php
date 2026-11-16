@@ -114,7 +114,7 @@ class FrontendPagesTest extends TestCase
 
         // Test Monthly Customer CRUD elements
         $monthlyRes = $this->get('/pos/monthly');
-        $monthlyRes->assertSee('Tambah Customer');
+        $monthlyRes->assertSee('Tambah Pelanggan');
     }
 
     public function test_pages_render_without_intl_with_usage_data(): void

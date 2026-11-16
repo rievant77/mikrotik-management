@@ -359,13 +359,6 @@
                                         </svg>
                                         <span>Tagihan Bulanan</span>
                                     </a>
-
-                                    <a href="{{ route('pos.shifts') }}" class="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('pos.shifts') ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100' }}">
-                                        <svg class="w-5 h-5 shrink-0 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        <span>Shift & Kas</span>
-                                    </a>
                                 </nav>
                             </div>
 
@@ -448,7 +441,7 @@
                         <kbd class="ml-auto font-mono text-[10px] bg-white dark:bg-zinc-700 px-1.5 py-0.5 rounded border border-zinc-300 dark:border-zinc-600">Ctrl K</kbd>
                     </button>
 
-                    <!-- Right Controls: Status Badge, Shift, Dark Mode, Profile & Logout -->
+                    <!-- Right Controls: Status Badge, Dark Mode, Profile & Logout -->
                     <div class="flex items-center gap-2 sm:gap-3" x-data="{ userMenuOpen: false, isSyncing: false }">
                         <!-- Quick Router Sync Button -->
                         <button 

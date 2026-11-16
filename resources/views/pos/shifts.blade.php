@@ -33,20 +33,20 @@
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mt-4 text-xs">
                     <div>
-                        <span class="text-zinc-400">Kasir Bertugas:</span>
+                        <span class="text-zinc-600 dark:text-zinc-400 font-medium">Kasir Bertugas:</span>
                         <div class="font-bold text-zinc-900 dark:text-zinc-100 text-sm mt-0.5" x-text="currentShift.user?.name || 'Administrator'"></div>
                     </div>
                     <div>
-                        <span class="text-zinc-400">Waktu Buka:</span>
-                        <div class="font-mono text-zinc-700 dark:text-zinc-300 mt-0.5" x-text="formatDateTimeIndo(currentShift.opened_at)"></div>
+                        <span class="text-zinc-600 dark:text-zinc-400 font-medium">Waktu Buka:</span>
+                        <div class="font-mono text-zinc-800 dark:text-zinc-200 mt-0.5 font-medium" x-text="formatDateTimeIndo(currentShift.opened_at)"></div>
                     </div>
                     <div>
-                        <span class="text-zinc-400">Modal Awal Laci:</span>
+                        <span class="text-zinc-600 dark:text-zinc-400 font-medium">Modal Awal Laci:</span>
                         <div class="font-mono font-bold text-zinc-900 dark:text-zinc-100 text-sm mt-0.5" x-text="formatRupiah(currentShift.opening_cash || 0)"></div>
                     </div>
                     <div>
-                        <span class="text-zinc-400">Expected Cash (Laci):</span>
-                        <div class="font-mono font-bold text-emerald-600 dark:text-emerald-400 text-sm mt-0.5" x-text="formatRupiah(currentShift.expected_cash || 0)"></div>
+                        <span class="text-zinc-600 dark:text-zinc-400 font-medium">Expected Cash (Laci):</span>
+                        <div class="font-mono font-bold text-emerald-700 dark:text-emerald-400 text-sm mt-0.5" x-text="formatRupiah(currentShift.expected_cash || 0)"></div>
                     </div>
                 </div>
             </div>

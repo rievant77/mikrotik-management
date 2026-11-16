@@ -23,6 +23,7 @@ class PosOmsetExclusionTest extends TestCase
         $mockRouter->shouldReceive('getActiveHotspotSessions')->andReturn([]);
         $mockRouter->shouldReceive('getSystemResource')->andReturn(['cpu-load' => 5, 'free-memory' => 1000000, 'uptime' => '1d']);
         $mockRouter->shouldReceive('getInterfaceTraffic')->andReturn(['rx_bps' => 0, 'tx_bps' => 0]);
+        $mockRouter->shouldReceive('getDhcpLeases')->andReturn([]);
         $this->app->instance(RouterOsService::class, $mockRouter);
 
         // 1. Create profiles

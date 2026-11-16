@@ -245,4 +245,84 @@ class VoucherCategoryFilterTest extends TestCase
         $response->assertSee('print-vch-01');
         $response->assertDontSee('print-bln-01');
     }
+
+    public function test_pos_vouchers_advanced_filters_and_metrics(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $profCommercial = HotspotProfile::create([
+            'name' => 'PKT_POS_TEST_COMM',
+            'category' => 'voucher',
+            'selling_price' => 10000,
+            'cost_price' => 3000,
+            'is_active' => true,
+        ]);
+
+        $profPribadi = HotspotProfile::create([
+            'name' => 'PKT_POS_TEST_PRIBADI',
+            'category' => 'pribadi',
+            'selling_price' => 0,
+            'cost_price' => 0,
+            'is_active' => true,
+        ]);
+
+        // Sale 1: Current month commercial
+        \App\Models\VoucherSale::create([
+            'username' => 'vc-comm-101',
+            'profile_name' => $profCommercial->name,
+            'cost_price' => 3000,
+            'selling_price' => 10000,
+            'profit' => 7000,
+            'activated_at' => now(),
+            'status' => 'completed',
+        ]);
+
+        // Sale 2: Current month pribadi
+        \App\Models\VoucherSale::create([
+            'username' => 'vc-pribadi-102',
+            'profile_name' => $profPribadi->name,
+            'cost_price' => 0,
+            'selling_price' => 0,
+            'profit' => 0,
+            'activated_at' => now(),
+            'status' => 'completed',
+        ]);
+
+        // 1. Test Default: Month is current month
+        $res = $this->get(route('pos.vouchers'));
+        $res->assertStatus(200);
+        $res->assertSee('vc-comm-101');
+        $res->assertSee('vc-pribadi-102');
+        $res->assertViewHas('metrics');
+        $metrics = $res->viewData('metrics');
+        $this->assertGreaterThanOrEqual(1, $metrics['total_count']);
+        $this->assertGreaterThanOrEqual(10000, $metrics['total_revenue']);
+        $this->assertGreaterThanOrEqual(7000, $metrics['total_profit']);
+        $this->assertEquals(70.0, $metrics['margin']);
+
+        // 2. Test Search by username
+        $searchRes = $this->get(route('pos.vouchers', ['search' => 'comm-101']));
+        $searchRes->assertStatus(200);
+        $searchRes->assertSee('vc-comm-101');
+        $searchRes->assertDontSee('vc-pribadi-102');
+
+        // 3. Test Filter by profile
+        $profRes = $this->get(route('pos.vouchers', ['profile' => $profCommercial->name]));
+        $profRes->assertStatus(200);
+        $profRes->assertSee('vc-comm-101');
+        $profRes->assertDontSee('vc-pribadi-102');
+
+        // 4. Test Filter by category = profit
+        $profitCatRes = $this->get(route('pos.vouchers', ['category' => 'profit']));
+        $profitCatRes->assertStatus(200);
+        $profitCatRes->assertSee('vc-comm-101');
+        $profitCatRes->assertDontSee('vc-pribadi-102');
+
+        // 5. Test Filter by category = pribadi
+        $pribadiCatRes = $this->get(route('pos.vouchers', ['category' => 'pribadi']));
+        $pribadiCatRes->assertStatus(200);
+        $pribadiCatRes->assertSee('vc-pribadi-102');
+        $pribadiCatRes->assertDontSee('vc-comm-101');
+    }
 }

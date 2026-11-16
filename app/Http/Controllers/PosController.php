@@ -27,34 +27,81 @@ class PosController extends Controller
         $overview = $this->posService->getDetailedDashboardAnalytics($request->month);
         $recentVouchers = VoucherSale::where('status', 'completed')->latest('activated_at')->limit(5)->get();
         $recentPayments = MonthlyPayment::with('customer')->where('status', '<>', 'void')->latest('paid_at')->limit(5)->get();
+        $currentShift = CashierShift::with('user')->where('status', 'open')->latest()->first();
+        if ($currentShift) {
+            $this->posService->recalculateShiftExpectedCash($currentShift);
+        }
 
-        return view('pos.index', compact('overview', 'recentVouchers', 'recentPayments'));
+        return view('pos.index', compact('overview', 'recentVouchers', 'recentPayments', 'currentShift'));
     }
 
     public function vouchers(Request $request): View
     {
-        $month = $request->get('month');
-        $targetMonth = $month ? \Carbon\Carbon::parse($month)->startOfMonth() : now()->startOfMonth();
+        $month = $request->get('month', now()->format('Y-m'));
+        $search = $request->get('search');
+        $profileName = $request->get('profile');
+        $category = $request->get('category', 'all');
 
         $salesQuery = VoucherSale::with('profile')->latest('activated_at');
-        if ($month) {
+
+        if ($month && $month !== 'all') {
+            $targetMonth = \Carbon\Carbon::parse($month)->startOfMonth();
             $salesQuery->whereBetween('activated_at', [$targetMonth, $targetMonth->copy()->endOfMonth()]);
+        } else {
+            $targetMonth = now()->startOfMonth();
+        }
+
+        if ($search) {
+            $salesQuery->where('username', 'like', "%{$search}%");
+        }
+
+        if ($profileName && $profileName !== 'all') {
+            $salesQuery->where('profile_name', $profileName);
+        }
+
+        if ($category === 'profit') {
+            $salesQuery->forRevenue();
+        } elseif ($category === 'pribadi') {
+            $salesQuery->whereHas('profile', function ($q) {
+                $q->where('category', 'pribadi');
+            });
         }
 
         $sales = $salesQuery->paginate(50)->withQueryString();
 
-        $monthSales = VoucherSale::where('status', 'completed')
-            ->forRevenue()
-            ->whereBetween('activated_at', [$targetMonth, $targetMonth->copy()->endOfMonth()]);
+        // Calculate metrics for commercial revenue
+        $monthSalesQuery = VoucherSale::where('status', 'completed')->forRevenue();
+
+        if ($month && $month !== 'all') {
+            $monthSalesQuery->whereBetween('activated_at', [$targetMonth, $targetMonth->copy()->endOfMonth()]);
+        }
+
+        $totalCount = (int) (clone $monthSalesQuery)->count();
+        $totalRevenue = (float) (clone $monthSalesQuery)->sum('selling_price');
+        $totalProfit = (float) (clone $monthSalesQuery)->sum('profit');
+        $totalCost = (float) (clone $monthSalesQuery)->sum('cost_price');
+        $margin = $totalRevenue > 0 ? round(($totalProfit / $totalRevenue) * 100, 1) : 0;
+        $avgRevenue = $totalCount > 0 ? round($totalRevenue / $totalCount) : 0;
 
         $metrics = [
-            'period' => \App\Support\FormatHelper::formatMonthIndo($targetMonth),
-            'total_count' => (clone $monthSales)->count(),
-            'total_revenue' => (float) (clone $monthSales)->sum('selling_price'),
-            'total_profit' => (float) (clone $monthSales)->sum('profit'),
+            'period' => ($month === 'all') ? 'Semua Waktu' : \App\Support\FormatHelper::formatMonthIndo($targetMonth),
+            'month_value' => ($month === 'all') ? 'all' : $targetMonth->format('Y-m'),
+            'total_count' => $totalCount,
+            'total_revenue' => $totalRevenue,
+            'total_profit' => $totalProfit,
+            'total_cost' => $totalCost,
+            'margin' => $margin,
+            'avg_revenue' => $avgRevenue,
         ];
 
-        return view('pos.vouchers', compact('sales', 'metrics'));
+        $currentShift = CashierShift::with('user')->where('status', 'open')->latest()->first();
+        if ($currentShift) {
+            $this->posService->recalculateShiftExpectedCash($currentShift);
+        }
+
+        $profiles = HotspotProfile::orderBy('name')->get();
+
+        return view('pos.vouchers', compact('sales', 'metrics', 'profiles', 'currentShift', 'month', 'search', 'profileName', 'category'));
     }
 
     public function monthly(Request $request): View
@@ -95,7 +142,12 @@ class PosController extends Controller
         $hotspotUsers = \App\Models\HotspotUser::with('profile')->orderBy('username')->get();
         $monthlyProfiles = HotspotProfile::where('is_active', true)->where('category', 'bulanan')->get();
 
-        return view('pos.monthly', compact('invoices', 'metrics', 'customers', 'hotspotUsers', 'monthlyProfiles', 'selectedMonth'));
+        $currentShift = CashierShift::with('user')->where('status', 'open')->latest()->first();
+        if ($currentShift) {
+            $this->posService->recalculateShiftExpectedCash($currentShift);
+        }
+
+        return view('pos.monthly', compact('invoices', 'metrics', 'customers', 'hotspotUsers', 'monthlyProfiles', 'selectedMonth', 'currentShift'));
     }
 
     public function generateInvoices(Request $request): JsonResponse

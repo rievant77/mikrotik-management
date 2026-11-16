@@ -9,9 +9,15 @@
             </div>
             <div class="flex items-center gap-2">
                 <a href="{{ route('vouchers.index') }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors shadow-xs">
-                    <span>🎟️ Lihat Daftar Voucher</span>
+                    <svg class="w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                    </svg>
+                    <span>Daftar Voucher</span>
                 </a>
                 <a href="{{ route('hotspot.users') }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors shadow-xs">
+                    <svg class="w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
                     <span>User Hotspot</span>
                 </a>
             </div>
@@ -84,15 +90,26 @@
                 <!-- Row 4: Profile & Time Limit -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
-                            7. Profile (Paket Hotspot) *
-                        </label>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block font-medium text-zinc-700 dark:text-zinc-300">
+                                7. Profile (Paket Hotspot) *
+                            </label>
+                            <div class="flex items-center gap-1.5 text-[11px]">
+                                <span class="text-zinc-500 dark:text-zinc-400">Kategori:</span>
+                                <select x-model="profileCategory" @change="onCategoryChange()" class="py-0.5 px-2 text-[11px] font-medium rounded-md bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 focus:ring-1 focus:ring-zinc-400">
+                                    <option value="voucher">Voucher (Default)</option>
+                                    <option value="all">Semua Kategori</option>
+                                    <option value="bulanan">Bulanan</option>
+                                    <option value="pribadi">Pribadi</option>
+                                </select>
+                            </div>
+                        </div>
                         <select x-model="form.profile" @change="onProfileChange()" required class="w-full px-3.5 py-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 text-xs focus:ring-2 focus:ring-zinc-400">
-                            <template x-for="p in profiles" :key="p.id">
+                            <template x-for="p in filteredProfiles" :key="p.id">
                                 <option :value="p.name" x-text="p.name + ' (' + formatRupiah(p.selling_price) + (p.validity ? ' / Masa Aktif: ' + p.validity : '') + ')'"></option>
                             </template>
                         </select>
-                        <span class="text-[10px] text-zinc-500 mt-1 block">Masa berlaku paket dihitung sejak pertama login</span>
+                        <span class="text-[10px] text-zinc-500 mt-1 block">Default profil hanya menampilkan paket kategori voucher</span>
                     </div>
                     <div>
                         <label class="block font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
@@ -163,7 +180,7 @@
                         <svg x-show="isGenerating" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                         </svg>
-                        <span x-text="isGenerating ? 'Sedang Generate...' : 'Simpan & Generate ' + form.qty + ' Voucher'"></span>
+                        <span x-text="isGenerating ? 'Sedang Generate...' : 'Simpan & Generate ' + formatNumber(form.qty) + ' Voucher'"></span>
                     </button>
                 </div>
             </form>
@@ -175,13 +192,14 @@
         function voucherGenerator() {
             return {
                 isGenerating: false,
-                profiles: @json($profiles ?? []),
+                allProfiles: @json($allProfiles ?? $profiles ?? []),
+                profileCategory: 'voucher',
                 servers: @json($servers ?? []),
                 form: {
                     qty: 5,
                     server: 'all',
                     credentialMode: 'same',
-                    length: 5,
+                    length: 4,
                     prefix: '',
                     charSet: 'numeric',
                     profile: '{{ $profiles->first()?->name ?? "" }}',
@@ -189,25 +207,53 @@
                     dataLimit: '',
                     comment: ''
                 },
-                init() {
-                    if (!this.form.profile && this.profiles.length > 0) {
-                        this.form.profile = this.profiles[0].name;
-                        this.onProfileChange();
+                get filteredProfiles() {
+                    if (this.profileCategory === 'all') {
+                        return this.allProfiles;
                     }
+                    if (this.profileCategory === 'voucher') {
+                        return this.allProfiles.filter(p => p.category === 'voucher' || p.category === 'profit' || !p.category);
+                    }
+                    return this.allProfiles.filter(p => p.category === this.profileCategory);
+                },
+                init() {
+                    this.initDefaultProfile();
+                },
+                onCategoryChange() {
+                    this.initDefaultProfile();
+                },
+                initDefaultProfile() {
+                    const list = this.filteredProfiles;
+                    if (list.length > 0) {
+                        if (!list.some(p => p.name === this.form.profile)) {
+                            this.form.profile = list[0].name;
+                        }
+                    } else {
+                        this.form.profile = '';
+                    }
+                    this.onProfileChange();
                 },
                 onProfileChange() {
-                    const p = this.profiles.find(x => x.name === this.form.profile);
+                    const p = this.allProfiles.find(x => x.name === this.form.profile);
                 },
                 get selectedProfilePrice() {
-                    const p = this.profiles.find(x => x.name === this.form.profile);
+                    const p = this.allProfiles.find(x => x.name === this.form.profile);
                     return p ? formatRupiah(p.selling_price) : '';
                 },
                 get sampleCode() {
                     const pref = this.form.prefix || '';
-                    if (this.form.charSet === 'numeric') return pref + '84920';
-                    if (this.form.charSet === 'uppercase') return pref + 'KWXPZ';
-                    if (this.form.charSet === 'lowercase') return pref + 'mxtya';
-                    return pref + '7xK9A';
+                    const len = Math.max(3, Math.min(12, parseInt(this.form.length) || 4));
+                    const num = '849203175648';
+                    const upper = 'KWXPZQBCDFGH';
+                    const lower = 'mxtyapqrstuv';
+                    const mixed = '7xK9AbCdEfGh';
+                    
+                    let sample = num;
+                    if (this.form.charSet === 'uppercase') sample = upper;
+                    else if (this.form.charSet === 'lowercase') sample = lower;
+                    else if (this.form.charSet === 'mixed') sample = mixed;
+                    
+                    return pref + sample.substring(0, len);
                 },
                 generateVouchers() {
                     if (this.isGenerating) return;

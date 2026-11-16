@@ -41,15 +41,42 @@ class HotspotUserController extends Controller
             }
         }
 
-        $profiles = HotspotProfile::all();
+        // 1. Fetch live active sessions for live uptime calculation
+        $activeUserMap = [];
+        try {
+            $activeSessions = $routerOs->getActiveHotspotSessions();
+            foreach ($activeSessions as $s) {
+                if (!empty($s['user'])) {
+                    $activeUserMap[$s['user']] = $s;
+                }
+            }
+        } catch (\Throwable $e) {
+            // Non-blocking if router query fails
+        }
+
+        $profiles = HotspotProfile::orderByRaw("CASE WHEN category = 'voucher' THEN 1 WHEN category = 'bulanan' THEN 2 ELSE 3 END")
+            ->orderBy('name')
+            ->get();
+
         $status = $request->get('status');
         if (empty($status)) {
             $status = 'active'; // Default: hanya user aktif
         }
+        $category = $request->get('category', 'all');
 
         $query = HotspotUser::with('profile')
             ->when($request->search, fn($q, $s) => $q->where('username', 'like', "%{$s}%"))
             ->when($request->profile_id, fn($q, $p) => $q->where('profile_id', $p));
+
+        if ($category && $category !== 'all') {
+            $query->whereHas('profile', function ($q) use ($category) {
+                if ($category === 'voucher') {
+                    $q->whereIn('category', ['voucher', 'profit']);
+                } else {
+                    $q->where('category', $category);
+                }
+            });
+        }
 
         if ($status === 'active') {
             $query->where('is_active', true);
@@ -57,9 +84,9 @@ class HotspotUserController extends Controller
             $query->where('is_active', false);
         } // if $status === 'all', don't filter is_active
 
-        $users = $query->latest('id')->paginate(50)->withQueryString();
+        $users = $query->latest('id')->paginate(25)->withQueryString();
 
-        return view('hotspot.users', compact('users', 'profiles', 'status'));
+        return view('hotspot.users', compact('users', 'profiles', 'status', 'category', 'activeUserMap'));
     }
 
     public function store(Request $request, RouterOsService $routerOs): JsonResponse

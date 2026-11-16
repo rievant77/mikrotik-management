@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\DailyUserUsageSummary;
 use App\Models\HotspotSession;
 use App\Models\HotspotUser;
+use App\Models\MonthlyCustomer;
+use App\Models\MonthlyInvoice;
 use App\Models\RouterSetting;
 use App\Models\VoucherSale;
 use App\Services\CollectorService;
@@ -31,7 +33,9 @@ class DashboardController extends Controller
 
         $todayUsage = $this->calculateTodayUsage($rawSessions);
 
-        $todaySalesQuery = VoucherSale::where('status', 'completed')->whereDate('activated_at', Carbon::today());
+        $todaySalesQuery = VoucherSale::where('status', 'completed')
+            ->forRevenue()
+            ->whereDate('activated_at', Carbon::today());
         $todayRevenue = (float) $todaySalesQuery->sum('selling_price');
         $todayVouchersSold = $todaySalesQuery->count();
 
@@ -67,10 +71,33 @@ class DashboardController extends Controller
             ];
         });
 
+        // Live devices from DHCP leases and active sessions
+        $leases = $routerOs->getDhcpLeases();
+        $totalDevicesCount = count($leases) > 0 ? count($leases) : $onlineUsersCount;
+        $onlineDevicesCount = $onlineUsersCount;
+        $standbyDevicesCount = max(0, $totalDevicesCount - $onlineDevicesCount);
+
+        // Current Month Billing stats (Monthly invoices & customers)
+        $currentMonth = Carbon::now()->startOfMonth()->toDateString();
+        $monthlyInvoices = MonthlyInvoice::whereDate('billing_month', $currentMonth)
+            ->where('status', '<>', 'cancelled')
+            ->get();
+        $monthlyUnpaidCount = $monthlyInvoices->whereIn('status', ['unpaid', 'partial'])->count();
+        $monthlyUnpaidAmount = (float) $monthlyInvoices->sum('balance_due');
+        $monthlyCustomersCount = MonthlyCustomer::where('is_active', true)->count();
+        $monthlyPaidCount = $monthlyInvoices->where('status', 'paid')->count();
+
         return view('dashboard.index', compact(
             'onlineUsersCount',
             'activeSessionsCount',
             'totalHotspotUsers',
+            'totalDevicesCount',
+            'onlineDevicesCount',
+            'standbyDevicesCount',
+            'monthlyUnpaidCount',
+            'monthlyUnpaidAmount',
+            'monthlyCustomersCount',
+            'monthlyPaidCount',
             'todayUsage',
             'todayRevenue',
             'todayVouchersSold',
@@ -108,7 +135,9 @@ class DashboardController extends Controller
         $freeMemory = $routerInfo['free_memory'];
         $uptime = $routerInfo['uptime'];
 
-        $todaySalesQuery = VoucherSale::where('status', 'completed')->whereDate('activated_at', Carbon::today());
+        $todaySalesQuery = VoucherSale::where('status', 'completed')
+            ->forRevenue()
+            ->whereDate('activated_at', Carbon::today());
         $todayRevenue = (float) $todaySalesQuery->sum('selling_price');
         $todayVouchersSold = $todaySalesQuery->count();
 
@@ -144,9 +173,31 @@ class DashboardController extends Controller
 
         $todayUsage = $this->calculateTodayUsage($rawSessions);
 
+        $leases = $routerOs->getDhcpLeases();
+        $totalDevicesCount = count($leases) > 0 ? count($leases) : $onlineUsersCount;
+        $onlineDevicesCount = $onlineUsersCount;
+        $standbyDevicesCount = max(0, $totalDevicesCount - $onlineDevicesCount);
+
+        $currentMonth = Carbon::now()->startOfMonth()->toDateString();
+        $monthlyInvoices = MonthlyInvoice::whereDate('billing_month', $currentMonth)
+            ->where('status', '<>', 'cancelled')
+            ->get();
+        $monthlyUnpaidCount = $monthlyInvoices->whereIn('status', ['unpaid', 'partial'])->count();
+        $monthlyUnpaidAmount = (float) $monthlyInvoices->sum('balance_due');
+        $monthlyCustomersCount = MonthlyCustomer::where('is_active', true)->count();
+        $monthlyPaidCount = $monthlyInvoices->where('status', 'paid')->count();
+
         return response()->json([
             'online_users' => $onlineUsersCount,
             'active_devices' => $activeSessionsCount,
+            'total_devices' => $totalDevicesCount,
+            'online_devices' => $onlineDevicesCount,
+            'standby_devices' => $standbyDevicesCount,
+            'monthly_unpaid_count' => $monthlyUnpaidCount,
+            'monthly_unpaid_amount' => $monthlyUnpaidAmount,
+            'monthly_unpaid_amount_formatted' => \App\Support\FormatHelper::formatRupiah($monthlyUnpaidAmount),
+            'monthly_customers_count' => $monthlyCustomersCount,
+            'monthly_paid_count' => $monthlyPaidCount,
             'download_rate_mbps' => $downloadMbps,
             'upload_rate_mbps' => $uploadMbps,
             'download_rate_formatted' => $totalRxBps > 1000000 ? ($downloadMbps . ' Mbps') : (round($totalRxBps / 1000) . ' Kbps'),
@@ -208,7 +259,7 @@ class DashboardController extends Controller
             'host' => $routerSetting->host ?? 'Belum diatur',
             'api_port' => $routerSetting->api_port ?? 8728,
             'use_ssl' => (bool) ($routerSetting->use_ssl ?? false),
-            'last_poll' => $routerSetting?->last_successful_poll_at?->diffForHumans() ?? 'Belum pernah',
+            'last_poll' => $routerSetting?->last_successful_poll_at?->locale('id')->diffForHumans() ?? 'Belum pernah',
         ];
     }
 

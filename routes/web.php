@@ -58,6 +58,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/traffic-analytics/live', [TrafficAnalyticsController::class, 'liveData'])->name('traffic.live');
     Route::post('/api/traffic-analytics/deploy-rules', [TrafficAnalyticsController::class, 'deployRules'])->name('traffic.deploy');
     Route::post('/api/traffic-analytics/reset-counters', [TrafficAnalyticsController::class, 'resetCounters'])->name('traffic.reset-counters');
+    Route::get('/api/traffic-analytics/signatures', [TrafficAnalyticsController::class, 'signatures'])->name('traffic.signatures');
+    Route::post('/api/traffic-analytics/signatures', [TrafficAnalyticsController::class, 'storeSignature'])->name('traffic.signatures.store');
+    Route::put('/api/traffic-analytics/signatures/{id}', [TrafficAnalyticsController::class, 'updateSignature'])->name('traffic.signatures.update');
+    Route::delete('/api/traffic-analytics/signatures/{id}', [TrafficAnalyticsController::class, 'destroySignature'])->name('traffic.signatures.destroy');
+    Route::post('/api/traffic-analytics/signatures/reset-defaults', [TrafficAnalyticsController::class, 'resetDefaultSignatures'])->name('traffic.signatures.reset-defaults');
+    Route::get('/api/traffic-analytics/platforms/{platformKey}/users', [TrafficAnalyticsController::class, 'platformUserRank'])->name('traffic.platforms.users');
 
     // Hotspot
     Route::prefix('hotspot')->group(function () {

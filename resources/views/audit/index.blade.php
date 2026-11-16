@@ -22,7 +22,7 @@
                     </thead>
                     <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
                         <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/40">
-                            <td class="py-3.5 px-4 font-mono text-zinc-500">25 Ags 2026, 09:12</td>
+                            <td class="py-3.5 px-4 font-mono text-zinc-500">{{ \App\Support\FormatHelper::formatDateTimeShort(now()->subMinutes(30)) }}</td>
                             <td class="py-3.5 px-4 font-semibold text-zinc-900 dark:text-zinc-100">System (Collector)</td>
                             <td class="py-3.5 px-4 font-mono">voucher_activated</td>
                             <td class="py-3.5 px-4 text-zinc-600 dark:text-zinc-300">Voucher: VC-89241</td>
@@ -30,18 +30,18 @@
                             <td class="py-3.5 px-4 text-right"><x-badge type="success">Success</x-badge></td>
                         </tr>
                         <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/40">
-                            <td class="py-3.5 px-4 font-mono text-zinc-500">25 Ags 2026, 08:45</td>
+                            <td class="py-3.5 px-4 font-mono text-zinc-500">{{ \App\Support\FormatHelper::formatDateTimeShort(now()->subHours(2)) }}</td>
                             <td class="py-3.5 px-4 font-semibold text-zinc-900 dark:text-zinc-100">Admin (Kaligata)</td>
                             <td class="py-3.5 px-4 font-mono">monthly_payment_created</td>
-                            <td class="py-3.5 px-4 text-zinc-600 dark:text-zinc-300">Customer: Budi Santoso (Rp150.000)</td>
+                            <td class="py-3.5 px-4 text-zinc-600 dark:text-zinc-300">Customer: Budi Santoso (Rp 150.000)</td>
                             <td class="py-3.5 px-4 font-mono text-zinc-400">192.168.88.10</td>
                             <td class="py-3.5 px-4 text-right"><x-badge type="success">Success</x-badge></td>
                         </tr>
                         <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/40">
-                            <td class="py-3.5 px-4 font-mono text-zinc-500">25 Ags 2026, 08:00</td>
+                            <td class="py-3.5 px-4 font-mono text-zinc-500">{{ \App\Support\FormatHelper::formatDateTimeShort(now()->subHours(3)) }}</td>
                             <td class="py-3.5 px-4 font-semibold text-zinc-900 dark:text-zinc-100">Admin (Kaligata)</td>
                             <td class="py-3.5 px-4 font-mono">cashier_shift_opened</td>
-                            <td class="py-3.5 px-4 text-zinc-600 dark:text-zinc-300">Shift #104 (Modal: Rp200.000)</td>
+                            <td class="py-3.5 px-4 text-zinc-600 dark:text-zinc-300">Shift #104 (Modal: Rp 200.000)</td>
                             <td class="py-3.5 px-4 font-mono text-zinc-400">192.168.88.10</td>
                             <td class="py-3.5 px-4 text-right"><x-badge type="success">Success</x-badge></td>
                         </tr>

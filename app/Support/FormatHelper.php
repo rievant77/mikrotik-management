@@ -32,12 +32,89 @@ class FormatHelper
     }
 
     /**
+     * Format number using Indonesian numeric / thousands separator (e.g. 1.000 or 1.250,50).
+     */
+    public static function formatNumber(float|int|string|null $number, int $decimals = 0): string
+    {
+        if ($number === null || $number === '') {
+            return '0';
+        }
+
+        return number_format((float) $number, $decimals, ',', '.');
+    }
+
+    /**
+     * Format date in Indonesian using Carbon localized translatedFormat.
+     * Example: "15 November 2026"
+     */
+    public static function formatDate(\DateTimeInterface|string|null $date, string $format = 'd F Y'): string
+    {
+        if (empty($date)) {
+            return '-';
+        }
+
+        try {
+            return \Illuminate\Support\Carbon::parse($date)->locale('id')->translatedFormat($format);
+        } catch (\Throwable $e) {
+            return (string) $date;
+        }
+    }
+
+    /**
+     * Alias for formatDate for Indonesian date formatting.
+     */
+    public static function formatDateIndo(\DateTimeInterface|string|null $date, string $format = 'd F Y'): string
+    {
+        return self::formatDate($date, $format);
+    }
+
+    /**
+     * Format date and time in Indonesian using Carbon localized translatedFormat.
+     * Example: "15 November 2026, 14:30"
+     */
+    public static function formatDateTime(\DateTimeInterface|string|null $date, string $format = 'd F Y, H:i'): string
+    {
+        if (empty($date)) {
+            return '-';
+        }
+
+        try {
+            return \Illuminate\Support\Carbon::parse($date)->locale('id')->translatedFormat($format);
+        } catch (\Throwable $e) {
+            return (string) $date;
+        }
+    }
+
+    /**
+     * Format short date in Indonesian (e.g. "15 Nov 2026", "25 Agt 2026").
+     */
+    public static function formatDateShort(\DateTimeInterface|string|null $date): string
+    {
+        return self::formatDate($date, 'd M Y');
+    }
+
+    /**
+     * Format short datetime in Indonesian (e.g. "15 Nov 2026, 14:30").
+     */
+    public static function formatDateTimeShort(\DateTimeInterface|string|null $date): string
+    {
+        return self::formatDate($date, 'd M Y, H:i');
+    }
+
+    /**
      * Format month year in Indonesian using Carbon native locale.
      */
-    public static function formatMonthIndo(\Carbon\CarbonInterface $date): string
+    public static function formatMonthIndo(\Carbon\CarbonInterface|\DateTimeInterface|string|null $date): string
     {
-        // ponytail: native Carbon translatedFormat replaces 20-line manual lookup table
-        return $date->locale('id')->translatedFormat('F Y');
+        if (empty($date)) {
+            return '-';
+        }
+
+        try {
+            return \Illuminate\Support\Carbon::parse($date)->locale('id')->translatedFormat('F Y');
+        } catch (\Throwable $e) {
+            return (string) $date;
+        }
     }
 
     /**
@@ -290,5 +367,66 @@ class FormatHelper
         }
 
         return 0;
+    }
+
+    /**
+     * Calculate throttled FUP rate limit string (e.g. "10M/10M" * 50% => "5M/5M").
+     */
+    public static function calculateFupRateLimit(?string $baseRate, int|float|null $percent): ?string
+    {
+        if (empty($baseRate) || empty($percent) || (float)$percent <= 0) {
+            return null;
+        }
+
+        $multiplier = ((float) $percent) / 100;
+        if ($multiplier >= 1.0) {
+            return trim($baseRate);
+        }
+
+        $parts = explode('/', trim($baseRate));
+        $calculated = [];
+
+        foreach ($parts as $part) {
+            $part = trim($part);
+            if (preg_match('/^(\d+(?:\.\d+)?)\s*([kKmMgG])?$/', $part, $m)) {
+                $val = (float) $m[1];
+                $unit = isset($m[2]) && $m[2] !== '' ? strtolower($m[2]) : '';
+
+                // Convert to kbps
+                $kbps = match ($unit) {
+                    'g' => $val * 1000 * 1000,
+                    'm' => $val * 1000,
+                    'k' => $val,
+                    default => $val / 1000,
+                };
+
+                $throttledKbps = $kbps * $multiplier;
+
+                // Format: if >= 1000 kbps and cleanly divisible by 1000, use 'M'
+                if ($throttledKbps >= 1000 && fmod($throttledKbps, 1000) === 0.0) {
+                    $calculated[] = ((int) ($throttledKbps / 1000)) . 'M';
+                } else {
+                    $calculated[] = max(1, (int) round($throttledKbps)) . 'k';
+                }
+            } else {
+                $calculated[] = $part;
+            }
+        }
+
+        return implode('/', $calculated);
+    }
+
+    /**
+     * Calculate cost price based on type (percentage, fixed, custom).
+     */
+    public static function calculateCostPrice(?string $type, float|int|null $percent, float|int|null $sellingPrice, float|int|null $customCost): float
+    {
+        $type = $type ?: 'custom';
+
+        return match ($type) {
+            'percentage' => round(((float) ($sellingPrice ?? 0)) * (((float) ($percent ?? 0)) / 100), 2),
+            'fixed' => (float) ($customCost ?? 0),
+            default => (float) ($customCost ?? 0),
+        };
     }
 }

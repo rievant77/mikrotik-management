@@ -169,7 +169,7 @@
                 </div>
                 <div class="flex items-center justify-between text-[11px] text-zinc-400 mt-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
                     <span>Uptime: {{ \App\Support\FormatHelper::formatUptime($totalUptimeSeconds) }}</span>
-                    <span>{{ number_format($totalSessionsCount) }} Sesi</span>
+                    <span>{{ \App\Support\FormatHelper::formatNumber($totalSessionsCount) }} Sesi</span>
                 </div>
             </div>
         </div>
@@ -181,7 +181,9 @@
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div class="flex items-start gap-3">
                         <div class="p-2 rounded-lg" :class="fup.fup_active ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400' : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'">
-                            <span class="text-xl" x-text="fup.fup_active ? '🐢' : '🚀'"></span>
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
                         </div>
                         <div>
                             <div class="flex items-center gap-2">
@@ -223,7 +225,9 @@
                                 :disabled="isResettingFup"
                                 class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-300 dark:border-zinc-700 transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
                             >
-                                <span>🔄</span>
+                                <svg class="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
                                 <span x-text="isResettingFup ? 'Mereset...' : 'Reset FUP User'"></span>
                             </button>
                         </template>
@@ -338,12 +342,12 @@
                         @if($isHourlyChart ?? false)
                             Grafik Konsumsi Kuota User (24 Jam: 00:00 - 23:00)
                         @else
-                            Grafik Konsumsi Kuota User ({{ count($chartCategories) }} Titik Waktu)
+                            Grafik Konsumsi Kuota User ({{ \App\Support\FormatHelper::formatNumber(count($chartCategories)) }} Titik Waktu)
                         @endif
                     </h3>
                     <p class="text-[11px] text-zinc-400 mt-0.5">
                         @if($isHourlyChart ?? false)
-                            Distribusi volume unduh (Rx) dan unggah (Tx) per-jam pada tanggal {{ ($startDate ?? now())->format('d M Y') }}
+                            Distribusi volume unduh (Rx) dan unggah (Tx) per-jam pada tanggal {{ \App\Support\FormatHelper::formatDateIndo($startDate ?? now()) }}
                         @else
                             Riwayat volume download dan upload per hari sesuai filter periode
                         @endif
@@ -383,7 +387,13 @@
                             <div class="flex items-start justify-between">
                                 <div>
                                     <div class="font-bold text-sm text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
-                                        <span>{{ ($live['device_type'] ?? '') === 'phone' ? '📱' : (($live['device_type'] ?? '') === 'laptop' ? '💻' : '📡') }}</span>
+                                        @if(($live['device_type'] ?? '') === 'phone')
+                                            <svg class="w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                                        @elseif(($live['device_type'] ?? '') === 'laptop' || ($live['device_type'] ?? '') === 'pc')
+                                            <svg class="w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                                        @else
+                                            <svg class="w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                                        @endif
                                         <span>{{ $live['device_display_name'] ?? ($live['device_name'] ?? 'Perangkat Hotspot') }}</span>
                                     </div>
                                     <div class="text-[11px] font-mono text-zinc-500 dark:text-zinc-400 mt-0.5">
@@ -409,7 +419,7 @@
                                     @endphp
                                     @if($liveProg['has_limit'] && $liveProg['remaining_formatted'])
                                         <div class="text-[10px] font-mono text-amber-600 dark:text-amber-400 font-semibold">
-                                            ⏳ Sisa: {{ $liveProg['remaining_formatted'] }} ({{ $liveProg['remaining_percent'] }}%)
+                                            Sisa: {{ $liveProg['remaining_formatted'] }} ({{ $liveProg['remaining_percent'] }}%)
                                         </div>
                                     @endif
                                 </div>
@@ -447,7 +457,13 @@
                                 <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors">
                                     <td class="py-3.5 px-4">
                                         <div class="font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
-                                            <span>{{ ($live['device_type'] ?? '') === 'phone' ? '📱' : (($live['device_type'] ?? '') === 'laptop' ? '💻' : '📡') }}</span>
+                                            @if(($live['device_type'] ?? '') === 'phone')
+                                                <svg class="w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                                            @elseif(($live['device_type'] ?? '') === 'laptop' || ($live['device_type'] ?? '') === 'pc')
+                                                <svg class="w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                                            @else
+                                                <svg class="w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                                            @endif
                                             <span>{{ $live['device_display_name'] ?? ($live['device_name'] ?? 'Perangkat Hotspot') }}</span>
                                         </div>
                                         <div class="text-[10px] text-zinc-400 font-mono">{{ $live['.id'] ?? $username }}</div>
@@ -499,7 +515,7 @@
         <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden shadow-xs">
             <div class="px-5 py-3.5 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-800/20">
                 <h3 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">Histori Pemakaian Harian</h3>
-                <span class="text-[11px] text-zinc-400">{{ count($dailySummaries) }} Hari Terfilter</span>
+                <span class="text-[11px] text-zinc-400">{{ \App\Support\FormatHelper::formatNumber(count($dailySummaries)) }} Hari Terfilter</span>
             </div>
 
             @if(count($dailySummaries) > 0)
@@ -509,7 +525,7 @@
                         <div class="p-4 space-y-2">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-1.5 font-bold text-sm text-zinc-900 dark:text-zinc-100">
-                                    <span>{{ \Carbon\Carbon::parse($day->usage_date)->format('d M Y') }}</span>
+                                    <span>{{ \App\Support\FormatHelper::formatDateShort($day->usage_date) }}</span>
                                     @if(\Carbon\Carbon::parse($day->usage_date)->isToday())
                                         <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400">Hari Ini</span>
                                     @endif
@@ -526,7 +542,7 @@
                                 </div>
                                 <div class="text-right">
                                     <span class="text-[10px] text-zinc-400 block">Sesi & Durasi</span>
-                                    <span class="text-zinc-700 dark:text-zinc-300 font-medium">{{ $day->session_count ?: 1 }} Sesi • {{ \App\Support\FormatHelper::formatUptime($day->total_uptime_seconds) }}</span>
+                                    <span class="text-zinc-700 dark:text-zinc-300 font-medium">{{ \App\Support\FormatHelper::formatNumber($day->session_count ?: 1) }} Sesi • {{ \App\Support\FormatHelper::formatUptime($day->total_uptime_seconds) }}</span>
                                 </div>
                             </div>
                         </div>
@@ -550,13 +566,13 @@
                             @foreach($dailySummaries as $day)
                                 <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors">
                                     <td class="py-3.5 px-4 font-semibold text-zinc-900 dark:text-zinc-100">
-                                        {{ \Carbon\Carbon::parse($day->usage_date)->format('d M Y') }}
+                                        {{ \App\Support\FormatHelper::formatDateShort($day->usage_date) }}
                                         @if(\Carbon\Carbon::parse($day->usage_date)->isToday())
                                             <span class="ml-1.5 px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400">Hari Ini</span>
                                         @endif
                                     </td>
                                     <td class="py-3.5 px-4 text-zinc-700 dark:text-zinc-300">
-                                        {{ $day->session_count ?: 1 }} Sesi
+                                        {{ \App\Support\FormatHelper::formatNumber($day->session_count ?: 1) }} Sesi
                                     </td>
                                     <td class="py-3.5 px-4 font-mono text-zinc-500">
                                         {{ \App\Support\FormatHelper::formatUptime($day->total_uptime_seconds) }}
@@ -586,7 +602,7 @@
         <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden shadow-xs">
             <div class="px-5 py-3.5 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-800/20">
                 <h3 class="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">Riwayat Sesi Login Sebelumnya</h3>
-                <span class="text-[11px] text-zinc-400">{{ count($pastSessions) }} Sesi Ditemukan</span>
+                <span class="text-[11px] text-zinc-400">{{ \App\Support\FormatHelper::formatNumber(count($pastSessions)) }} Sesi Ditemukan</span>
             </div>
 
             @if(count($pastSessions) > 0)
@@ -617,7 +633,7 @@
                                 <div>
                                     <span class="text-[10px] text-zinc-400 block">Waktu Sesi</span>
                                     <div class="text-zinc-700 dark:text-zinc-300">
-                                        {{ $session->started_at ? \Carbon\Carbon::parse($session->started_at)->format('d M, H:i') : '-' }}
+                                        {{ $session->started_at ? \Carbon\Carbon::parse($session->started_at)->locale('id')->translatedFormat('d M, H:i') : '-' }}
                                         &rarr;
                                         {{ $session->ended_at ? \Carbon\Carbon::parse($session->ended_at)->format('H:i') : 'Now' }}
                                     </div>
@@ -657,10 +673,10 @@
                                         <div class="text-[10px] text-zinc-400">{{ $session->mac_address ?: '-' }}</div>
                                     </td>
                                     <td class="py-3.5 px-4 text-zinc-600 dark:text-zinc-400">
-                                        {{ $session->started_at ? \Carbon\Carbon::parse($session->started_at)->format('d M Y, H:i') : '-' }}
+                                        {{ $session->started_at ? \App\Support\FormatHelper::formatDateTimeShort($session->started_at) : '-' }}
                                     </td>
                                     <td class="py-3.5 px-4 text-zinc-600 dark:text-zinc-400">
-                                        {{ $session->ended_at ? \Carbon\Carbon::parse($session->ended_at)->format('d M Y, H:i') : '-' }}
+                                        {{ $session->ended_at ? \App\Support\FormatHelper::formatDateTimeShort($session->ended_at) : '-' }}
                                     </td>
                                     <td class="py-3.5 px-4 font-mono text-sky-600 dark:text-sky-400">
                                         ↑ {{ \App\Support\FormatHelper::formatBytes($session->total_bytes_in, 1) }}

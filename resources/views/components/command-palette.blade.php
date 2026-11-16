@@ -63,8 +63,13 @@
                 <template x-if="results.users && results.users.length > 0">
                     <div>
                         <div class="px-2 pb-1.5 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider flex items-center justify-between">
-                            <span>👥 Pengguna Hotspot</span>
-                            <span class="text-[10px] lowercase" x-text="results.users.length + ' ditemukan'"></span>
+                            <span class="flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                                </svg>
+                                <span>Pengguna Hotspot</span>
+                            </span>
+                            <span class="text-[10px] lowercase" x-text="formatNumber(results.users.length) + ' ditemukan'"></span>
                         </div>
                         <div class="space-y-1">
                             <template x-for="user in results.users" :key="user.id || user.title">
@@ -78,7 +83,7 @@
                                             <span class="text-[11px] text-zinc-400 block" x-text="user.subtitle"></span>
                                         </div>
                                     </div>
-                                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 font-medium">Buka Profil ➔</span>
+                                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 font-medium">Buka Profil &rarr;</span>
                                 </a>
                             </template>
                         </div>
@@ -89,8 +94,13 @@
                 <template x-if="results.devices && results.devices.length > 0">
                     <div>
                         <div class="px-2 pb-1.5 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider flex items-center justify-between">
-                            <span>🖥️ Perangkat Jaringan (IP / MAC)</span>
-                            <span class="text-[10px] lowercase" x-text="results.devices.length + ' ditemukan'"></span>
+                            <span class="flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                                <span>Perangkat Jaringan (IP / MAC)</span>
+                            </span>
+                            <span class="text-[10px] lowercase" x-text="formatNumber(results.devices.length) + ' ditemukan'"></span>
                         </div>
                         <div class="space-y-1">
                             <template x-for="device in results.devices" :key="device.title">
@@ -106,7 +116,7 @@
                                             <span class="text-[11px] text-zinc-400 block font-mono" x-text="device.subtitle"></span>
                                         </div>
                                     </div>
-                                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 font-medium">Lihat di Live Devices ➔</span>
+                                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 font-medium">Lihat di Live Devices &rarr;</span>
                                 </a>
                             </template>
                         </div>
@@ -117,8 +127,13 @@
                 <template x-if="results.customers && results.customers.length > 0">
                     <div>
                         <div class="px-2 pb-1.5 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider flex items-center justify-between">
-                            <span>🧾 Pelanggan & Tagihan Bulanan</span>
-                            <span class="text-[10px] lowercase" x-text="results.customers.length + ' ditemukan'"></span>
+                            <span class="flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                <span>Pelanggan & Tagihan Bulanan</span>
+                            </span>
+                            <span class="text-[10px] lowercase" x-text="formatNumber(results.customers.length) + ' ditemukan'"></span>
                         </div>
                         <div class="space-y-1">
                             <template x-for="item in results.customers" :key="item.id || item.title">
@@ -134,7 +149,7 @@
                                             <span class="text-[11px] text-zinc-400 block" x-text="item.subtitle"></span>
                                         </div>
                                     </div>
-                                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 font-medium">Buka Kasir ➔</span>
+                                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 font-medium">Buka Kasir &rarr;</span>
                                 </a>
                             </template>
                         </div>
@@ -144,8 +159,11 @@
                 <!-- Group 4: Navigation / Quick Jump -->
                 <template x-if="results.navigation && results.navigation.length > 0">
                     <div>
-                        <div class="px-2 pb-1.5 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
-                            <span>⚡ Menu & Navigasi Cepat</span>
+                        <div class="px-2 pb-1.5 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                            <span>Menu & Navigasi Cepat</span>
                         </div>
                         <div class="space-y-1">
                             <template x-for="nav in results.navigation" :key="nav.url">

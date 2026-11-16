@@ -6,7 +6,9 @@
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
                 <h1 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight flex items-center gap-2.5">
-                    <span>🎟️</span>
+                    <svg class="w-6 h-6 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                    </svg>
                     <span>Daftar & Cetak Voucher</span>
                 </h1>
                 <p class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-1">
@@ -41,10 +43,12 @@
             <div class="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs">
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-medium text-zinc-500 dark:text-zinc-400">Total Voucher</span>
-                    <span class="text-lg">🎟️</span>
+                    <svg class="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                    </svg>
                 </div>
                 <div class="mt-2 text-xl sm:text-2xl font-extrabold text-zinc-900 dark:text-zinc-100 font-mono">
-                    {{ number_format($stats['total']) }}
+                    {{ \App\Support\FormatHelper::formatNumber($stats['total']) }}
                 </div>
                 <span class="text-[11px] text-zinc-400 mt-1 block">Tersimpan di sistem</span>
             </div>
@@ -56,7 +60,7 @@
                     <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 </div>
                 <div class="mt-2 text-xl sm:text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 font-mono">
-                    {{ number_format($stats['online']) }}
+                    {{ \App\Support\FormatHelper::formatNumber($stats['online']) }}
                 </div>
                 <span class="text-[11px] text-zinc-400 mt-1 block">Sesi aktif di router</span>
             </div>
@@ -65,10 +69,12 @@
             <div class="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs">
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-medium text-zinc-500 dark:text-zinc-400">Batch Generate</span>
-                    <span class="text-lg">📦</span>
+                    <svg class="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
                 </div>
                 <div class="mt-2 text-xl sm:text-2xl font-extrabold text-zinc-900 dark:text-zinc-100 font-mono">
-                    {{ number_format($stats['batches']) }}
+                    {{ \App\Support\FormatHelper::formatNumber($stats['batches']) }}
                 </div>
                 <span class="text-[11px] text-zinc-400 mt-1 block">Kelompok batch generate</span>
             </div>
@@ -77,19 +83,27 @@
             <div class="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs">
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-medium text-zinc-500 dark:text-zinc-400">Nilai Inventory</span>
-                    <span class="text-lg">💰</span>
+                    <svg class="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
                 </div>
                 <div class="mt-2 text-xl sm:text-2xl font-extrabold text-sky-600 dark:text-sky-400 font-mono">
                     {{ \App\Support\FormatHelper::formatRupiah($stats['inventory_value']) }}
                 </div>
-                <span class="text-[11px] text-zinc-400 mt-1 block">Potensi nominal rupiah</span>
+                <span class="text-[11px] text-zinc-400 mt-1 block">
+                    @if(request('category') === 'pribadi')
+                        Non-profit (dikecualikan)
+                    @else
+                        Potensi nominal rupiah
+                    @endif
+                </span>
             </div>
         </div>
 
         <!-- Filter & Search Toolbar -->
         <div class="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-4 shadow-xs">
             <form method="GET" action="{{ route('vouchers.index') }}" class="space-y-3">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
                     <!-- Search Input -->
                     <div>
                         <label class="block text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 mb-1">Cari Voucher</label>
@@ -107,6 +121,21 @@
                         </div>
                     </div>
 
+                    <!-- Kategori Filter -->
+                    <div>
+                        <label class="block text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 mb-1">Kategori</label>
+                        <select 
+                            name="category" 
+                            onchange="this.form.submit()" 
+                            class="w-full px-3 py-2 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-400"
+                        >
+                            <option value="all" {{ request('category', 'all') === 'all' ? 'selected' : '' }}>Semua Kategori</option>
+                            <option value="voucher" {{ request('category') === 'voucher' ? 'selected' : '' }}>Voucher (Komersial)</option>
+                            <option value="bulanan" {{ request('category') === 'bulanan' ? 'selected' : '' }}>Bulanan (Langganan)</option>
+                            <option value="pribadi" {{ request('category') === 'pribadi' ? 'selected' : '' }}>Pribadi (Non-Profit)</option>
+                        </select>
+                    </div>
+
                     <!-- Profile / Paket Filter -->
                     <div>
                         <label class="block text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 mb-1">Paket / Profile</label>
@@ -117,8 +146,15 @@
                         >
                             <option value="">Semua Paket Hotspot</option>
                             @foreach($profiles as $p)
+                                @php
+                                    $catLabel = match($p->category) {
+                                        'bulanan' => 'Bulanan',
+                                        'pribadi' => 'Pribadi',
+                                        default => 'Voucher',
+                                    };
+                                @endphp
                                 <option value="{{ $p->id }}" {{ request('profile_id') == $p->id ? 'selected' : '' }}>
-                                    {{ $p->name }} ({{ \App\Support\FormatHelper::formatRupiah($p->selling_price) }})
+                                    {{ $p->name }} [{{ $catLabel }}] ({{ \App\Support\FormatHelper::formatRupiah($p->selling_price) }})
                                 </option>
                             @endforeach
                         </select>
@@ -151,17 +187,17 @@
                         >
                             <option value="active" {{ request('status', 'active') === 'active' ? 'selected' : '' }}>Aktif / Ready (Default)</option>
                             <option value="all" {{ request('status') === 'all' ? 'selected' : '' }}>Semua (Termasuk In-Active)</option>
-                            <option value="online" {{ request('status') === 'online' ? 'selected' : '' }}>🟢 Sedang Online</option>
-                            <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>⚪ In-Active / Non-Aktif</option>
+                            <option value="online" {{ request('status') === 'online' ? 'selected' : '' }}>Sedang Online</option>
+                            <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>In-Active / Non-Aktif</option>
                         </select>
                     </div>
                 </div>
 
-                @if(request()->hasAny(['search', 'profile_id', 'batch']) || (request('status') && request('status') !== 'active'))
+                @if(request()->hasAny(['search', 'profile_id', 'batch']) || (request('category') && request('category') !== 'all') || (request('status') && request('status') !== 'active'))
                     <div class="flex items-center justify-between pt-2 border-t border-zinc-100 dark:border-zinc-800 text-xs">
                         <span class="text-zinc-500 dark:text-zinc-400">Filter aktif diterapkan.</span>
-                        <a href="{{ route('vouchers.index') }}" class="text-xs font-semibold text-red-600 dark:text-red-400 hover:underline">
-                            Reset Filter ✕
+                        <a href="{{ route('vouchers.index') }}" class="text-xs font-semibold text-rose-600 dark:text-rose-400 hover:underline">
+                            Reset Filter
                         </a>
                     </div>
                 @endif
@@ -177,11 +213,11 @@
                     :checked="isAllSelected({{ json_encode($vouchers->pluck('id')) }})"
                     class="rounded border-zinc-300 dark:border-zinc-700 text-zinc-900 focus:ring-zinc-900 dark:bg-zinc-800"
                 >
-                <span class="font-bold text-zinc-800 dark:text-zinc-200">Pilih Semua di Halaman Ini ({{ $vouchers->count() }} voucher)</span>
+                <span class="font-bold text-zinc-800 dark:text-zinc-200">Pilih Semua di Halaman Ini ({{ \App\Support\FormatHelper::formatNumber($vouchers->count()) }} voucher)</span>
             </label>
 
             <div class="flex items-center gap-2">
-                <span class="text-zinc-500 dark:text-zinc-400" x-text="selectedVouchers.length + ' terpilih'"></span>
+                <span class="text-zinc-500 dark:text-zinc-400" x-text="formatNumber(selectedVouchers.length) + ' terpilih'"></span>
                 <template x-if="selectedVouchers.length > 0">
                     <button 
                         type="button" 
@@ -250,7 +286,7 @@
                                 </span>
                             @else
                                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-zinc-200 dark:bg-zinc-700 text-zinc-500 dark:text-zinc-400 border border-zinc-300 dark:border-zinc-600">
-                                    ⚪ In-Active
+                                    In-Active
                                 </span>
                             @endif
                         </div>
@@ -260,8 +296,26 @@
                     <div class="mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800/80 grid grid-cols-2 gap-2 text-xs">
                         <div>
                             <span class="text-[10px] text-zinc-400 block">Paket & Harga:</span>
-                            <span class="font-bold text-zinc-800 dark:text-zinc-200">{{ $v->profile?->name ?? 'Default' }}</span>
-                            <span class="text-emerald-600 dark:text-emerald-400 font-mono font-semibold ml-1">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="font-bold text-zinc-800 dark:text-zinc-200">{{ $v->profile?->name ?? 'Default' }}</span>
+                                @php
+                                    $cat = $v->profile?->category ?? 'voucher';
+                                @endphp
+                                @if($cat === 'bulanan')
+                                    <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[9px] font-semibold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-800">
+                                        Bulanan
+                                    </span>
+                                @elseif($cat === 'pribadi')
+                                    <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[9px] font-semibold bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-300 dark:border-purple-800">
+                                        Pribadi
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[9px] font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+                                        Voucher
+                                    </span>
+                                @endif
+                            </div>
+                            <span class="text-emerald-600 dark:text-emerald-400 font-mono font-semibold">
                                 ({{ \App\Support\FormatHelper::formatRupiah($v->profile?->selling_price ?? 3000) }})
                             </span>
                         </div>
@@ -275,7 +329,7 @@
                                 @endphp
                                 @if($liveProg['has_limit'] && $liveProg['remaining_formatted'])
                                     <div class="text-[10px] font-mono text-amber-600 dark:text-amber-400 font-semibold mt-0.5">
-                                        ⏳ Sisa: {{ $liveProg['remaining_formatted'] }} ({{ $liveProg['remaining_percent'] }}%)
+                                        Sisa: {{ $liveProg['remaining_formatted'] }} ({{ $liveProg['remaining_percent'] }}%)
                                     </div>
                                 @elseif($isOnline)
                                     <div class="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 mt-0.5">
@@ -288,7 +342,7 @@
 
                     @if($v->comment)
                         <div class="mt-2 text-[10px] text-zinc-400 bg-zinc-100 dark:bg-zinc-800/50 px-2 py-1 rounded truncate">
-                            🏷️ {{ $v->comment }}
+                            {{ $v->comment }}
                         </div>
                     @endif
 
@@ -299,13 +353,13 @@
                                 href="{{ route('vouchers.print.58mm', ['ids' => $v->id]) }}" 
                                 class="px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 transition-colors"
                             >
-                                🧾 58mm
+                                58mm
                             </a>
                             <a 
                                 href="{{ route('vouchers.print.80mm', ['ids' => $v->id]) }}" 
                                 class="px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 transition-colors"
                             >
-                                🧾 80mm
+                                80mm
                             </a>
                         </div>
                         <a 
@@ -389,7 +443,25 @@
 
                                 <!-- Profile & Price -->
                                 <td class="py-3 px-4">
-                                    <span class="font-bold text-zinc-900 dark:text-zinc-100">{{ $v->profile?->name ?? 'Default' }}</span>
+                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                        <span class="font-bold text-zinc-900 dark:text-zinc-100">{{ $v->profile?->name ?? 'Default' }}</span>
+                                        @php
+                                            $cat = $v->profile?->category ?? 'voucher';
+                                        @endphp
+                                        @if($cat === 'bulanan')
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-semibold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-800">
+                                                Bulanan
+                                            </span>
+                                        @elseif($cat === 'pribadi')
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-semibold bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-300 dark:border-purple-800">
+                                                Pribadi
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+                                                Voucher
+                                            </span>
+                                        @endif
+                                    </div>
                                     <div class="text-[11px] font-mono font-semibold text-emerald-600 dark:text-emerald-400">
                                         {{ \App\Support\FormatHelper::formatRupiah($v->profile?->selling_price ?? 3000) }}
                                     </div>
@@ -439,7 +511,7 @@
                                         </span>
                                     @else
                                         <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-zinc-200 dark:bg-zinc-700 text-zinc-500 dark:text-zinc-400 border border-zinc-300 dark:border-zinc-600">
-                                            ⚪ In-Active
+                                            In-Active
                                         </span>
                                     @endif
                                 </td>
@@ -496,7 +568,7 @@
             style="display: none;"
         >
             <div class="flex items-center gap-2 font-bold text-zinc-100 dark:text-zinc-100">
-                <span class="px-2 py-0.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-md font-mono" x-text="selectedVouchers.length"></span>
+                <span class="px-2 py-0.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-md font-mono" x-text="formatNumber(selectedVouchers.length)"></span>
                 <span>Voucher Terpilih</span>
             </div>
 
@@ -506,29 +578,34 @@
                     @click="printSelectedGrid()" 
                     class="px-3 py-1.5 font-semibold rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-100 dark:bg-zinc-700/80 dark:hover:bg-zinc-700 dark:text-zinc-100 border border-zinc-700 dark:border-zinc-600 transition-colors flex items-center gap-1.5 shadow-xs"
                 >
-                    <span>🖨️</span> Grid A4
+                    <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    <span>Grid A4</span>
                 </button>
                 <button 
                     type="button" 
                     @click="printSelected58mm()" 
                     class="px-3 py-1.5 font-semibold rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-100 dark:bg-zinc-700/80 dark:hover:bg-zinc-700 dark:text-zinc-100 border border-zinc-700 dark:border-zinc-600 transition-colors flex items-center gap-1.5 shadow-xs"
                 >
-                    <span>🧾</span> 58mm
+                    58mm
                 </button>
                 <button 
                     type="button" 
                     @click="printSelected80mm()" 
                     class="px-3 py-1.5 font-semibold rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-100 dark:bg-zinc-700/80 dark:hover:bg-zinc-700 dark:text-zinc-100 border border-zinc-700 dark:border-zinc-600 transition-colors flex items-center gap-1.5 shadow-xs"
                 >
-                    <span>🧾</span> 80mm
+                    80mm
                 </button>
                 <button 
                     type="button" 
                     @click="deleteSelected()" 
                     :disabled="isBatchDeleting"
-                    class="px-3 py-1.5 font-semibold rounded-lg bg-red-600 hover:bg-red-700 text-white transition-colors flex items-center gap-1.5 shadow-xs"
+                    class="px-3 py-1.5 font-semibold rounded-lg bg-rose-600 hover:bg-rose-700 text-white transition-colors flex items-center gap-1.5 shadow-xs"
                 >
-                    <span>🗑️</span>
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
                     <span x-text="isBatchDeleting ? 'Menghapus...' : 'Hapus'"></span>
                 </button>
                 <button 
@@ -537,7 +614,9 @@
                     class="p-1.5 hover:bg-zinc-800 dark:hover:bg-zinc-700 rounded-lg text-zinc-400 hover:text-zinc-100 dark:hover:text-zinc-100 transition-colors"
                     title="Batal Seleksi"
                 >
-                    ✕
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                 </button>
             </div>
         </div>
@@ -586,7 +665,7 @@
                 },
                 deleteSelected() {
                     if (this.selectedVouchers.length === 0 || this.isBatchDeleting) return;
-                    if (!confirm(`Apakah Anda yakin ingin menghapus ${this.selectedVouchers.length} voucher terpilih dari database dan MikroTik?`)) return;
+                    if (!confirm(`Apakah Anda yakin ingin menghapus ${window.formatNumber(this.selectedVouchers.length)} voucher terpilih dari database dan MikroTik?`)) return;
 
                     this.isBatchDeleting = true;
                     fetch('{{ route("vouchers.batch-delete") }}', {

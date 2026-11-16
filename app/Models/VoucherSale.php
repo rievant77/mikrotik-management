@@ -36,4 +36,19 @@ class VoucherSale extends Model
     {
         return $this->belongsTo(CashierShift::class, 'shift_id');
     }
+
+    public function profile(): BelongsTo
+    {
+        return $this->belongsTo(HotspotProfile::class, 'profile_name', 'name');
+    }
+
+    /**
+     * Scope query to only include commercial/profit voucher sales (exclude 'pribadi').
+     */
+    public function scopeForRevenue($query)
+    {
+        return $query->whereDoesntHave('profile', function ($q) {
+            $q->where('category', 'pribadi');
+        });
+    }
 }

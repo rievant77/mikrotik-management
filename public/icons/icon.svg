@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <rect width="512" height="512" rx="128" fill="#09090b"/>
+  <circle cx="256" cy="256" r="210" fill="#18181b" stroke="#27272a" stroke-width="6"/>
+  <!-- Wi-Fi Arcs -->
+  <path d="M 120 180 A 180 180 0 0 1 392 180" fill="none" stroke="#34d399" stroke-width="14" stroke-linecap="round"/>
+  <path d="M 160 215 A 130 130 0 0 1 352 215" fill="none" stroke="#10b981" stroke-width="12" stroke-linecap="round"/>
+  <!-- Signal Bolt -->
+  <polygon points="275,130 145,270 240,270 220,400 365,250 270,250" fill="#10b981"/>
+  <polygon points="268,160 175,265 240,265 230,340 330,255 270,255" fill="#34d399"/>
+</svg>

@@ -33,46 +33,54 @@
             <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 shadow-xs">
                 <div class="flex items-center justify-between text-xs text-zinc-400 font-bold uppercase">
                     <span>Transaksi POS & Kas</span>
-                    <span>💳</span>
+                    <svg class="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                    </svg>
                 </div>
-                <div class="mt-2 text-2xl font-bold font-mono text-zinc-900 dark:text-zinc-100" x-text="((counts.voucher_sales || 0) + (counts.monthly_invoices || 0) + (counts.monthly_payments || 0)) + ' Record'"></div>
+                <div class="mt-2 text-2xl font-bold font-mono text-zinc-900 dark:text-zinc-100" x-text="formatNumber((counts.voucher_sales || 0) + (counts.monthly_invoices || 0) + (counts.monthly_payments || 0)) + ' Record'"></div>
                 <div class="mt-2 text-[11px] text-zinc-500 flex flex-col gap-0.5">
-                    <div class="flex justify-between"><span>Penjualan Voucher:</span> <strong class="font-mono text-zinc-700 dark:text-zinc-300" x-text="counts.voucher_sales || 0"></strong></div>
-                    <div class="flex justify-between"><span>Tagihan Bulanan:</span> <strong class="font-mono text-zinc-700 dark:text-zinc-300" x-text="counts.monthly_invoices || 0"></strong></div>
-                    <div class="flex justify-between"><span>Pembayaran Masuk:</span> <strong class="font-mono text-zinc-700 dark:text-zinc-300" x-text="counts.monthly_payments || 0"></strong></div>
+                    <div class="flex justify-between"><span>Penjualan Voucher:</span> <strong class="font-mono text-zinc-700 dark:text-zinc-300" x-text="formatNumber(counts.voucher_sales || 0)"></strong></div>
+                    <div class="flex justify-between"><span>Tagihan Bulanan:</span> <strong class="font-mono text-zinc-700 dark:text-zinc-300" x-text="formatNumber(counts.monthly_invoices || 0)"></strong></div>
+                    <div class="flex justify-between"><span>Pembayaran Masuk:</span> <strong class="font-mono text-zinc-700 dark:text-zinc-300" x-text="formatNumber(counts.monthly_payments || 0)"></strong></div>
                 </div>
             </div>
 
             <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 shadow-xs">
                 <div class="flex items-center justify-between text-xs text-zinc-400 font-bold uppercase">
                     <span>Pengguna & Pelanggan</span>
-                    <span>👥</span>
+                    <svg class="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
                 </div>
-                <div class="mt-2 text-2xl font-bold font-mono text-zinc-900 dark:text-zinc-100" x-text="((counts.hotspot_users || 0) + (counts.monthly_customers || 0)) + ' User'"></div>
+                <div class="mt-2 text-2xl font-bold font-mono text-zinc-900 dark:text-zinc-100" x-text="formatNumber((counts.hotspot_users || 0) + (counts.monthly_customers || 0)) + ' User'"></div>
                 <div class="mt-2 text-[11px] text-zinc-500 flex flex-col gap-0.5">
-                    <div class="flex justify-between"><span>Hotspot Users:</span> <strong class="font-mono text-zinc-700 dark:text-zinc-300" x-text="counts.hotspot_users || 0"></strong></div>
-                    <div class="flex justify-between"><span>Pelanggan Bulanan:</span> <strong class="font-mono text-zinc-700 dark:text-zinc-300" x-text="counts.monthly_customers || 0"></strong></div>
+                    <div class="flex justify-between"><span>Hotspot Users:</span> <strong class="font-mono text-zinc-700 dark:text-zinc-300" x-text="formatNumber(counts.hotspot_users || 0)"></strong></div>
+                    <div class="flex justify-between"><span>Pelanggan Bulanan:</span> <strong class="font-mono text-zinc-700 dark:text-zinc-300" x-text="formatNumber(counts.monthly_customers || 0)"></strong></div>
                 </div>
             </div>
 
             <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 shadow-xs">
                 <div class="flex items-center justify-between text-xs text-zinc-400 font-bold uppercase">
                     <span>Traffic & Log FUP</span>
-                    <span>⚡</span>
+                    <svg class="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
                 </div>
-                <div class="mt-2 text-2xl font-bold font-mono text-zinc-900 dark:text-zinc-100" x-text="((counts.daily_summaries || 0) + (counts.hourly_samples || 0) + (counts.fup_trackers || 0)) + ' Log'"></div>
+                <div class="mt-2 text-2xl font-bold font-mono text-zinc-900 dark:text-zinc-100" x-text="formatNumber((counts.daily_summaries || 0) + (counts.hourly_samples || 0) + (counts.fup_trackers || 0)) + ' Log'"></div>
                 <div class="mt-2 text-[11px] text-zinc-500 flex flex-col gap-0.5">
-                    <div class="flex justify-between"><span>Daily Traffic:</span> <strong class="font-mono text-zinc-700 dark:text-zinc-300" x-text="counts.daily_summaries || 0"></strong></div>
-                    <div class="flex justify-between"><span>FUP Trackers:</span> <strong class="font-mono text-zinc-700 dark:text-zinc-300" x-text="counts.fup_trackers || 0"></strong></div>
+                    <div class="flex justify-between"><span>Daily Traffic:</span> <strong class="font-mono text-zinc-700 dark:text-zinc-300" x-text="formatNumber(counts.daily_summaries || 0)"></strong></div>
+                    <div class="flex justify-between"><span>FUP Trackers:</span> <strong class="font-mono text-zinc-700 dark:text-zinc-300" x-text="formatNumber(counts.fup_trackers || 0)"></strong></div>
                 </div>
             </div>
 
             <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 shadow-xs">
                 <div class="flex items-center justify-between text-xs text-zinc-400 font-bold uppercase">
                     <span>Audit Log Sistem</span>
-                    <span>📜</span>
+                    <svg class="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
                 </div>
-                <div class="mt-2 text-2xl font-bold font-mono text-zinc-900 dark:text-zinc-100" x-text="(counts.audit_logs || 0) + ' Log'"></div>
+                <div class="mt-2 text-2xl font-bold font-mono text-zinc-900 dark:text-zinc-100" x-text="formatNumber(counts.audit_logs || 0) + ' Log'"></div>
                 <div class="mt-2 text-[11px] text-zinc-500">
                     Aktivitas sistem & riwayat aksi admin
                 </div>
@@ -217,8 +225,11 @@
                         Menghapus dan membersihkan <strong>SELURUH data operasional sekaligus</strong>: Data Penjualan & POS, Semua User Hotspot & Pelanggan Bulanan di DB & MikroTik, Counter Internet, Log Traffic, dan Siklus FUP.
                     </p>
                 </div>
-                <button type="button" @click="confirmAction('factory_reset', 'FACTORY RESET SISTEM TOTAL', 'PERINGATAN TERTINGGI: Seluruh data operasional penjualan, pelanggan, dan router akan dibersihkan secara total!')" class="px-5 py-2.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shrink-0 transition-colors shadow-sm">
-                    🔥 Factory Reset Total
+                <button type="button" @click="confirmAction('factory_reset', 'FACTORY RESET SISTEM TOTAL', 'PERINGATAN TERTINGGI: Seluruh data operasional penjualan, pelanggan, dan router akan dibersihkan secara total!')" class="px-5 py-2.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shrink-0 transition-colors shadow-sm flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    <span>Factory Reset Total</span>
                 </button>
             </div>
         </div>

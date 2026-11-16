@@ -142,8 +142,8 @@ class VoucherExpiryService
         // Ensure sales revenue is completed & recorded before removal
         $this->ensureVoucherSaleRecorded($user, $profile, $now);
 
-        if ($mode === 'notice') {
-            // NOTICE MODE: Disable on router & local DB, disconnect active session
+        if ($mode === 'notice' || $mode === 'notice & record' || str_contains($mode, 'notice')) {
+            // NOTICE / NOTICE & RECORD MODE: Disable on router & local DB, disconnect active session
             try {
                 $routerOs->setHotspotUserStatus($username, false);
                 $routerOs->disconnectHotspotUser($username);
@@ -158,12 +158,16 @@ class VoucherExpiryService
                 'current_tx_bps' => 0,
             ]);
 
+            $action = ($mode === 'notice & record' || str_contains($mode, 'record'))
+                ? 'voucher_auto_expired_notice_record'
+                : 'voucher_auto_expired_notice';
+
             AuditLog::create([
                 'user_id' => auth()->id() ?? null,
-                'action' => 'voucher_auto_expired_notice',
+                'action' => $action,
                 'entity_type' => 'HotspotUser',
                 'entity_id' => $user->id,
-                'details' => "Voucher {$username} telah kedaluwarsa dan dinonaktifkan (Notice Mode).",
+                'details' => "Voucher {$username} telah kedaluwarsa dan dinonaktifkan (Notice & Record Mode).",
                 'created_at' => $now,
             ]);
 

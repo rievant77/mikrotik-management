@@ -62,7 +62,11 @@
 
             <div class="my-2 border-t border-dashed border-zinc-400"></div>
             <div class="font-bold text-xs">
-                {{ ($voucher->profile && (float)$voucher->profile->selling_price == 0) ? 'Gratis (Rp 0)' : \App\Support\FormatHelper::formatRupiah($voucher->profile?->selling_price ?? 3000) }}
+                @if($voucher->profile?->category === 'pribadi')
+                    Pribadi (Non-Profit)
+                @else
+                    {{ ($voucher->profile && (float)$voucher->profile->selling_price == 0) ? 'Gratis (Rp 0)' : \App\Support\FormatHelper::formatRupiah($voucher->profile?->selling_price ?? 3000) }}
+                @endif
             </div>
             <div class="text-[8px] text-zinc-400 mt-1">{{ $routerSetting->footer_text ?? 'Terima Kasih Atas Kunjungan Anda' }}</div>
         </div>

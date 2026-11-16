@@ -29,7 +29,7 @@ class VoucherBatchService
         $credentialMode = $params['credentialMode'] ?? 'same'; // same or different
         $charSet = $params['charSet'] ?? 'numeric'; // numeric, lowercase, uppercase, mixed
         $prefix = $params['prefix'] ?? '';
-        $length = max(3, min(12, (int) ($params['length'] ?? 5)));
+        $length = max(3, min(12, (int) ($params['length'] ?? 4)));
         $timeLimitRaw = $params['timeLimit'] ?? null;
         $dataLimitRaw = $params['dataLimit'] ?? null;
         $userComment = trim($params['comment'] ?? '');

@@ -31,7 +31,7 @@
 
         <div>
             <h2 class="font-bold text-sm text-zinc-900 dark:text-zinc-100 text-center md:text-left">Layout Cetak Kartu Voucher (A4 / F4 Sheet)</h2>
-            <p class="text-xs text-zinc-500 text-center md:text-left">Total: {{ count($vouchers) }} Lembar Voucher</p>
+            <p class="text-xs text-zinc-500 text-center md:text-left">Total: {{ \App\Support\FormatHelper::formatNumber(count($vouchers)) }} Lembar Voucher</p>
         </div>
 
         <div class="flex items-center gap-2">
@@ -86,7 +86,11 @@
                     <!-- Voucher Footer -->
                     <div class="border-t border-zinc-200 pt-1.5 flex items-center justify-between text-[10px] text-zinc-500">
                         <strong class="text-zinc-900 font-mono">
-                            {{ ($v->profile && (float)$v->profile->selling_price == 0) ? 'Gratis (Rp 0)' : \App\Support\FormatHelper::formatRupiah($v->profile?->selling_price ?? 3000) }}
+                            @if($v->profile?->category === 'pribadi')
+                                Pribadi (Non-Profit)
+                            @else
+                                {{ ($v->profile && (float)$v->profile->selling_price == 0) ? 'Gratis (Rp 0)' : \App\Support\FormatHelper::formatRupiah($v->profile?->selling_price ?? 3000) }}
+                            @endif
                         </strong>
                         <span>Login: {{ $routerSetting->login_url ?? 'http://hotspot.lan' }}</span>
                     </div>

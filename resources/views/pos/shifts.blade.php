@@ -38,7 +38,7 @@
                     </div>
                     <div>
                         <span class="text-zinc-400">Waktu Buka:</span>
-                        <div class="font-mono text-zinc-700 dark:text-zinc-300 mt-0.5" x-text="currentShift.opened_at"></div>
+                        <div class="font-mono text-zinc-700 dark:text-zinc-300 mt-0.5" x-text="formatDateTimeIndo(currentShift.opened_at)"></div>
                     </div>
                     <div>
                         <span class="text-zinc-400">Modal Awal Laci:</span>

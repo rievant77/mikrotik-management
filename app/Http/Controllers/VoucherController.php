@@ -49,6 +49,7 @@ class VoucherController extends Controller
         $search = $request->get('search');
         $profileId = $request->get('profile_id');
         $batch = $request->get('batch');
+        $category = $request->get('category', 'all');
         $status = $request->get('status');
         if (empty($status)) {
             $status = 'active'; // Default: hanya voucher aktif
@@ -66,6 +67,16 @@ class VoucherController extends Controller
 
         if ($profileId) {
             $query->where('profile_id', $profileId);
+        }
+
+        if ($category && $category !== 'all') {
+            $query->whereHas('profile', function ($q) use ($category) {
+                if ($category === 'voucher') {
+                    $q->whereIn('category', ['voucher', 'profit']);
+                } else {
+                    $q->where('category', $category);
+                }
+            });
         }
 
         if ($batch) {
@@ -87,24 +98,40 @@ class VoucherController extends Controller
 
         $vouchers = $query->latest('id')->paginate(50)->withQueryString();
 
-        // 2. Fetch KPI statistics
-        $allUsers = HotspotUser::with('profile')->get();
+        // 2. Fetch KPI statistics (scoped by category filter if applied)
+        $statsUsersQuery = HotspotUser::with('profile');
+        if ($category && $category !== 'all') {
+            $statsUsersQuery->whereHas('profile', function ($q) use ($category) {
+                if ($category === 'voucher') {
+                    $q->whereIn('category', ['voucher', 'profit']);
+                } else {
+                    $q->where('category', $category);
+                }
+            });
+        }
+        $allUsers = $statsUsersQuery->get();
         $totalVouchers = $allUsers->count();
-        $onlineCount = count($activeUserMap);
+        $onlineCount = $allUsers->whereIn('username', array_keys($activeUserMap))->count();
         $totalBatches = $allUsers->pluck('comment')->filter()->unique()->count();
         $inventoryValue = $allUsers->sum(function ($u) {
-            return $u->profile?->selling_price ?? 3000;
+            // Pribadi is non-profit internal usage (excluded from inventory value)
+            if ($u->profile?->category === 'pribadi') {
+                return 0;
+            }
+            return (float) ($u->profile?->selling_price ?? 3000);
         });
 
         $stats = [
             'total' => $totalVouchers,
             'online' => $onlineCount,
             'batches' => $totalBatches,
-            'inventory_value' => $inventoryValue,
+            'inventory_value' => (float) $inventoryValue,
         ];
 
         // 3. Profiles and Batches for filters
-        $profiles = HotspotProfile::all();
+        $profiles = HotspotProfile::orderByRaw("CASE WHEN category = 'voucher' THEN 1 WHEN category = 'bulanan' THEN 2 ELSE 3 END")
+            ->orderBy('name')
+            ->get();
         $batches = HotspotUser::whereNotNull('comment')
             ->where('comment', '!=', '')
             ->selectRaw('comment, MAX(id) as max_id')
@@ -122,9 +149,25 @@ class VoucherController extends Controller
         ));
     }
 
-    public function generateView(RouterOsService $routerOs): View
+    public function generateView(Request $request, RouterOsService $routerOs): View
     {
-        $profiles = HotspotProfile::all();
+        $category = $request->get('category', 'voucher');
+        $voucherProfiles = HotspotProfile::where('is_active', true)
+            ->whereIn('category', ['voucher', 'profit'])
+            ->orderBy('name')
+            ->get();
+
+        $allProfiles = HotspotProfile::where('is_active', true)
+            ->orderByRaw("CASE WHEN category IN ('voucher', 'profit') THEN 1 WHEN category = 'bulanan' THEN 2 ELSE 3 END")
+            ->orderBy('name')
+            ->get();
+
+        $profiles = ($category === 'voucher')
+            ? $voucherProfiles
+            : (($category === 'all')
+                ? $allProfiles
+                : HotspotProfile::where('is_active', true)->where('category', $category)->orderBy('name')->get());
+
         $servers = [];
         try {
             $servers = $routerOs->getHotspotServers();
@@ -132,7 +175,7 @@ class VoucherController extends Controller
             $servers = [];
         }
 
-        return view('hotspot.generate', compact('profiles', 'servers'));
+        return view('hotspot.generate', compact('profiles', 'allProfiles', 'category', 'servers'));
     }
 
     public function generateBatch(Request $request, VoucherBatchService $service): JsonResponse
@@ -256,6 +299,38 @@ class VoucherController extends Controller
         }
         if ($username) {
             return $query->where('username', $username)->get();
+        }
+
+        $category = $request->get('category');
+        if ($category && $category !== 'all') {
+            $query->whereHas('profile', function ($q) use ($category) {
+                if ($category === 'voucher') {
+                    $q->whereIn('category', ['voucher', 'profit']);
+                } else {
+                    $q->where('category', $category);
+                }
+            });
+        }
+
+        $profileId = $request->get('profile_id');
+        if ($profileId) {
+            $query->where('profile_id', $profileId);
+        }
+
+        $search = $request->get('search');
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('username', 'like', "%{$search}%")
+                  ->orWhere('password', 'like', "%{$search}%")
+                  ->orWhere('comment', 'like', "%{$search}%");
+            });
+        }
+
+        $status = $request->get('status');
+        if ($status === 'active') {
+            $query->where('is_active', true);
+        } elseif ($status === 'inactive' || $status === 'disabled') {
+            $query->where('is_active', false);
         }
 
         return $query->latest()->limit($limit)->get();

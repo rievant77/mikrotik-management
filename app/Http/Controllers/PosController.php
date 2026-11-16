@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CashierShift;
+use App\Models\HotspotProfile;
 use App\Models\MonthlyCustomer;
 use App\Models\MonthlyPayment;
 use App\Models\VoucherSale;
@@ -35,7 +36,7 @@ class PosController extends Controller
         $month = $request->get('month');
         $targetMonth = $month ? \Carbon\Carbon::parse($month)->startOfMonth() : now()->startOfMonth();
 
-        $salesQuery = VoucherSale::latest('activated_at');
+        $salesQuery = VoucherSale::with('profile')->latest('activated_at');
         if ($month) {
             $salesQuery->whereBetween('activated_at', [$targetMonth, $targetMonth->copy()->endOfMonth()]);
         }
@@ -43,6 +44,7 @@ class PosController extends Controller
         $sales = $salesQuery->paginate(50)->withQueryString();
 
         $monthSales = VoucherSale::where('status', 'completed')
+            ->forRevenue()
             ->whereBetween('activated_at', [$targetMonth, $targetMonth->copy()->endOfMonth()]);
 
         $metrics = [
@@ -89,10 +91,11 @@ class PosController extends Controller
             'unpaid_count' => $allMonthInvoices->where('status', 'unpaid')->count(),
         ];
 
-        $customers = MonthlyCustomer::with(['hotspotUser.profile'])->orderBy('name')->get();
+        $customers = MonthlyCustomer::with(['profile', 'hotspotUser.profile'])->orderBy('name')->get();
         $hotspotUsers = \App\Models\HotspotUser::with('profile')->orderBy('username')->get();
+        $monthlyProfiles = HotspotProfile::where('is_active', true)->where('category', 'bulanan')->get();
 
-        return view('pos.monthly', compact('invoices', 'metrics', 'customers', 'hotspotUsers', 'selectedMonth'));
+        return view('pos.monthly', compact('invoices', 'metrics', 'customers', 'hotspotUsers', 'monthlyProfiles', 'selectedMonth'));
     }
 
     public function generateInvoices(Request $request): JsonResponse
@@ -151,6 +154,7 @@ class PosController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:150',
             'hotspot_user_id' => 'nullable|exists:hotspot_users,id',
+            'profile_id' => 'nullable|exists:hotspot_profiles,id',
             'contact' => 'nullable|string|max:100',
             'address' => 'nullable|string',
             'notes' => 'nullable|string',
@@ -160,7 +164,7 @@ class PosController extends Controller
         ]);
 
         $customer = MonthlyCustomer::create($validated);
-        $customer->load('hotspotUser.profile');
+        $customer->load(['profile', 'hotspotUser.profile']);
 
         return response()->json(['success' => true, 'customer' => $customer]);
     }
@@ -170,6 +174,7 @@ class PosController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:150',
             'hotspot_user_id' => 'nullable|exists:hotspot_users,id',
+            'profile_id' => 'nullable|exists:hotspot_profiles,id',
             'contact' => 'nullable|string|max:100',
             'address' => 'nullable|string',
             'notes' => 'nullable|string',
@@ -179,7 +184,7 @@ class PosController extends Controller
         ]);
 
         $customer->update($validated);
-        $customer->load('hotspotUser.profile');
+        $customer->load(['profile', 'hotspotUser.profile']);
 
         return response()->json(['success' => true, 'customer' => $customer]);
     }

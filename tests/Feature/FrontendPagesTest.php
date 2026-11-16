@@ -76,7 +76,7 @@ class FrontendPagesTest extends TestCase
 
         // Test Profile CRUD elements and optional rate_limit & selling_price & unlimited shared_users
         $profileRes = $this->get('/hotspot/profiles');
-        $profileRes->assertSee('Sinkron dari Router');
+        $profileRes->assertSee('Tambah Profile');
 
         $createFreeProfileRes = $this->postJson('/hotspot/profiles', [
             'name' => 'FREE_UNLIMITED_PROFILE',
@@ -110,7 +110,7 @@ class FrontendPagesTest extends TestCase
 
         // Test User CRUD elements
         $userRes = $this->get('/hotspot/users');
-        $userRes->assertSee('Sinkron dari Router');
+        $userRes->assertSee('Tambah User');
 
         // Test Monthly Customer CRUD elements
         $monthlyRes = $this->get('/pos/monthly');

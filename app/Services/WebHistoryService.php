@@ -96,10 +96,11 @@ class WebHistoryService
                     'protocol' => strtoupper($h->protocol),
                     'port' => $h->port,
                     'hit_count' => $h->hit_count,
+                    'hit_count_formatted' => FormatHelper::formatNumber($h->hit_count),
                     'total_bytes_formatted' => FormatHelper::formatBytes($h->total_bytes),
-                    'last_seen_formatted' => $h->last_seen_at ? $h->last_seen_at->diffForHumans() : '-',
-                    'last_seen_datetime' => $h->last_seen_at ? $h->last_seen_at->format('d M Y, H:i:s') : '-',
-                    'first_seen_datetime' => $h->first_seen_at ? $h->first_seen_at->format('d M Y, H:i') : '-',
+                    'last_seen_formatted' => $h->last_seen_at ? $h->last_seen_at->locale('id')->diffForHumans() : '-',
+                    'last_seen_datetime' => $h->last_seen_at ? FormatHelper::formatDateTime($h->last_seen_at, 'd M Y, H:i:s') : '-',
+                    'first_seen_datetime' => $h->first_seen_at ? FormatHelper::formatDateTimeShort($h->first_seen_at) : '-',
                 ];
             });
 

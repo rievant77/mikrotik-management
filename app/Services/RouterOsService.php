@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\RouterSetting;
+use App\Models\TrafficSignature;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use RouterOS\Client;
@@ -654,6 +655,9 @@ class RouterOsService
                 if (isset($p['.id'])) {
                     $setQuery = (new Query('/ip/hotspot/user/profile/set'))->equal('.id', $p['.id']);
 
+                    if (array_key_exists('name', $params) && !empty($params['name'])) {
+                        $setQuery->equal('name', $params['name']);
+                    }
                     if (array_key_exists('rate_limit', $params)) {
                         $setQuery->equal('rate-limit', $params['rate_limit'] ?: '');
                     }
@@ -754,32 +758,52 @@ class RouterOsService
     }
 
     /**
-     * Get IP binding status for a MAC address.
+     * Get all IP bindings from MikroTik.
+     *
+     * @param bool $activeOnly Only return non-disabled bindings
+     * @return array
      */
-    public function getHotspotIpBinding(string $macAddress): ?array
+    public function getHotspotIpBindings(bool $activeOnly = true): array
     {
         $client = $this->getClient();
         if (!$client) {
-            return null;
+            return [];
         }
 
         try {
-            $cleanMac = strtoupper(trim($macAddress));
             $query = new Query('/ip/hotspot/ip-binding/print');
             $bindings = $client->query($query)->read();
 
-            foreach ($bindings as $b) {
-                $bMac = strtoupper($b['mac-address'] ?? '');
-                if ($bMac === $cleanMac) {
-                    return $b;
-                }
+            if (!$activeOnly) {
+                return $bindings;
             }
 
-            return null;
+            return array_values(array_filter($bindings, function ($b) {
+                $disabled = strtolower((string)($b['disabled'] ?? 'false'));
+                return !in_array($disabled, ['true', 'yes', '1'], true);
+            }));
         } catch (Exception $e) {
-            Log::error("RouterOS getHotspotIpBinding error: " . $e->getMessage());
-            return null;
+            Log::error("RouterOS getHotspotIpBindings error: " . $e->getMessage());
+            return [];
         }
+    }
+
+    /**
+     * Get IP binding status for a MAC address.
+     */
+    public function getHotspotIpBinding(string $macAddress, bool $activeOnly = true): ?array
+    {
+        $cleanMac = strtoupper(trim($macAddress));
+        $bindings = $this->getHotspotIpBindings($activeOnly);
+
+        foreach ($bindings as $b) {
+            $bMac = strtoupper($b['mac-address'] ?? '');
+            if ($bMac === $cleanMac) {
+                return $b;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -794,12 +818,13 @@ class RouterOsService
 
         try {
             $cleanMac = strtoupper(trim($macAddress));
-            $existing = $this->getHotspotIpBinding($cleanMac);
+            $existing = $this->getHotspotIpBinding($cleanMac, false);
 
             if ($existing && isset($existing['.id'])) {
                 $setQuery = (new Query('/ip/hotspot/ip-binding/set'))
                     ->equal('.id', $existing['.id'])
-                    ->equal('type', $type);
+                    ->equal('type', $type)
+                    ->equal('disabled', 'no');
 
                 if ($comment !== null) {
                     $setQuery->equal('comment', $comment);
@@ -837,7 +862,7 @@ class RouterOsService
 
         try {
             $cleanMac = strtoupper(trim($macAddress));
-            $existing = $this->getHotspotIpBinding($cleanMac);
+            $existing = $this->getHotspotIpBinding($cleanMac, false);
 
             if ($existing && isset($existing['.id'])) {
                 $removeQuery = (new Query('/ip/hotspot/ip-binding/remove'))->equal('.id', $existing['.id']);
@@ -1004,151 +1029,34 @@ class RouterOsService
             ];
         }
 
-        $definitions = [
-            // 1. Video Streaming
-            [
-                'mark' => 'agy_cm_youtube',
-                'comment' => '[AGY-TRAFFIC-VIDEO] YouTube & Google Video',
-                'category' => 'video',
-                'address_list' => 'agy_list_youtube',
-                'fqdn_domains' => ['youtube.com', 'googlevideo.com', 'ytimg.com', 'youtu.be', 'ggpht.com', 'youtubei.googleapis.com'],
-                'tls_host' => '*googlevideo.com,*youtube.com,*ytimg.com,*youtu.be,*ggpht.com,*gvt1.com,*youtubei.googleapis.com',
-                'quic' => true,
-            ],
-            [
-                'mark' => 'agy_cm_tiktok',
-                'comment' => '[AGY-TRAFFIC-VIDEO] TikTok Video',
-                'category' => 'video',
-                'address_list' => 'agy_list_tiktok',
-                'fqdn_domains' => ['tiktok.com', 'tiktokcdn.com', 'byteoversea.com', 'ibytedtos.com', 'musical.ly'],
-                'tls_host' => '*tiktokcdn.com,*tiktokv.com,*byteoversea.com,*musical.ly,*tiktok.com,*ibytedtos.com',
-                'quic' => true,
-            ],
-            [
-                'mark' => 'agy_cm_netflix',
-                'comment' => '[AGY-TRAFFIC-VIDEO] Netflix',
-                'category' => 'video',
-                'address_list' => 'agy_list_netflix',
-                'fqdn_domains' => ['netflix.com', 'nflxvideo.net', 'nflxext.com', 'nflximg.net'],
-                'tls_host' => '*netflix.com,*nflxvideo.net,*nflxext.com,*nflximg.net',
-            ],
-            [
-                'mark' => 'agy_cm_vidio',
-                'comment' => '[AGY-TRAFFIC-VIDEO] Vidio & Local OTT',
-                'category' => 'video',
-                'address_list' => 'agy_list_vidio',
-                'fqdn_domains' => ['vidio.com', 'rctiplus.com', 'visionplus.id', 'maxstream.tv', 'hotstar.com'],
-                'tls_host' => '*vidio.com,*rctiplus.com,*visionplus.id,*maxstream.tv,*hotstar.com',
-            ],
+        $signatures = TrafficSignature::active()->get();
+        if ($signatures->isEmpty()) {
+            TrafficSignature::seedDefaults();
+            $signatures = TrafficSignature::active()->get();
+        }
 
-            // 2. Social Media & Messaging
-            [
-                'mark' => 'agy_cm_whatsapp',
-                'comment' => '[AGY-TRAFFIC-SOSMED] WhatsApp & Call',
-                'category' => 'social_media',
-                'address_list' => 'agy_list_whatsapp',
-                'fqdn_domains' => ['whatsapp.com', 'whatsapp.net'],
-                'tls_host' => '*whatsapp.net,*whatsapp.com',
-                'tcp_port' => '5222,5223,5228,4244',
-                'udp_port' => '3478,5349',
-            ],
-            [
-                'mark' => 'agy_cm_meta',
-                'comment' => '[AGY-TRAFFIC-SOSMED] Instagram & Facebook',
-                'category' => 'social_media',
-                'address_list' => 'agy_list_meta',
-                'fqdn_domains' => ['instagram.com', 'cdninstagram.com', 'facebook.com', 'fbcdn.net'],
-                'tls_host' => '*instagram.com,*cdninstagram.com,*fbcdn.net,*facebook.com,*facebook.net',
-                'quic' => true,
-            ],
-            [
-                'mark' => 'agy_cm_telegram',
-                'comment' => '[AGY-TRAFFIC-SOSMED] Telegram',
-                'category' => 'social_media',
-                'address_list' => 'agy_list_telegram',
-                'fqdn_domains' => ['telegram.org', 't.me', 'telegram.me'],
-                'tls_host' => '*telegram.org,*t.me,*telegram.me',
-                'tcp_port' => '443,80,5222',
-            ],
-            [
-                'mark' => 'agy_cm_twitter',
-                'comment' => '[AGY-TRAFFIC-SOSMED] Twitter / X & Threads',
-                'category' => 'social_media',
-                'address_list' => 'agy_list_twitter',
-                'fqdn_domains' => ['twitter.com', 'x.com', 'twimg.com', 'threads.net'],
-                'tls_host' => '*twimg.com,*twitter.com,*x.com,*threads.net',
-            ],
+        $definitions = [];
+        foreach ($signatures as $sig) {
+            $catTag = match($sig->category) {
+                'video' => 'VIDEO',
+                'social_media' => 'SOSMED',
+                'gaming' => 'GAMING',
+                'cloud_work' => 'CLOUD',
+                default => 'BROWSING',
+            };
 
-            // 3. Online Games
-            [
-                'mark' => 'agy_cm_mlbb',
-                'comment' => '[AGY-TRAFFIC-GAMING] Mobile Legends: Bang Bang',
-                'category' => 'gaming',
-                'address_list' => 'agy_list_mlbb',
-                'fqdn_domains' => ['mobilelegends.com', 'moonton.com'],
-                'tls_host' => '*mobilelegends.com,*moonton.com,*youngjoygame.com',
-                'udp_port' => '5000-5200,5500-5700,30000-30200,10003',
-                'tcp_port' => '5000-5200,5500-5700,30000-30200',
-            ],
-            [
-                'mark' => 'agy_cm_freefire',
-                'comment' => '[AGY-TRAFFIC-GAMING] Free Fire & Garena',
-                'category' => 'gaming',
-                'address_list' => 'agy_list_freefire',
-                'fqdn_domains' => ['freefiremobile.com', 'garena.com'],
-                'tls_host' => '*freefiremobile.com,*garena.com,*garenanow.com',
-                'udp_port' => '10000-10010,7006,39003',
-                'tcp_port' => '10000-10010,7006',
-            ],
-            [
-                'mark' => 'agy_cm_pubg',
-                'comment' => '[AGY-TRAFFIC-GAMING] PUBG Mobile',
-                'category' => 'gaming',
-                'address_list' => 'agy_list_pubg',
-                'fqdn_domains' => ['pubgmobile.com', 'proximabeta.com'],
-                'tls_host' => '*pubgmobile.com,*proximabeta.com',
-                'udp_port' => '17500,18081,10012,20000-20002',
-                'tcp_port' => '17500,18081',
-            ],
-            [
-                'mark' => 'agy_cm_roblox_steam',
-                'comment' => '[AGY-TRAFFIC-GAMING] Roblox & Steam',
-                'category' => 'gaming',
-                'address_list' => 'agy_list_roblox_steam',
-                'fqdn_domains' => ['roblox.com', 'steampowered.com', 'steamcommunity.com'],
-                'tls_host' => '*roblox.com,*rbxcdn.com,*steampowered.com,*steamcommunity.com',
-                'udp_port' => '27015-27030,27036-27037',
-            ],
-
-            // 4. Cloud & Work / Meet
-            [
-                'mark' => 'agy_cm_zoom_meet',
-                'comment' => '[AGY-TRAFFIC-CLOUD] Zoom & Google Meet',
-                'category' => 'cloud_work',
-                'address_list' => 'agy_list_zoom_meet',
-                'fqdn_domains' => ['zoom.us', 'zoom.com', 'meet.google.com', 'teams.microsoft.com'],
-                'tls_host' => '*zoom.us,*zoom.com,*meet.google.com,*teams.microsoft.com',
-                'udp_port' => '8801,8802,3478-3481',
-            ],
-            [
-                'mark' => 'agy_cm_cloud_drive',
-                'comment' => '[AGY-TRAFFIC-CLOUD] Google Drive & Cloud Storage',
-                'category' => 'cloud_work',
-                'address_list' => 'agy_list_drive',
-                'fqdn_domains' => ['drive.google.com', 'onedrive.live.com', 'dropbox.com'],
-                'tls_host' => '*drive.google.com,*onedrive.live.com,*dropbox.com,*icloud.com',
-            ],
-
-            // 5. Web Browsing & E-Commerce
-            [
-                'mark' => 'agy_cm_ecommerce',
-                'comment' => '[AGY-TRAFFIC-BROWSING] Shopee & Tokopedia',
-                'category' => 'browsing',
-                'address_list' => 'agy_list_ecommerce',
-                'fqdn_domains' => ['shopee.co.id', 'tokopedia.com', 'lazada.co.id', 'bukalapak.com'],
-                'tls_host' => '*shopee.co.id,*shopeemobile.com,*tokopedia.com,*tokopedia.net,*lazada.co.id,*bukalapak.com',
-            ],
-        ];
+            $definitions[] = [
+                'mark' => $sig->mark_name,
+                'comment' => "[AGY-TRAFFIC-{$catTag}] {$sig->name}",
+                'category' => $sig->category,
+                'address_list' => $sig->address_list_name,
+                'fqdn_domains' => $sig->fqdn_domains ?: [],
+                'tls_host' => $sig->tls_host,
+                'tcp_port' => $sig->tcp_ports,
+                'udp_port' => $sig->udp_ports,
+                'quic' => (bool) $sig->is_quic,
+            ];
+        }
 
         try {
             // 1. Clean existing AGY mangle rules to ensure clean order & no duplicates
@@ -1385,6 +1293,49 @@ class RouterOsService
             return $results;
         } catch (Exception $e) {
             Log::warning("RouterOS getDeviceActiveConnections error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Fetch active firewall connections for a specific connection mark or platform.
+     */
+    public function getPlatformActiveConnections(string $markName): array
+    {
+        $client = $this->getClient();
+        if (!$client || empty($markName)) {
+            return [];
+        }
+
+        try {
+            $query = new Query('/ip/firewall/connection/print');
+            $connections = $client->query($query)->read();
+            $results = [];
+
+            foreach ($connections as $c) {
+                $connMark = $c['connection-mark'] ?? '';
+                if ($connMark === $markName || str_contains($connMark, $markName)) {
+                    $src = $c['src-address'] ?? '';
+                    $results[] = [
+                        'id' => $c['.id'] ?? '',
+                        'src_address' => $src,
+                        'dst_address' => $c['dst-address'] ?? '',
+                        'protocol' => strtolower($c['protocol'] ?? 'tcp'),
+                        'tcp_state' => strtolower($c['tcp-state'] ?? ($c['protocol'] ?? 'active')),
+                        'connection_mark' => $connMark,
+                        'orig_bytes' => (int) ($c['orig-bytes'] ?? 0),
+                        'repl_bytes' => (int) ($c['repl-bytes'] ?? 0),
+                        'orig_packets' => (int) ($c['orig-packets'] ?? 0),
+                        'repl_packets' => (int) ($c['repl-packets'] ?? 0),
+                        'total_bytes' => (int) ($c['orig-bytes'] ?? 0) + (int) ($c['repl-bytes'] ?? 0),
+                        'total_packets' => (int) ($c['orig-packets'] ?? 0) + (int) ($c['repl-packets'] ?? 0),
+                    ];
+                }
+            }
+
+            return $results;
+        } catch (Exception $e) {
+            Log::warning("RouterOS getPlatformActiveConnections error: " . $e->getMessage());
             return [];
         }
     }

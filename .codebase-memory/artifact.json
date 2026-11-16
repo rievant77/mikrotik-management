@@ -1,0 +1,11 @@
+{
+    "schema_version": 2,
+    "commit": "00089e53dbf2cf4a05080cb130eb8e860afb9c02",
+    "indexed_at": "2026-11-12T15:43:21Z",
+    "project": "D-PROJECTS-WEB-mikrotik-management",
+    "nodes": 919,
+    "edges": 2542,
+    "original_size": 4587520,
+    "compressed_size": 590811,
+    "compression_level": 9
+}

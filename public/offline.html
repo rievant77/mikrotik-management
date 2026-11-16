@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Koneksi Terputus - MikroTik Manager</title>
+    <link rel="icon" href="/favicon.ico">
+    <style>
+        :root {
+            color-scheme: light dark;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            background-color: #09090b;
+            color: #f4f4f5;
+        }
+        @media (prefers-color-scheme: light) {
+            body {
+                background-color: #f4f4f5;
+                color: #09090b;
+            }
+            .card {
+                background-color: #ffffff !important;
+                border-color: #e4e4e7 !important;
+                box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+            }
+            .icon-wrapper {
+                background-color: #f4f4f5 !important;
+                border-color: #e4e4e7 !important;
+                color: #71717a !important;
+            }
+            .desc {
+                color: #71717a !important;
+            }
+            .btn-primary {
+                background-color: #18181b !important;
+                color: #ffffff !important;
+            }
+            .btn-primary:hover {
+                background-color: #27272a !important;
+            }
+            .btn-secondary {
+                background-color: #f4f4f5 !important;
+                border-color: #e4e4e7 !important;
+                color: #27272a !important;
+            }
+        }
+        .card {
+            max-width: 26rem;
+            width: 100%;
+            background-color: #18181b;
+            border: 1px solid #27272a;
+            border-radius: 1rem;
+            padding: 2rem 1.5rem;
+            text-align: center;
+        }
+        .icon-wrapper {
+            width: 4rem;
+            height: 4rem;
+            margin: 0 auto 1.25rem;
+            border-radius: 9999px;
+            background-color: #27272a;
+            border: 1px solid #3f3f46;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #a1a1aa;
+        }
+        .icon-wrapper svg {
+            width: 2rem;
+            height: 2rem;
+        }
+        h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+        }
+        .desc {
+            font-size: 0.875rem;
+            line-height: 1.4;
+            color: #a1a1aa;
+            margin-bottom: 1.5rem;
+        }
+        .actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        button, a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            min-height: 2.75rem;
+            padding: 0.625rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 150ms ease, border-color 150ms ease;
+            border: none;
+        }
+        .btn-primary {
+            background-color: #10b981;
+            color: #09090b;
+        }
+        .btn-primary:hover {
+            background-color: #059669;
+            color: #ffffff;
+        }
+        .btn-secondary {
+            background-color: #27272a;
+            border: 1px solid #3f3f46;
+            color: #e4e4e7;
+        }
+        .btn-secondary:hover {
+            background-color: #3f3f46;
+        }
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #e11d48;
+            background-color: rgba(225, 29, 72, 0.1);
+            border: 1px solid rgba(225, 29, 72, 0.2);
+            padding: 0.25rem 0.625rem;
+            border-radius: 9999px;
+            margin-bottom: 1rem;
+        }
+        .status-dot {
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: 9999px;
+            background-color: #e11d48;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="icon-wrapper">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 4.243a9 9 0 01-2.828-6.364m0 0a9 9 0 012.828-6.364m0 0l2.829 2.829M3 3l18 18" />
+            </svg>
+        </div>
+        <div class="status-pill">
+            <span class="status-dot"></span>
+            <span>Mode Tanpa Jaringan</span>
+        </div>
+        <h1>Koneksi Terputus</h1>
+        <p class="desc">Perangkat Anda tidak terhubung ke jaringan lokal MikroTik atau koneksi internet terputus. Pastikan Wi-Fi atau kabel LAN aktif.</p>
+        <div class="actions">
+            <button type="button" class="btn-primary" onclick="window.location.reload()">
+                Muat Ulang Halaman
+            </button>
+            <a href="/" class="btn-secondary">
+                Kembali ke Beranda
+            </a>
+        </div>
+    </div>
+</body>
+</html>

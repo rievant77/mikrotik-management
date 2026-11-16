@@ -2,11 +2,25 @@
 <html lang="id" class="h-full">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ $header ?? 'Dashboard' }} - {{ $appSetting?->app_name ?? 'MikroTik Hotspot Manager' }}</title>
     <link rel="icon" href="{{ !empty($appSetting?->app_favicon) ? asset($appSetting->app_favicon) : asset('favicon.ico') }}">
+
+    <!-- PWA Manifest & App Metadata -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="application-name" content="{{ $appSetting?->app_name ?? 'MikroTik Hotspot Manager' }}">
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)">
+
+    <!-- iOS Safari PWA Support -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="{{ $appSetting?->app_name ?? 'MikroTik' }}">
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+    <link rel="mask-icon" href="/icons/icon.svg" color="#10b981">
 
     <!-- Prevent FOUC: Early Dark Mode Initialization -->
     <script>
@@ -230,7 +244,7 @@
         <div x-show="mobileMenuOpen" class="relative z-50 lg:hidden" style="display: none;">
             <div x-show="mobileMenuOpen" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-zinc-950/80 backdrop-blur-xs" @click="mobileMenuOpen = false"></div>
 
-            <div class="fixed inset-0 flex">
+            <div class="fixed inset-0 flex" style="padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);">
                 <div x-show="mobileMenuOpen" x-transition:enter="ease-out duration-300" x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0" x-transition:leave="ease-in duration-200" x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full" class="relative mr-16 flex w-full max-w-xs flex-1">
                     <div class="flex flex-col flex-1 bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-800">
                         <div class="h-16 flex items-center justify-between px-6 border-b border-zinc-200 dark:border-zinc-800">
@@ -274,7 +288,7 @@
         </div>
 
         <!-- Main Content Area -->
-        <div class="lg:pl-64 flex flex-col flex-1 min-w-0 pb-16 lg:pb-0">
+        <div class="lg:pl-64 flex flex-col flex-1 min-w-0 pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
             <!-- Topbar Navigation -->
             <header class="h-16 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800 sticky top-0 z-20 transition-colors no-print">
                 <div class="h-full px-4 sm:px-6 flex items-center justify-between gap-4">
@@ -395,36 +409,43 @@
         </div>
     </div>
 
-    <!-- Mobile Bottom Navigation Bar (Sticky for touch screens) -->
-    <nav class="lg:hidden fixed bottom-0 inset-x-0 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border-t border-zinc-200 dark:border-zinc-800 z-40 no-print">
-        <div class="grid grid-cols-4 h-16">
-            <a href="{{ route('dashboard') }}" class="flex flex-col items-center justify-center gap-1 text-[11px] font-medium {{ request()->routeIs('dashboard') ? 'text-zinc-900 dark:text-zinc-100 font-semibold' : 'text-zinc-400' }}">
+    <!-- Mobile Bottom Navigation Bar (Sticky for touch screens with Safe Area support) -->
+    <nav class="lg:hidden fixed bottom-0 inset-x-0 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border-t border-zinc-200 dark:border-zinc-800 z-40 no-print" style="padding-bottom: env(safe-area-inset-bottom, 0px);">
+        <div class="grid grid-cols-5 h-16">
+            <a href="{{ route('dashboard') }}" class="flex flex-col items-center justify-center gap-1 text-[10px] font-medium transition-colors {{ request()->routeIs('dashboard') ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-zinc-500 dark:text-zinc-400' }}">
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                 </svg>
                 <span>Live</span>
             </a>
 
-            <a href="{{ route('users.index') }}" class="flex flex-col items-center justify-center gap-1 text-[11px] font-medium {{ request()->routeIs('users.*') ? 'text-zinc-900 dark:text-zinc-100 font-semibold' : 'text-zinc-400' }}">
+            <a href="{{ route('users.index') }}" class="flex flex-col items-center justify-center gap-1 text-[10px] font-medium transition-colors {{ request()->routeIs('users.*') ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-zinc-500 dark:text-zinc-400' }}">
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
                 <span>Users</span>
             </a>
 
-            <a href="{{ route('pos.monthly') }}" class="flex flex-col items-center justify-center gap-1 text-[11px] font-medium {{ request()->routeIs('pos.*') ? 'text-zinc-900 dark:text-zinc-100 font-semibold' : 'text-zinc-400' }}">
+            <a href="{{ route('pos.monthly') }}" class="flex flex-col items-center justify-center gap-1 text-[10px] font-medium transition-colors {{ request()->routeIs('pos.*') ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-zinc-500 dark:text-zinc-400' }}">
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                 </svg>
                 <span>Kasir</span>
             </a>
 
-            <a href="{{ route('hotspot.generate') }}" class="flex flex-col items-center justify-center gap-1 text-[11px] font-medium {{ request()->routeIs('hotspot.*') ? 'text-zinc-900 dark:text-zinc-100 font-semibold' : 'text-zinc-400' }}">
+            <a href="{{ route('hotspot.generate') }}" class="flex flex-col items-center justify-center gap-1 text-[10px] font-medium transition-colors {{ request()->routeIs('hotspot.*') || request()->routeIs('vouchers.*') ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-zinc-500 dark:text-zinc-400' }}">
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
                 </svg>
                 <span>Voucher</span>
             </a>
+
+            <button type="button" @click="mobileMenuOpen = true" class="flex flex-col items-center justify-center gap-1 text-[10px] font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+                <span>Menu</span>
+            </button>
         </div>
     </nav>
 

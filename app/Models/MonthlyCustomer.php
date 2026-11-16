@@ -11,6 +11,7 @@ class MonthlyCustomer extends Model
     protected $fillable = [
         'name',
         'hotspot_user_id',
+        'profile_id',
         'contact',
         'address',
         'notes',
@@ -21,11 +22,17 @@ class MonthlyCustomer extends Model
     ];
 
     protected $casts = [
+        'profile_id' => 'integer',
         'monthly_price' => 'float',
         'cost_price' => 'float',
         'billing_day' => 'integer',
         'is_active' => 'boolean',
     ];
+
+    public function profile(): BelongsTo
+    {
+        return $this->belongsTo(HotspotProfile::class, 'profile_id');
+    }
 
     public function hotspotUser(): BelongsTo
     {

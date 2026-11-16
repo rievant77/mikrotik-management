@@ -19,6 +19,8 @@ class TrafficAnalyticsTest extends TestCase
         $res->assertSee('Analisis Trafik');
         $res->assertSee('Streaming Video');
         $res->assertSee('Online Gaming');
+        $res->assertSee('Kelola Signature & Port', false);
+        $res->assertSee('Rank User');
     }
 
     public function test_traffic_analytics_live_data_api(): void

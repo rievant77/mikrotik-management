@@ -47,6 +47,37 @@
     .dark ::-webkit-scrollbar-thumb:hover {
         background: rgba(82, 82, 91, 0.8);
     }
+
+    /* Mobile & PWA optimizations */
+    html {
+        -webkit-tap-highlight-color: transparent;
+        scroll-behavior: smooth;
+    }
+
+    /* iOS smooth inertial scrolling */
+    .overflow-x-auto, .overflow-y-auto {
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* Safe area support for notched phones */
+.safe-pb {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.safe-pt {
+    padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* Standalone PWA adjustments */
+@media all and (display-mode: standalone) {
+    body {
+        user-select: none;
+        -webkit-user-select: none;
+    }
+    input, textarea, [contenteditable="true"] {
+        user-select: text;
+        -webkit-user-select: text;
+    }
 }
 
 /* Print Specific Styles */

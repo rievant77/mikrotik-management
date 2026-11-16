@@ -39,8 +39,11 @@ class HotspotProfileController extends Controller
                         } else {
                             HotspotProfile::create([
                                 'name' => $name,
+                                'category' => 'voucher',
                                 'rate_limit' => $rateLimit,
                                 'shared_users' => $sharedUsers,
+                                'cost_price_type' => 'custom',
+                                'cost_price_percent' => null,
                                 'selling_price' => 0,
                                 'cost_price' => 0,
                                 'validity' => 'Unlimited',
@@ -67,26 +70,47 @@ class HotspotProfileController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:100|unique:hotspot_profiles,name',
+            'category' => 'nullable|in:voucher,bulanan,pribadi,profit',
             'rate_limit' => 'nullable|string|max:100',
             'shared_users' => 'nullable|integer|min:0',
             'validity' => 'nullable|string|max:50',
+            'cost_price_type' => 'nullable|in:custom,percentage,fixed',
+            'cost_price_percent' => 'nullable|numeric|min:0|max:100',
             'cost_price' => 'nullable|numeric|min:0',
             'selling_price' => 'nullable|numeric|min:0',
             'expired_mode' => 'nullable|string|max:50',
             'fup_enabled' => 'nullable|boolean',
             'fup_limit_display' => 'nullable|string|max:50',
+            'fup_rate_percent' => 'nullable|integer|min:1|max:99',
             'fup_rate_limit' => 'nullable|string|max:50',
             'fup_reset_cycle' => 'nullable|string|max:30',
         ]);
 
+        $cat = $validated['category'] ?? 'voucher';
+        $validated['category'] = $cat === 'profit' ? 'voucher' : $cat;
+        $validated['cost_price_type'] = $validated['cost_price_type'] ?? 'custom';
+        $validated['cost_price_percent'] = isset($validated['cost_price_percent']) && $validated['cost_price_percent'] !== '' ? (float)$validated['cost_price_percent'] : null;
+        $validated['fup_rate_percent'] = isset($validated['fup_rate_percent']) && $validated['fup_rate_percent'] !== '' ? (int)$validated['fup_rate_percent'] : null;
+
         $validated['rate_limit'] = !empty($validated['rate_limit']) ? trim($validated['rate_limit']) : null;
         $validated['selling_price'] = $validated['selling_price'] ?? 0;
-        $validated['cost_price'] = $validated['cost_price'] ?? 0;
+        $validated['cost_price'] = \App\Support\FormatHelper::calculateCostPrice(
+            $validated['cost_price_type'],
+            $validated['cost_price_percent'],
+            $validated['selling_price'],
+            $validated['cost_price'] ?? 0
+        );
         $validated['shared_users'] = isset($validated['shared_users']) && $validated['shared_users'] !== '' ? (int)$validated['shared_users'] : 0;
         $validated['fup_enabled'] = filter_var($request->input('fup_enabled', false), FILTER_VALIDATE_BOOLEAN);
         $validated['fup_limit_display'] = !empty($validated['fup_limit_display']) ? trim($validated['fup_limit_display']) : null;
         $validated['fup_limit_bytes'] = $validated['fup_limit_display'] ? \App\Support\FormatHelper::parseBytes($validated['fup_limit_display']) : null;
-        $validated['fup_rate_limit'] = !empty($validated['fup_rate_limit']) ? trim($validated['fup_rate_limit']) : null;
+
+        if ($validated['fup_enabled'] && !empty($validated['fup_rate_percent']) && !empty($validated['rate_limit'])) {
+            $validated['fup_rate_limit'] = \App\Support\FormatHelper::calculateFupRateLimit($validated['rate_limit'], $validated['fup_rate_percent']);
+        } else {
+            $validated['fup_rate_limit'] = !empty($validated['fup_rate_limit']) ? trim($validated['fup_rate_limit']) : null;
+        }
+
         $validated['fup_reset_cycle'] = !empty($validated['fup_reset_cycle']) ? trim($validated['fup_reset_cycle']) : 'daily';
 
         $profile = HotspotProfile::create($validated);
@@ -115,39 +139,67 @@ class HotspotProfileController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:100|unique:hotspot_profiles,name,' . $profile->id,
+            'category' => 'nullable|in:voucher,bulanan,pribadi,profit',
             'rate_limit' => 'nullable|string|max:100',
             'shared_users' => 'nullable|integer|min:0',
             'validity' => 'nullable|string|max:50',
+            'cost_price_type' => 'nullable|in:custom,percentage,fixed',
+            'cost_price_percent' => 'nullable|numeric|min:0|max:100',
             'cost_price' => 'nullable|numeric|min:0',
             'selling_price' => 'nullable|numeric|min:0',
             'expired_mode' => 'nullable|string|max:50',
             'fup_enabled' => 'nullable|boolean',
             'fup_limit_display' => 'nullable|string|max:50',
+            'fup_rate_percent' => 'nullable|integer|min:1|max:99',
             'fup_rate_limit' => 'nullable|string|max:50',
             'fup_reset_cycle' => 'nullable|string|max:30',
         ]);
 
+        $cat = $validated['category'] ?? $profile->category ?? 'voucher';
+        $validated['category'] = $cat === 'profit' ? 'voucher' : $cat;
+        $validated['cost_price_type'] = $validated['cost_price_type'] ?? $profile->cost_price_type ?? 'custom';
+        $validated['cost_price_percent'] = array_key_exists('cost_price_percent', $validated)
+            ? ($validated['cost_price_percent'] !== null && $validated['cost_price_percent'] !== '' ? (float)$validated['cost_price_percent'] : null)
+            : $profile->cost_price_percent;
+        $validated['fup_rate_percent'] = array_key_exists('fup_rate_percent', $validated)
+            ? ($validated['fup_rate_percent'] !== null && $validated['fup_rate_percent'] !== '' ? (int)$validated['fup_rate_percent'] : null)
+            : $profile->fup_rate_percent;
+
         $validated['rate_limit'] = !empty($validated['rate_limit']) ? trim($validated['rate_limit']) : null;
-        $validated['selling_price'] = $validated['selling_price'] ?? 0;
-        $validated['cost_price'] = $validated['cost_price'] ?? 0;
+        $validated['selling_price'] = $validated['selling_price'] ?? $profile->selling_price ?? 0;
+        $validated['cost_price'] = \App\Support\FormatHelper::calculateCostPrice(
+            $validated['cost_price_type'],
+            $validated['cost_price_percent'],
+            $validated['selling_price'],
+            $validated['cost_price'] ?? $profile->cost_price ?? 0
+        );
         $validated['shared_users'] = isset($validated['shared_users']) && $validated['shared_users'] !== '' ? (int)$validated['shared_users'] : 0;
         $validated['fup_enabled'] = filter_var($request->input('fup_enabled', false), FILTER_VALIDATE_BOOLEAN);
         $validated['fup_limit_display'] = !empty($validated['fup_limit_display']) ? trim($validated['fup_limit_display']) : null;
         $validated['fup_limit_bytes'] = $validated['fup_limit_display'] ? \App\Support\FormatHelper::parseBytes($validated['fup_limit_display']) : null;
-        $validated['fup_rate_limit'] = !empty($validated['fup_rate_limit']) ? trim($validated['fup_rate_limit']) : null;
+
+        if ($validated['fup_enabled'] && !empty($validated['fup_rate_percent']) && !empty($validated['rate_limit'])) {
+            $validated['fup_rate_limit'] = \App\Support\FormatHelper::calculateFupRateLimit($validated['rate_limit'], $validated['fup_rate_percent']);
+        } else {
+            $validated['fup_rate_limit'] = !empty($validated['fup_rate_limit']) ? trim($validated['fup_rate_limit']) : null;
+        }
+
         $validated['fup_reset_cycle'] = !empty($validated['fup_reset_cycle']) ? trim($validated['fup_reset_cycle']) : 'daily';
 
+        $oldName = $profile->name;
         $old = $profile->toArray();
         $profile->update($validated);
 
         // Sync to RouterOS
-        $routerOs->updateHotspotProfile(
-            $profile->name,
-            [
-                'rate_limit' => $profile->rate_limit,
-                'shared_users' => $profile->shared_users
-            ]
-        );
+        $routerParams = [
+            'rate_limit' => $profile->rate_limit,
+            'shared_users' => $profile->shared_users,
+        ];
+        if ($oldName !== $profile->name) {
+            $routerParams['name'] = $profile->name;
+        }
+
+        $routerOs->updateHotspotProfile($oldName, $routerParams);
 
         AuditLog::create([
             'user_id' => auth()->id(),

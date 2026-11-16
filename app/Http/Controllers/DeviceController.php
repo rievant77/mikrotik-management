@@ -9,7 +9,7 @@ use Illuminate\View\View;
 
 class DeviceController extends Controller
 {
-    public function index(Request $request, RouterOsService $routerOs): View
+    private function getDeviceCollection(RouterOsService $routerOs): \Illuminate\Support\Collection
     {
         // 1. Fetch live DHCP leases directly from MikroTik
         $leases = $routerOs->getDhcpLeases();
@@ -31,8 +31,67 @@ class DeviceController extends Controller
             }
         }
 
-        // 3. Map leases to clean device view models (without Rx/Tx clutter)
-        $devices = collect($leases)->map(function ($l, $idx) use ($activeUserMap) {
+        // 3. Fetch active IP bindings from MikroTik
+        $ipBindings = $routerOs->getHotspotIpBindings();
+        $ipBindingMap = [];
+        foreach ($ipBindings as $b) {
+            $bMac = !empty($b['mac-address']) ? strtoupper($b['mac-address']) : null;
+            $bIp = $b['address'] ?? null;
+            $bData = [
+                'type' => $b['type'] ?? 'regular',
+                'comment' => $b['comment'] ?? null,
+            ];
+            if ($bMac) {
+                $ipBindingMap[$bMac] = $bData;
+            }
+            if ($bIp) {
+                $ipBindingMap[$bIp] = $bData;
+            }
+        }
+
+        // 4. Resolve user categories
+        $activeUsernames = array_values(array_unique(array_filter($activeUserMap)));
+        $userCategoryMap = [];
+        if (!empty($activeUsernames)) {
+            $dbUsers = \App\Models\HotspotUser::with('profile')
+                ->whereIn('username', $activeUsernames)
+                ->get();
+            foreach ($dbUsers as $u) {
+                $cat = $u->profile?->category;
+                if ($cat === 'profit') {
+                    $cat = 'voucher';
+                }
+                $userCategoryMap[$u->username] = $cat ?: 'voucher';
+            }
+        }
+
+        // 5. Also include any active IP bindings (e.g. blocked or bypassed MACs) not present in DHCP leases
+        $leaseMacs = collect($leases)->map(function ($l) {
+            $m = $l['mac-address'] ?? ($l['active-mac-address'] ?? '');
+            return strtoupper(trim($m));
+        })->filter()->all();
+
+        $extraBindings = [];
+        foreach ($ipBindings as $idx => $b) {
+            $bMac = !empty($b['mac-address']) ? strtoupper(trim($b['mac-address'])) : null;
+            if ($bMac && !in_array($bMac, $leaseMacs, true)) {
+                $extraBindings[] = [
+                    '.id' => $b['.id'] ?? ('binding-' . $idx),
+                    'mac-address' => $b['mac-address'],
+                    'address' => $b['address'] ?? '-',
+                    'host-name' => $b['comment'] ?? ($b['type'] === 'blocked' ? 'Perangkat Diblokir' : 'Perangkat Bypassed'),
+                    'comment' => $b['comment'] ?? null,
+                    'status' => 'waiting',
+                    'server' => $b['server'] ?? 'hotspot',
+                    'dynamic' => false,
+                ];
+            }
+        }
+
+        $allRecords = array_merge($leases, $extraBindings);
+
+        // 6. Map leases and bindings to clean device view models
+        return collect($allRecords)->map(function ($l, $idx) use ($activeUserMap, $ipBindingMap, $userCategoryMap) {
             $mac = $l['mac-address'] ?? ($l['active-mac-address'] ?? '-');
             $macUpper = strtoupper($mac);
             $ip = $l['address'] ?? ($l['active-address'] ?? '-');
@@ -44,14 +103,27 @@ class DeviceController extends Controller
 
             $matchedUser = $activeUserMap[$macUpper] ?? ($activeUserMap[$ip] ?? null);
             $isHotspotActive = !empty($matchedUser);
+
+            $binding = $ipBindingMap[$macUpper] ?? ($ipBindingMap[$ip] ?? null);
+            $isBypassed = ($binding && $binding['type'] === 'bypassed');
+            $isBlocked = ($binding && $binding['type'] === 'blocked');
             $leaseStatus = strtolower($l['status'] ?? 'bound');
 
             if ($isHotspotActive) {
                 $status = 'online';
+                $category = $userCategoryMap[$matchedUser] ?? 'voucher';
+            } elseif ($isBypassed) {
+                $status = ($leaseStatus === 'bound') ? 'bypassed' : 'offline';
+                $category = 'bypassed';
+            } elseif ($isBlocked) {
+                $status = 'blocked';
+                $category = 'blocked';
             } elseif ($leaseStatus === 'bound') {
                 $status = 'standby';
+                $category = 'standby';
             } else {
                 $status = 'offline';
+                $category = 'standby';
             }
 
             return [
@@ -61,10 +133,15 @@ class DeviceController extends Controller
                 'hostname' => $hostname,
                 'vendor' => $vendor ?: 'Unknown Vendor',
                 'device_name' => $deviceName,
-                'device_display_name' => $hostname ?: $deviceName,
+                'device_display_name' => $hostname ?: ($binding['comment'] ?? $deviceName),
                 'device_type' => $deviceType,
                 'username' => $matchedUser,
                 'is_hotspot_active' => $isHotspotActive,
+                'is_bypassed' => $isBypassed,
+                'is_blocked' => $isBlocked,
+                'binding_type' => $binding['type'] ?? null,
+                'binding_comment' => $binding['comment'] ?? null,
+                'category' => $category,
                 'status' => $status,
                 'interface' => $l['server'] ?? 'hotspot',
                 'expires_after' => $l['expires-after'] ?? null,
@@ -72,10 +149,17 @@ class DeviceController extends Controller
                 'dynamic' => $l['dynamic'] ?? true,
             ];
         });
+    }
+
+    public function index(Request $request, RouterOsService $routerOs): View
+    {
+        $devices = $this->getDeviceCollection($routerOs);
 
         $stats = [
             'total' => $devices->count(),
             'online' => $devices->where('status', 'online')->count(),
+            'bypassed' => $devices->where('status', 'bypassed')->count(),
+            'blocked' => $devices->where('status', 'blocked')->count(),
             'standby' => $devices->where('status', 'standby')->count(),
             'offline' => $devices->where('status', 'offline')->count(),
         ];
@@ -88,67 +172,13 @@ class DeviceController extends Controller
      */
     public function liveData(RouterOsService $routerOs): \Illuminate\Http\JsonResponse
     {
-        $leases = $routerOs->getDhcpLeases();
-        $activeSessions = $routerOs->getActiveHotspotSessions();
-        $activeUserMap = [];
-
-        foreach ($activeSessions as $s) {
-            $mac = !empty($s['mac-address']) ? strtoupper($s['mac-address']) : null;
-            $ip = $s['address'] ?? null;
-            $user = $s['user'] ?? null;
-
-            if ($mac && $user) {
-                $activeUserMap[$mac] = $user;
-            }
-            if ($ip && $user) {
-                $activeUserMap[$ip] = $user;
-            }
-        }
-
-        $devices = collect($leases)->map(function ($l, $idx) use ($activeUserMap) {
-            $mac = $l['mac-address'] ?? ($l['active-mac-address'] ?? '-');
-            $macUpper = strtoupper($mac);
-            $ip = $l['address'] ?? ($l['active-address'] ?? '-');
-            $hostname = $l['host-name'] ?? ($l['comment'] ?? null);
-
-            $vendor = DeviceHelper::getVendorByMac($mac);
-            $deviceName = DeviceHelper::resolveDeviceName($hostname, $mac);
-            $deviceType = DeviceHelper::getDeviceType($hostname ?: $deviceName);
-
-            $matchedUser = $activeUserMap[$macUpper] ?? ($activeUserMap[$ip] ?? null);
-            $isHotspotActive = !empty($matchedUser);
-            $leaseStatus = strtolower($l['status'] ?? 'bound');
-
-            if ($isHotspotActive) {
-                $status = 'online';
-            } elseif ($leaseStatus === 'bound') {
-                $status = 'standby';
-            } else {
-                $status = 'offline';
-            }
-
-            return [
-                'id' => $l['.id'] ?? ($mac . '-' . $idx),
-                'mac_address' => $mac,
-                'ip_address' => $ip,
-                'hostname' => $hostname,
-                'vendor' => $vendor ?: 'Unknown Vendor',
-                'device_name' => $deviceName,
-                'device_display_name' => $hostname ?: $deviceName,
-                'device_type' => $deviceType,
-                'username' => $matchedUser,
-                'is_hotspot_active' => $isHotspotActive,
-                'status' => $status,
-                'interface' => $l['server'] ?? 'hotspot',
-                'expires_after' => $l['expires-after'] ?? null,
-                'last_seen' => $l['last-seen'] ?? null,
-                'dynamic' => $l['dynamic'] ?? true,
-            ];
-        });
+        $devices = $this->getDeviceCollection($routerOs);
 
         $stats = [
             'total' => $devices->count(),
             'online' => $devices->where('status', 'online')->count(),
+            'bypassed' => $devices->where('status', 'bypassed')->count(),
+            'blocked' => $devices->where('status', 'blocked')->count(),
             'standby' => $devices->where('status', 'standby')->count(),
             'offline' => $devices->where('status', 'offline')->count(),
         ];
@@ -199,8 +229,8 @@ class DeviceController extends Controller
                 'id' => $s->id,
                 'username' => $s->username,
                 'ip_address' => $s->ip_address,
-                'started_at' => $s->started_at ? $s->started_at->format('d M Y, H:i') : '-',
-                'ended_at' => $s->ended_at ? $s->ended_at->format('d M Y, H:i') : ($s->status === 'active' ? 'Aktif' : '-'),
+                'started_at' => $s->started_at ? \App\Support\FormatHelper::formatDateTimeShort($s->started_at) : '-',
+                'ended_at' => $s->ended_at ? \App\Support\FormatHelper::formatDateTimeShort($s->ended_at) : ($s->status === 'active' ? 'Aktif' : '-'),
                 'duration' => $duration,
                 'bytes_in_formatted' => \App\Support\FormatHelper::formatBytes($in),
                 'bytes_out_formatted' => \App\Support\FormatHelper::formatBytes($out),
@@ -211,6 +241,8 @@ class DeviceController extends Controller
 
         // 2. Query Live DHCP Lease, Active Hotspot Session, & IP Binding from MikroTik
         $ipBinding = $routerOs->getHotspotIpBinding($cleanMac);
+        $isDisabled = $ipBinding ? in_array(strtolower((string)($ipBinding['disabled'] ?? 'false')), ['true', 'yes', '1'], true) : false;
+
         $leases = $routerOs->getDhcpLeases();
         $matchedLease = collect($leases)->first(function ($l) use ($cleanMac) {
             $lMac = strtoupper($l['mac-address'] ?? ($l['active-mac-address'] ?? ''));
@@ -223,6 +255,14 @@ class DeviceController extends Controller
             return $sMac === $cleanMac;
         });
 
+        $activeUsername = $matchedActive['user'] ?? null;
+        $activeUserCategory = null;
+        if ($activeUsername) {
+            $userModel = \App\Models\HotspotUser::with('profile')->where('username', $activeUsername)->first();
+            $cat = $userModel?->profile?->category;
+            $activeUserCategory = ($cat === 'profit') ? 'voucher' : ($cat ?: 'voucher');
+        }
+
         return response()->json([
             'success' => true,
             'mac_address' => $cleanMac,
@@ -231,12 +271,13 @@ class DeviceController extends Controller
             'ip_address' => $matchedLease['address'] ?? ($matchedLease['active-address'] ?? ($matchedActive['address'] ?? null)),
             'is_dynamic' => ($matchedLease['dynamic'] ?? '') === 'true' || ($matchedLease['dynamic'] ?? false) === true,
             'comment' => $matchedLease['comment'] ?? null,
-            'active_username' => $matchedActive['user'] ?? null,
+            'active_username' => $activeUsername,
+            'active_user_category' => $activeUserCategory,
             'active_uptime' => $matchedActive['uptime'] ?? null,
-            'ip_binding' => $ipBinding ? [
+            'ip_binding' => ($ipBinding && !$isDisabled) ? [
                 'type' => $ipBinding['type'] ?? 'regular',
                 'comment' => $ipBinding['comment'] ?? null,
-                'disabled' => ($ipBinding['disabled'] ?? '') === 'true',
+                'disabled' => false,
             ] : null,
             'quota_stats' => [
                 'total_bytes' => $totalBytes,

@@ -235,7 +235,7 @@ class FupManagementService
             'usage_formatted' => FormatHelper::formatBytes($totalUsage, 1),
             'usage_percent' => min(100, $percent),
             'reset_cycle' => $resetCycle === 'daily' ? 'Harian (00:00)' : ($resetCycle === 'monthly' ? 'Bulanan' : 'Per Siklus'),
-            'triggered_at' => $user->fup_triggered_at?->format('d M Y H:i'),
+            'triggered_at' => $user->fup_triggered_at ? FormatHelper::formatDateTimeShort($user->fup_triggered_at) : null,
         ];
     }
 }

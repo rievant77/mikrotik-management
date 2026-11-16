@@ -13,7 +13,7 @@
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
-                    <span>⚡ Generate Tagihan</span>
+                    <span>Generate Tagihan</span>
                 </button>
                 <button @click="openCustomerModal()" class="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-zinc-200 dark:text-zinc-900 transition-colors shadow-xs">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -31,16 +31,22 @@
                 :class="activeTab === 'invoices' ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400 font-bold' : 'border-transparent text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 font-medium'"
                 class="flex items-center gap-2 px-4 py-3 border-b-2 transition-colors"
             >
-                <span>📋 Daftar Tagihan (Invoices)</span>
-                <span class="px-2 py-0.5 rounded-full text-xs" :class="activeTab === 'invoices' ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'" x-text="invoices.length"></span>
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span>Daftar Tagihan</span>
+                <span class="px-2 py-0.5 rounded-full text-xs" :class="activeTab === 'invoices' ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'" x-text="formatNumber(invoices.length)"></span>
             </button>
             <button 
                 @click="activeTab = 'customers'" 
                 :class="activeTab === 'customers' ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400 font-bold' : 'border-transparent text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 font-medium'"
                 class="flex items-center gap-2 px-4 py-3 border-b-2 transition-colors"
             >
-                <span>👥 Data Master Pelanggan</span>
-                <span class="px-2 py-0.5 rounded-full text-xs" :class="activeTab === 'customers' ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'" x-text="customers.length"></span>
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+                <span>Data Master Pelanggan</span>
+                <span class="px-2 py-0.5 rounded-full text-xs" :class="activeTab === 'customers' ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'" x-text="formatNumber(customers.length)"></span>
             </button>
         </div>
 
@@ -71,7 +77,7 @@
                         :class="statusFilter === 'all' ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 font-bold' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200'" 
                         class="px-3 py-1.5 rounded-lg transition-colors"
                     >
-                        Semua (<span x-text="invoices.length"></span>)
+                        Semua (<span x-text="formatNumber(invoices.length)"></span>)
                     </button>
                     <button 
                         type="button" 
@@ -79,7 +85,7 @@
                         :class="statusFilter === 'unpaid' ? 'bg-rose-600 text-white font-bold' : 'bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 hover:bg-rose-100'" 
                         class="px-3 py-1.5 rounded-lg transition-colors"
                     >
-                        Belum Bayar (<span x-text="invoices.filter(x => x.status === 'unpaid').length"></span>)
+                        Belum Bayar (<span x-text="formatNumber(invoices.filter(x => x.status === 'unpaid').length)"></span>)
                     </button>
                     <button 
                         type="button" 
@@ -87,7 +93,7 @@
                         :class="statusFilter === 'partial' ? 'bg-amber-600 text-white font-bold' : 'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 hover:bg-amber-100'" 
                         class="px-3 py-1.5 rounded-lg transition-colors"
                     >
-                        Angsuran (<span x-text="invoices.filter(x => x.status === 'partial').length"></span>)
+                        Angsuran (<span x-text="formatNumber(invoices.filter(x => x.status === 'partial').length)"></span>)
                     </button>
                     <button 
                         type="button" 
@@ -95,7 +101,7 @@
                         :class="statusFilter === 'paid' ? 'bg-emerald-600 text-white font-bold' : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100'" 
                         class="px-3 py-1.5 rounded-lg transition-colors"
                     >
-                        Lunas (<span x-text="invoices.filter(x => x.status === 'paid').length"></span>)
+                        Lunas (<span x-text="formatNumber(invoices.filter(x => x.status === 'paid').length)"></span>)
                     </button>
                 </div>
             </div>
@@ -132,7 +138,7 @@
                 <div class="p-4 border-b border-zinc-100 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <input type="text" x-model="invoiceSearch" placeholder="Cari nama atau nomor invoice..." class="px-3 py-1.5 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 w-full sm:w-72">
                     <div class="text-xs text-zinc-400">
-                        Menampilkan <strong class="text-zinc-900 dark:text-zinc-100" x-text="filteredInvoices.length"></strong> dari <span x-text="invoices.length"></span> tagihan
+                        Menampilkan <strong class="text-zinc-900 dark:text-zinc-100" x-text="formatNumber(filteredInvoices.length)"></strong> dari <span x-text="formatNumber(invoices.length)"></span> tagihan
                     </div>
                 </div>
 
@@ -147,7 +153,10 @@
                         <h3 class="mt-4 font-bold text-zinc-900 dark:text-zinc-100 text-sm">Belum Ada Tagihan untuk Periode Ini</h3>
                         <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1 max-w-sm mx-auto">Klik tombol di bawah untuk menerbitkan tagihan secara otomatis kepada semua pelanggan aktif.</p>
                         <button @click="openGenerateModal()" class="mt-4 inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white">
-                            ⚡ Generate Tagihan Periode Ini
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                            <span>Generate Tagihan Periode Ini</span>
                         </button>
                     </div>
                 </template>
@@ -173,13 +182,15 @@
                                     <td class="py-3.5 px-4">
                                         <div class="font-bold text-zinc-900 dark:text-zinc-100" x-text="inv.customer ? inv.customer.name : '-'"></div>
                                         <template x-if="inv.customer && inv.customer.hotspot_user">
-                                            <a :href="'/users/' + inv.customer.hotspot_user.username" class="inline-flex items-center gap-1 mt-0.5 px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-[11px] font-mono text-zinc-700 dark:text-zinc-300 hover:text-emerald-600" title="Lihat Detail User Hotspot">
-                                                <span class="text-emerald-500">📶</span>
+                                            <a :href="'/users/' + inv.customer.hotspot_user.username" class="inline-flex items-center gap-1.5 mt-0.5 px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-[11px] font-mono text-zinc-700 dark:text-zinc-300 hover:text-emerald-600" title="Lihat Detail User Hotspot">
+                                                <svg class="w-3 h-3 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" />
+                                                </svg>
                                                 <span x-text="inv.customer.hotspot_user.username"></span>
                                             </a>
                                         </template>
                                     </td>
-                                    <td class="py-3.5 px-4 text-zinc-500 font-mono text-[11px]" x-text="inv.due_date || '-'"></td>
+                                    <td class="py-3.5 px-4 text-zinc-500 font-mono text-[11px]" x-text="inv.due_date ? formatDateIndo(inv.due_date) : '-'"></td>
                                     <td class="py-3.5 px-4 font-mono font-bold text-zinc-900 dark:text-zinc-100" x-text="formatRupiah(inv.amount)"></td>
                                     <td class="py-3.5 px-4 font-mono text-emerald-600 dark:text-emerald-400 font-semibold" x-text="formatRupiah(inv.amount_paid)"></td>
                                     <td class="py-3.5 px-4 font-mono font-bold" :class="inv.balance_due > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-zinc-400'" x-text="formatRupiah(inv.balance_due)"></td>
@@ -237,11 +248,20 @@
                         <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
                             <template x-for="c in filteredMasterCustomers" :key="c.id">
                                 <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/40">
-                                    <td class="py-3.5 px-4 font-bold text-zinc-900 dark:text-zinc-100" x-text="c.name"></td>
+                                    <td class="py-3.5 px-4 font-bold text-zinc-900 dark:text-zinc-100">
+                                        <div class="flex items-center gap-1.5 flex-wrap">
+                                            <span x-text="c.name"></span>
+                                            <template x-if="c.profile">
+                                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-semibold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-800" x-text="c.profile.name"></span>
+                                            </template>
+                                        </div>
+                                    </td>
                                     <td class="py-3.5 px-4 font-mono">
                                         <template x-if="c.hotspot_user">
                                             <a :href="'/users/' + c.hotspot_user.username" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-zinc-100 dark:bg-zinc-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 border border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 hover:text-emerald-600 font-mono text-xs transition-colors">
-                                                <span class="text-emerald-500">📶</span>
+                                                <svg class="w-3 h-3 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" />
+                                                </svg>
                                                 <span class="font-bold" x-text="c.hotspot_user.username"></span>
                                             </a>
                                         </template>
@@ -274,7 +294,7 @@
         </div>
 
         <!-- MODAL 1: GENERATE INVOICES -->
-        <x-modal name="generate-invoices-modal" title="⚡ Generate Tagihan Bulanan">
+        <x-modal name="generate-invoices-modal" title="Generate Tagihan Bulanan">
             <form @submit.prevent="submitGenerateInvoices()" class="space-y-4 text-xs">
                 <div>
                     <label class="block font-medium text-zinc-700 dark:text-zinc-300 mb-1">Pilih Periode Bulan & Tahun *</label>
@@ -285,7 +305,7 @@
                 <div class="p-3 bg-zinc-50 dark:bg-zinc-800/60 rounded-lg border border-zinc-200 dark:border-zinc-700 space-y-1">
                     <div class="flex justify-between">
                         <span class="text-zinc-500">Total Pelanggan Aktif:</span>
-                        <strong class="font-mono text-zinc-900 dark:text-zinc-100" x-text="customers.length"></strong>
+                        <strong class="font-mono text-zinc-900 dark:text-zinc-100" x-text="formatNumber(customers.length)"></strong>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-zinc-500">Estimasi Total Tagihan:</span>
@@ -297,7 +317,7 @@
                     <button type="button" @click="$dispatch('close-modal', 'generate-invoices-modal')" class="px-4 py-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">Batal</button>
                     <button type="submit" :disabled="isGenerating" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold flex items-center gap-2">
                         <span x-show="isGenerating">Memproses...</span>
-                        <span x-show="!isGenerating">⚡ Mulai Generate Tagihan</span>
+                        <span x-show="!isGenerating">Mulai Generate Tagihan</span>
                     </button>
                 </div>
             </form>
@@ -410,7 +430,7 @@
                                 <div class="py-2.5 flex items-center justify-between">
                                     <div>
                                         <div class="font-mono font-bold text-emerald-600 dark:text-emerald-400" x-text="formatRupiah(p.amount_paid)"></div>
-                                        <div class="text-[10px] text-zinc-400" x-text="p.paid_at + ' • ' + (p.payment_method || 'cash').toUpperCase() + (p.notes ? ' (' + p.notes + ')' : '')"></div>
+                                        <div class="text-[10px] text-zinc-400" x-text="formatDateTimeIndo(p.paid_at) + ' • ' + (p.payment_method || 'cash').toUpperCase() + (p.notes ? ' (' + p.notes + ')' : '')"></div>
                                     </div>
                                     <div>
                                         <button @click="voidSinglePayment(p)" class="px-2 py-1 text-[10px] font-semibold rounded text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 transition-colors">
@@ -432,6 +452,16 @@
         <!-- MODAL 4: FORM MASTER PELANGGAN -->
         <x-modal name="customer-modal" title="Form Master Pelanggan">
             <form @submit.prevent="saveCustomer()" class="space-y-4 text-xs">
+                <div>
+                    <label class="block font-medium text-zinc-700 dark:text-zinc-300 mb-1">Paket Profil Bulanan (Opsional)</label>
+                    <select x-model="custForm.profile_id" @change="onProfileSelected($event.target.value)" class="w-full px-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100">
+                        <option value="">-- Tanpa Paket Khusus / Tarif Manual --</option>
+                        <template x-for="p in monthlyProfiles" :key="p.id">
+                            <option :value="p.id" x-text="p.name + ' (' + formatRupiah(p.selling_price) + ' / bln - HPP ' + formatRupiah(p.cost_price) + ')'"></option>
+                        </template>
+                    </select>
+                    <span class="text-[10px] text-zinc-400 mt-1 block">Memilih paket profil otomatis mengisi tarif bulanan default dan HPP.</span>
+                </div>
                 <div>
                     <label class="block font-medium text-zinc-700 dark:text-zinc-300 mb-1">Tautkan Akun Hotspot (Opsional)</label>
                     <select x-model="custForm.hotspot_user_id" @change="onHotspotUserSelected($event.target.value)" class="w-full px-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 font-mono">
@@ -512,12 +542,13 @@
                 metrics: @json($metrics ?? []),
                 customers: @json($customers ?? []),
                 hotspotUsers: @json($hotspotUsers ?? []),
+                monthlyProfiles: @json($monthlyProfiles ?? []),
                 isEditingCust: false,
                 isGenerating: false,
                 isPaying: false,
                 activeInvoice: null,
                 genForm: { month: '{{ $selectedMonth ?? now()->format("Y-m") }}' },
-                custForm: { id: null, name: '', hotspot_user_id: '', monthly_price: 150000, billing_day: 1, contact: '', address: '' },
+                custForm: { id: null, name: '', hotspot_user_id: '', profile_id: '', monthly_price: 150000, cost_price: 0, billing_day: 1, contact: '', address: '' },
                 payForm: { amount_paid: 0, paid_at: '{{ now()->toDateString() }}', payment_method: 'cash', notes: '' },
 
                 get filteredInvoices() {
@@ -671,6 +702,19 @@
                     });
                 },
 
+                onProfileSelected(pid) {
+                    if (!pid) return;
+                    const p = this.monthlyProfiles.find(x => String(x.id) === String(pid));
+                    if (p) {
+                        if (p.selling_price && p.selling_price > 0) {
+                            this.custForm.monthly_price = p.selling_price;
+                        }
+                        if (p.cost_price !== undefined && p.cost_price !== null) {
+                            this.custForm.cost_price = p.cost_price;
+                        }
+                    }
+                },
+
                 onHotspotUserSelected(userId) {
                     if (!userId) return;
                     const u = this.hotspotUsers.find(x => String(x.id) === String(userId));
@@ -689,7 +733,7 @@
 
                 openCustomerModal() {
                     this.isEditingCust = false;
-                    this.custForm = { id: null, name: '', hotspot_user_id: '', monthly_price: 150000, cost_price: 0, billing_day: 1, contact: '', address: '' };
+                    this.custForm = { id: null, name: '', hotspot_user_id: '', profile_id: '', monthly_price: 150000, cost_price: 0, billing_day: 1, contact: '', address: '' };
                     this.$dispatch('open-modal', 'customer-modal');
                 },
 
@@ -699,6 +743,7 @@
                         id: c.id,
                         name: c.name,
                         hotspot_user_id: c.hotspot_user_id || (c.hotspot_user ? c.hotspot_user.id : ''),
+                        profile_id: c.profile_id || (c.profile ? c.profile.id : ''),
                         monthly_price: c.monthly_price || 150000,
                         cost_price: c.cost_price || 0,
                         billing_day: c.billing_day || 1,

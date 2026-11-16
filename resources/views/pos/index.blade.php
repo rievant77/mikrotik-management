@@ -91,7 +91,7 @@
                 <div class="mt-2 text-[11px] text-zinc-500 dark:text-zinc-400 flex flex-col gap-0.5">
                     <div class="flex justify-between">
                         <span>Voucher Terpakai:</span>
-                        <strong class="font-mono text-zinc-700 dark:text-zinc-300" x-text="(overview.voucher_count || 0) + ' Unit'"></strong>
+                        <strong class="font-mono text-zinc-700 dark:text-zinc-300" x-text="formatNumber(overview.voucher_count || 0) + ' Unit'"></strong>
                     </div>
                     <div class="flex justify-between">
                         <span>Laba Bersih Voucher:</span>
@@ -281,11 +281,11 @@
                         <div class="py-3 flex items-center justify-between text-xs">
                             <div>
                                 <div class="font-mono font-bold text-zinc-900 dark:text-zinc-100">{{ $v->username }}</div>
-                                <div class="text-[10px] text-zinc-400">{{ $v->profile_name }} • Diaktifkan {{ $v->activated_at }}</div>
+                                <div class="text-[10px] text-zinc-400">{{ $v->profile_name }} • Diaktifkan {{ \App\Support\FormatHelper::formatDateTimeShort($v->activated_at) }}</div>
                             </div>
                             <div class="text-right">
-                                <div class="font-mono font-bold text-zinc-900 dark:text-zinc-100">Rp {{ number_format($v->selling_price, 0, ',', '.') }}</div>
-                                <div class="text-[10px] text-emerald-600 font-semibold">Laba: Rp {{ number_format($v->profit, 0, ',', '.') }}</div>
+                                <div class="font-mono font-bold text-zinc-900 dark:text-zinc-100">{{ \App\Support\FormatHelper::formatRupiah($v->selling_price) }}</div>
+                                <div class="text-[10px] text-emerald-600 font-semibold">Laba: {{ \App\Support\FormatHelper::formatRupiah($v->profit) }}</div>
                             </div>
                         </div>
                     @empty
@@ -311,13 +311,13 @@
                             <div>
                                 <div class="font-bold text-zinc-900 dark:text-zinc-100">{{ $p->customer->name ?? 'Pelanggan' }}</div>
                                 <div class="text-[10px] text-zinc-400">
-                                    Periode {{ \Carbon\Carbon::parse($p->billing_month)->format('M Y') }} • {{ strtoupper($p->payment_method) }}
+                                    Periode {{ \App\Support\FormatHelper::formatMonthIndo(\Carbon\Carbon::parse($p->billing_month)) }} • {{ strtoupper($p->payment_method) }}
                                     @if($p->notes) <span class="italic">({{ $p->notes }})</span> @endif
                                 </div>
                             </div>
                             <div class="text-right">
-                                <div class="font-mono font-bold text-emerald-600 dark:text-emerald-400">Rp {{ number_format($p->amount_paid, 0, ',', '.') }}</div>
-                                <span class="text-[10px] text-zinc-400 font-mono">{{ $p->paid_at }}</span>
+                                <div class="font-mono font-bold text-emerald-600 dark:text-emerald-400">{{ \App\Support\FormatHelper::formatRupiah($p->amount_paid) }}</div>
+                                <span class="text-[10px] text-zinc-400 font-mono">{{ \App\Support\FormatHelper::formatDateTimeShort($p->paid_at) }}</span>
                             </div>
                         </div>
                     @empty

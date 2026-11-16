@@ -8,7 +8,7 @@
                 <div class="flex items-center gap-2">
                     <h1 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">Histori Pemakaian Kuota & Bandwidth</h1>
                     <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700">
-                        {{ $startDate->format('d M Y') }} - {{ $endDate->format('d M Y') }}
+                        {{ \App\Support\FormatHelper::formatDateShort($startDate) }} - {{ \App\Support\FormatHelper::formatDateShort($endDate) }}
                     </span>
                 </div>
                 <p class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-1">Laporan analitik pemakaian data user aktual dari router MikroTik dan database harian</p>
@@ -65,12 +65,12 @@
             </div>
             <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-xs">
                 <span class="text-xs text-zinc-400 uppercase font-medium">Total Sesi Tercatat</span>
-                <h4 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mt-1">{{ number_format($totalSessionsPeriod ?? 0) }} Sesi</h4>
+                <h4 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mt-1">{{ \App\Support\FormatHelper::formatNumber($totalSessionsPeriod ?? 0) }} Sesi</h4>
                 <p class="text-[11px] text-zinc-400 mt-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">Akumulasi login koneksi</p>
             </div>
             <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-xs">
                 <span class="text-xs text-zinc-400 uppercase font-medium">Pengguna Unik Aktif</span>
-                <h4 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mt-1">{{ number_format($uniqueUsersCount ?? 0) }} User</h4>
+                <h4 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mt-1">{{ \App\Support\FormatHelper::formatNumber($uniqueUsersCount ?? 0) }} User</h4>
                 <p class="text-[11px] text-zinc-400 mt-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">Hotspot Voucher + Member</p>
             </div>
             <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-xs">
@@ -95,7 +95,7 @@
                     </h3>
                     <p class="text-[11px] text-zinc-400 mt-0.5">
                         @if($isHourlyChart ?? false)
-                            Distribusi volume data unduh (Rx) dan unggah (Tx) per-jam pada tanggal {{ $startDate->format('d M Y') }}
+                            Distribusi volume data unduh (Rx) dan unggah (Tx) per-jam pada tanggal {{ \App\Support\FormatHelper::formatDateIndo($startDate) }}
                         @else
                             Grafik volume data unduh (Rx) dan unggah (Tx) per tanggal
                         @endif
@@ -117,7 +117,7 @@
 
         <!-- Filter & Search Toolbar -->
         <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-xs">
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 <!-- Search Input -->
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
@@ -128,15 +128,31 @@
                     <input 
                         type="text" 
                         x-model="search" 
+                        @input="currentPage = 1"
                         placeholder="Cari user..." 
                         class="w-full pl-9 pr-3 py-2 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:focus:ring-zinc-600"
                     >
+                </div>
+
+                <!-- Category Filter Dropdown -->
+                <div>
+                    <select 
+                        x-model="categoryFilter" 
+                        @change="currentPage = 1"
+                        class="w-full px-3 py-2 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 font-medium focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:focus:ring-zinc-600"
+                    >
+                        <option value="all">Semua Kategori</option>
+                        <option value="voucher">Voucher (Profit)</option>
+                        <option value="bulanan">Bulanan (Profit)</option>
+                        <option value="pribadi">Pribadi (Non-Profit)</option>
+                    </select>
                 </div>
 
                 <!-- Profile Filter Dropdown -->
                 <div>
                     <select 
                         x-model="selectedProfile" 
+                        @change="currentPage = 1"
                         class="w-full px-3 py-2 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:focus:ring-zinc-600"
                     >
                         <option value="">Semua Profile / Paket</option>
@@ -150,6 +166,7 @@
                 <div>
                     <select 
                         x-model="sortBy" 
+                        @change="currentPage = 1"
                         class="w-full px-3 py-2 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:focus:ring-zinc-600"
                     >
                         <option value="usage_desc">Total Pemakaian Terbanyak</option>
@@ -179,7 +196,7 @@
         <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden shadow-xs" x-show="filteredSummaries.length > 0">
             <div class="px-5 py-3.5 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-800/20">
                 <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">
-                    Daftar Pengguna (<span x-text="filteredSummaries.length"></span>)
+                    Daftar Pengguna (<span x-text="formatNumber(filteredSummaries.length)"></span>)
                 </span>
                 <span class="text-[11px] text-zinc-400">Diurutkan berdasarkan pemakaian aktual</span>
             </div>
@@ -187,74 +204,160 @@
                 <table class="w-full text-left text-xs">
                     <thead class="bg-zinc-50/80 dark:bg-zinc-800/50 text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase border-b border-zinc-200 dark:border-zinc-800">
                         <tr>
-                            <th class="py-3.5 px-4">User & Profile</th>
-                            <th class="py-3.5 px-4">Status</th>
-                            <th class="py-3.5 px-4">Jumlah Sesi</th>
-                            <th class="py-3.5 px-4">Total Uptime</th>
-                            <th class="py-3.5 px-4">Upload (Tx)</th>
-                            <th class="py-3.5 px-4">Download (Rx)</th>
-                            <th class="py-3.5 px-4 font-bold">Total Pemakaian</th>
-                            <th class="py-3.5 px-4 text-right">Detail</th>
+                            <th class="py-3.5 px-4 text-left">User</th>
+                            <th class="py-3.5 px-4 text-center">Kategori</th>
+                            <th class="py-3.5 px-4 text-center">Status</th>
+                            <th class="py-3.5 px-4 text-left">Paket Profil</th>
+                            <th class="py-3.5 px-4 text-center">Jumlah Sesi</th>
+                            <th class="py-3.5 px-4 text-center">Total Uptime</th>
+                            <th class="py-3.5 px-4 text-right">Upload (Tx)</th>
+                            <th class="py-3.5 px-4 text-right">Download (Rx)</th>
+                            <th class="py-3.5 px-4 text-right font-bold">Total Pemakaian</th>
+                            <th class="py-3.5 px-4 text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
-                        <template x-for="item in filteredSummaries" :key="item.username">
+                        <template x-for="item in paginatedSummaries" :key="item.username">
                             <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors">
-                                <!-- User & Profile -->
-                                <td class="py-3.5 px-4">
+                                <!-- User -->
+                                <td class="py-3.5 px-4 align-middle">
                                     <div class="flex items-center gap-2.5">
-                                        <div class="w-7 h-7 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-bold text-xs flex items-center justify-center">
+                                        <div class="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-bold text-xs flex items-center justify-center shrink-0 border border-zinc-200/60 dark:border-zinc-700/60">
                                             <span x-text="item.username.substring(0,2).toUpperCase()"></span>
                                         </div>
-                                        <div>
-                                            <a :href="'/users/' + item.username" class="font-semibold text-zinc-900 dark:text-zinc-100 hover:underline" x-text="item.username"></a>
-                                            <div class="text-[10px] text-zinc-400" x-text="item.profile_name || 'Standard'"></div>
+                                        <div class="min-w-0">
+                                            <a :href="'/users/' + item.username" class="font-bold text-zinc-900 dark:text-zinc-100 hover:underline truncate block" x-text="item.username"></a>
+                                            <div class="text-[10px] text-zinc-400 truncate" x-text="'Terakhir: ' + (item.last_seen || '-')"></div>
                                         </div>
                                     </div>
                                 </td>
 
+                                <!-- Kategori -->
+                                <td class="py-3.5 px-4 text-center align-middle">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase border"
+                                        :class="{
+                                            'bg-emerald-50 text-emerald-700 border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800': item.category === 'voucher',
+                                            'bg-sky-50 text-sky-700 border-sky-300 dark:bg-sky-950/60 dark:text-sky-300 dark:border-sky-800': item.category === 'bulanan',
+                                            'bg-purple-50 text-purple-700 border-purple-300 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-800': item.category === 'pribadi',
+                                        }"
+                                        x-text="item.category || 'voucher'"
+                                    ></span>
+                                </td>
+
                                 <!-- Status Online/Offline -->
-                                <td class="py-3.5 px-4">
+                                <td class="py-3.5 px-4 text-center align-middle">
                                     <template x-if="item.is_online">
-                                        <x-badge type="active" dot="true">Online</x-badge>
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800/80">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Online
+                                        </span>
                                     </template>
                                     <template x-if="!item.is_online">
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700">
                                             Offline
                                         </span>
                                     </template>
                                 </td>
 
+                                <!-- Paket Profil -->
+                                <td class="py-3.5 px-4 align-middle">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700" x-text="item.profile_name || 'Standard'"></span>
+                                </td>
+
                                 <!-- Sessions Count -->
-                                <td class="py-3.5 px-4 font-medium text-zinc-700 dark:text-zinc-300" x-text="(item.total_sessions || 1) + ' Sesi'"></td>
+                                <td class="py-3.5 px-4 text-center align-middle font-medium text-zinc-700 dark:text-zinc-300" x-text="formatNumber(item.total_sessions || 1) + ' Sesi'"></td>
 
                                 <!-- Total Uptime -->
-                                <td class="py-3.5 px-4 font-mono text-zinc-500" x-text="item.total_uptime_formatted || '-'"></td>
+                                <td class="py-3.5 px-4 text-center align-middle font-mono text-zinc-500 dark:text-zinc-400" x-text="item.total_uptime_formatted || '-'"></td>
 
                                 <!-- Upload (Tx) -->
-                                <td class="py-3.5 px-4 font-mono font-medium text-sky-600 dark:text-sky-400 whitespace-nowrap" x-text="'↑ ' + (item.total_in_formatted || '0 B')"></td>
+                                <td class="py-3.5 px-4 text-right align-middle font-mono font-medium text-sky-600 dark:text-sky-400 whitespace-nowrap" x-text="'↑ ' + (item.total_in_formatted || '0 B')"></td>
 
                                 <!-- Download (Rx) -->
-                                <td class="py-3.5 px-4 font-mono font-semibold text-emerald-600 dark:text-emerald-400 whitespace-nowrap" x-text="'↓ ' + (item.total_out_formatted || '0 B')"></td>
+                                <td class="py-3.5 px-4 text-right align-middle font-mono font-semibold text-emerald-600 dark:text-emerald-400 whitespace-nowrap" x-text="'↓ ' + (item.total_out_formatted || '0 B')"></td>
 
                                 <!-- Total Usage with Ratio Bar -->
-                                <td class="py-3.5 px-4 font-mono">
+                                <td class="py-3.5 px-4 text-right align-middle font-mono">
                                     <div class="font-bold text-zinc-900 dark:text-zinc-100" x-text="item.total_usage_formatted || '0 B'"></div>
-                                    <div class="w-24 bg-zinc-100 dark:bg-zinc-800 h-1.5 rounded-full overflow-hidden mt-1">
+                                    <div class="w-24 bg-zinc-100 dark:bg-zinc-800 h-1.5 rounded-full overflow-hidden mt-1 ml-auto">
                                         <div class="bg-zinc-900 dark:bg-zinc-100 h-full rounded-full" :style="'width: ' + Math.min(100, Math.round((item.total_usage / (totalData || 1)) * 100)) + '%'"></div>
                                     </div>
                                 </td>
 
                                 <!-- Action Link -->
-                                <td class="py-3.5 px-4 text-right">
-                                    <a :href="'/users/' + item.username" class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 transition-colors">
-                                        Detail &rarr;
+                                <td class="py-3.5 px-4 text-center align-middle">
+                                    <a :href="'/users/' + item.username" class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 transition-colors shadow-2xs">
+                                        <span>Detail</span>
+                                        <span class="text-[10px] text-zinc-400 dark:text-zinc-500">→</span>
                                     </a>
                                 </td>
                             </tr>
                         </template>
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Pagination Navigation Bar -->
+            <div class="px-5 py-3.5 border-t border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs bg-zinc-50/60 dark:bg-zinc-800/30">
+                <div class="flex items-center gap-2 text-zinc-500 dark:text-zinc-400">
+                    <span>Menampilkan</span>
+                    <span class="font-semibold text-zinc-800 dark:text-zinc-200" x-text="filteredSummaries.length > 0 ? formatNumber(((currentPage - 1) * perPage) + 1) : 0"></span>
+                    <span>-</span>
+                    <span class="font-semibold text-zinc-800 dark:text-zinc-200" x-text="formatNumber(Math.min(currentPage * perPage, filteredSummaries.length))"></span>
+                    <span>dari</span>
+                    <span class="font-semibold text-zinc-800 dark:text-zinc-200" x-text="formatNumber(filteredSummaries.length)"></span>
+                    <span>pengguna</span>
+
+                    <span class="mx-1">•</span>
+                    <span>Per halaman:</span>
+                    <select 
+                        x-model.number="perPage" 
+                        @change="currentPage = 1"
+                        class="px-2 py-1 rounded bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs font-medium text-zinc-700 dark:text-zinc-300 focus:outline-none"
+                    >
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
+
+                <!-- Page Buttons -->
+                <div class="flex items-center gap-1" x-show="totalPages > 1">
+                    <button 
+                        type="button" 
+                        @click="goToPage(currentPage - 1)" 
+                        :disabled="currentPage === 1" 
+                        :class="currentPage === 1 ? 'opacity-40 cursor-not-allowed text-zinc-400' : 'hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300'"
+                        class="px-2.5 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 font-medium transition-colors"
+                    >
+                        &larr; Prev
+                    </button>
+
+                    <template x-for="p in displayedPages" :key="p">
+                        <button 
+                            type="button" 
+                            @click="typeof p === 'number' && goToPage(p)" 
+                            :disabled="typeof p !== 'number'" 
+                            :class="p === currentPage 
+                                ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 font-bold border-zinc-900 dark:border-zinc-100' 
+                                : (typeof p === 'number' ? 'hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700' : 'cursor-default border-transparent text-zinc-400')"
+                            class="min-w-8 py-1.5 px-2 rounded-lg text-center font-medium transition-colors"
+                            x-text="p"
+                        >
+                        </button>
+                    </template>
+
+                    <button 
+                        type="button" 
+                        @click="goToPage(currentPage + 1)" 
+                        :disabled="currentPage === totalPages" 
+                        :class="currentPage === totalPages ? 'opacity-40 cursor-not-allowed text-zinc-400' : 'hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300'"
+                        class="px-2.5 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 font-medium transition-colors"
+                    >
+                        Next &rarr;
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -267,8 +370,11 @@
                 customStart: '{{ $startDate->format("Y-m-d") }}',
                 customEnd: '{{ $endDate->format("Y-m-d") }}',
                 search: '',
+                categoryFilter: 'all',
                 selectedProfile: '',
                 sortBy: 'usage_desc',
+                currentPage: 1,
+                perPage: 15,
                 summaries: @json($summaries ?? []),
                 totalData: {{ $totalDataPeriod ?? 0 }},
                 totalSessions: {{ $totalSessionsPeriod ?? 0 }},
@@ -278,6 +384,40 @@
                 chartTxSeries: @json($chartTxSeries ?? []),
                 init() {
                     this.renderTrendChart();
+                },
+                get totalPages() {
+                    return Math.max(1, Math.ceil(this.filteredSummaries.length / this.perPage));
+                },
+                get paginatedSummaries() {
+                    const start = (this.currentPage - 1) * this.perPage;
+                    return this.filteredSummaries.slice(start, start + this.perPage);
+                },
+                get displayedPages() {
+                    const total = this.totalPages;
+                    const current = this.currentPage;
+                    if (total <= 7) {
+                        return Array.from({ length: total }, (_, i) => i + 1);
+                    }
+                    const pages = [];
+                    pages.push(1);
+                    if (current > 3) {
+                        pages.push('...');
+                    }
+                    const start = Math.max(2, current - 1);
+                    const end = Math.min(total - 1, current + 1);
+                    for (let i = start; i <= end; i++) {
+                        pages.push(i);
+                    }
+                    if (current < total - 2) {
+                        pages.push('...');
+                    }
+                    pages.push(total);
+                    return pages;
+                },
+                goToPage(p) {
+                    if (p >= 1 && p <= this.totalPages) {
+                        this.currentPage = p;
+                    }
                 },
                 renderTrendChart() {
                     const el = document.getElementById('historical-trend-chart');
@@ -367,7 +507,9 @@
                         const profile = s.profile_name || '';
                         const matchesSearch = !this.search || name.toLowerCase().includes(this.search.toLowerCase());
                         const matchesProfile = !this.selectedProfile || profile === this.selectedProfile;
-                        return matchesSearch && matchesProfile;
+                        const userCategory = s.category || 'voucher';
+                        const matchesCategory = this.categoryFilter === 'all' || userCategory === this.categoryFilter;
+                        return matchesSearch && matchesProfile && matchesCategory;
                     });
 
                     if (this.sortBy === 'usage_desc') {

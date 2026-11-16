@@ -80,7 +80,13 @@
             <div class="my-2 border-t border-dashed border-zinc-400"></div>
             <div class="flex justify-between font-bold text-sm">
                 <span>TOTAL:</span>
-                <span>{{ ($voucher->profile && (float)$voucher->profile->selling_price == 0) ? 'Gratis (Rp 0)' : \App\Support\FormatHelper::formatRupiah($voucher->profile?->selling_price ?? 3000) }}</span>
+                <span>
+                    @if($voucher->profile?->category === 'pribadi')
+                        Pribadi (Non-Profit)
+                    @else
+                        {{ ($voucher->profile && (float)$voucher->profile->selling_price == 0) ? 'Gratis (Rp 0)' : \App\Support\FormatHelper::formatRupiah($voucher->profile?->selling_price ?? 3000) }}
+                    @endif
+                </span>
             </div>
             <div class="text-[9px] text-zinc-400 mt-2">{{ $routerSetting->footer_text ?? 'Simpan struk ini sebagai bukti login yang sah' }}</div>
         </div>

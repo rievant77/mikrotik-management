@@ -22,17 +22,17 @@
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 shadow-xs">
                 <span class="text-xs font-medium text-zinc-400 uppercase">Voucher Terpakai ({{ $metrics['period'] ?? 'Bulan Ini' }})</span>
-                <div class="mt-2 text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-mono">{{ number_format($metrics['total_count'] ?? 0, 0, ',', '.') }}</div>
+                <div class="mt-2 text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-mono">{{ \App\Support\FormatHelper::formatNumber($metrics['total_count'] ?? 0) }}</div>
                 <div class="mt-2 text-xs text-zinc-500">Total voucher aktif tercatat</div>
             </div>
             <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 shadow-xs">
                 <span class="text-xs font-medium text-zinc-400 uppercase">Total Omzet Penjualan</span>
-                <div class="mt-2 text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-mono">Rp {{ number_format($metrics['total_revenue'] ?? 0, 0, ',', '.') }}</div>
+                <div class="mt-2 text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-mono">{{ \App\Support\FormatHelper::formatRupiah($metrics['total_revenue'] ?? 0) }}</div>
                 <div class="mt-2 text-xs text-zinc-500">Gross revenue dari voucher</div>
             </div>
             <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 shadow-xs">
                 <span class="text-xs font-medium text-zinc-400 uppercase">Total Laba Bersih (Profit)</span>
-                <div class="mt-2 text-2xl font-bold text-emerald-600 dark:text-emerald-400 font-mono">Rp {{ number_format($metrics['total_profit'] ?? 0, 0, ',', '.') }}</div>
+                <div class="mt-2 text-2xl font-bold text-emerald-600 dark:text-emerald-400 font-mono">{{ \App\Support\FormatHelper::formatRupiah($metrics['total_profit'] ?? 0) }}</div>
                 <div class="mt-2 text-xs text-emerald-600 dark:text-emerald-400 font-medium">Laba bersih masuk ke kas</div>
             </div>
         </div>
@@ -69,8 +69,17 @@
                         <template x-for="r in records" :key="r.id">
                             <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/40">
                                 <td class="py-3.5 px-4 font-mono font-bold text-zinc-900 dark:text-zinc-100" x-text="r.username || r.code"></td>
-                                <td class="py-3.5 px-4 font-medium" x-text="r.profile_name || r.profile"></td>
-                                <td class="py-3.5 px-4 text-zinc-500 font-mono text-[11px]" x-text="r.activated_at"></td>
+                                <td class="py-3.5 px-4 font-medium">
+                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                        <span x-text="r.profile_name || r.profile"></span>
+                                        <template x-if="r.profile && r.profile.category === 'pribadi'">
+                                            <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[9px] font-semibold bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-300 dark:border-purple-800">
+                                                Pribadi
+                                            </span>
+                                        </template>
+                                    </div>
+                                </td>
+                                <td class="py-3.5 px-4 text-zinc-500 font-mono text-[11px]" x-text="formatDateTimeIndo(r.activated_at)"></td>
                                 <td class="py-3.5 px-4 font-mono text-zinc-400" x-text="formatRupiah(r.cost_price || r.cost || 0)"></td>
                                 <td class="py-3.5 px-4 font-mono font-bold text-zinc-900 dark:text-zinc-100" x-text="formatRupiah(r.selling_price || r.price || 0)"></td>
                                 <td class="py-3.5 px-4 font-mono font-semibold text-emerald-600 dark:text-emerald-400" x-text="formatRupiah(r.profit || 0)"></td>

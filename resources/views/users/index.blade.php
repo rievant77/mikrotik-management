@@ -9,7 +9,7 @@
                     <h1 class="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">User Hotspot Online</h1>
                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse mr-1.5"></span>
-                        <span x-text="filteredUsers.length"></span> Aktif
+                        <span x-text="formatNumber(filteredUsers.length)"></span> Aktif
                     </span>
                 </div>
                 <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Pantauan perangkat & konsumsi data user aktif secara realtime</p>
@@ -31,9 +31,92 @@
             </div>
         </div>
 
+        <!-- 5 KPI Metrics Summary -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+            <!-- Total Online -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-xs">
+                <div class="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
+                    <span class="text-xs font-medium uppercase tracking-wider">Total Online</span>
+                    <svg class="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mt-2 font-mono" x-text="formatNumber(stats.total || users.length)">
+                    {{ \App\Support\FormatHelper::formatNumber($stats['total'] ?? count($sessions)) }}
+                </h3>
+                <p class="text-[11px] text-zinc-400 dark:text-zinc-500 mt-1">Sesi hotspot aktif</p>
+            </div>
+
+            <!-- Voucher (Profit) -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-xs">
+                <div class="flex items-center justify-between text-emerald-600 dark:text-emerald-400">
+                    <span class="text-xs font-medium uppercase tracking-wider flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Voucher
+                    </span>
+                    <svg class="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-2 font-mono" x-text="formatNumber(stats.voucher)">
+                    {{ \App\Support\FormatHelper::formatNumber($stats['voucher'] ?? 0) }}
+                </h3>
+                <p class="text-[11px] text-zinc-400 dark:text-zinc-500 mt-1">Paket Voucher Profit</p>
+            </div>
+
+            <!-- Bulanan (Profit) -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-xs">
+                <div class="flex items-center justify-between text-sky-600 dark:text-sky-400">
+                    <span class="text-xs font-medium uppercase tracking-wider flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-sky-500"></span>
+                        Bulanan
+                    </span>
+                    <svg class="w-4 h-4 text-sky-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-bold text-sky-600 dark:text-sky-400 mt-2 font-mono" x-text="formatNumber(stats.bulanan)">
+                    {{ \App\Support\FormatHelper::formatNumber($stats['bulanan'] ?? 0) }}
+                </h3>
+                <p class="text-[11px] text-zinc-400 dark:text-zinc-500 mt-1">Langganan Rumahan</p>
+            </div>
+
+            <!-- Pribadi (Non-Profit) -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-xs">
+                <div class="flex items-center justify-between text-purple-600 dark:text-purple-400">
+                    <span class="text-xs font-medium uppercase tracking-wider flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                        Pribadi
+                    </span>
+                    <svg class="w-4 h-4 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-bold text-purple-600 dark:text-purple-400 mt-2 font-mono" x-text="formatNumber(stats.pribadi)">
+                    {{ \App\Support\FormatHelper::formatNumber($stats['pribadi'] ?? 0) }}
+                </h3>
+                <p class="text-[11px] text-zinc-400 dark:text-zinc-500 mt-1">Owner & Non-Profit</p>
+            </div>
+
+            <!-- Total Live Traffic -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-xs col-span-2 md:col-span-1">
+                <div class="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
+                    <span class="text-xs font-medium uppercase tracking-wider">Trafik Live</span>
+                    <svg class="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </div>
+                <div class="mt-2 font-mono leading-tight">
+                    <div class="text-xs text-emerald-600 dark:text-emerald-400 font-bold" x-text="'↓ ' + formatRate(stats.total_rx_bps)"></div>
+                    <div class="text-[11px] text-sky-600 dark:text-sky-400 font-medium mt-0.5" x-text="'↑ ' + formatRate(stats.total_tx_bps)"></div>
+                </div>
+                <p class="text-[10px] text-zinc-400 dark:text-zinc-500 mt-1" x-text="'Total: ' + formatBytes(stats.total_bytes)">Akumulasi Sesi</p>
+            </div>
+        </div>
+
         <!-- Filter & Search Toolbar -->
         <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3.5 sm:p-4 shadow-xs space-y-3">
-            <!-- Search & Sort Row -->
+            <!-- Search, Category & Sort Row -->
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
                 <!-- Search Input with Clear Button -->
                 <div class="relative flex-1">
@@ -45,7 +128,7 @@
                     <input 
                         type="text" 
                         x-model="search" 
-                        placeholder="Cari user, nama HP/device, IP, MAC..." 
+                        placeholder="Cari username, nama perangkat, IP, MAC..." 
                         class="w-full pl-9 pr-8 py-2 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:focus:ring-zinc-600"
                     >
                     <button 
@@ -60,6 +143,20 @@
                     </button>
                 </div>
 
+                <!-- Category Filter Dropdown -->
+                <div class="flex items-center gap-1.5 shrink-0">
+                    <label class="text-zinc-500 dark:text-zinc-400 text-xs font-medium">Kategori:</label>
+                    <select 
+                        x-model="categoryFilter" 
+                        class="px-2.5 py-2 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 font-medium focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:focus:ring-zinc-600"
+                    >
+                        <option value="all">Semua Kategori</option>
+                        <option value="voucher">Voucher (Profit)</option>
+                        <option value="bulanan">Bulanan (Profit)</option>
+                        <option value="pribadi">Pribadi (Non-Profit)</option>
+                    </select>
+                </div>
+
                 <!-- Sort Dropdown -->
                 <div class="flex items-center gap-2">
                     <select 
@@ -68,13 +165,14 @@
                     >
                         <option value="rate_desc">Speed Tertinggi (Rx)</option>
                         <option value="bytes_desc">Total Kuota Terbanyak</option>
+                        <option value="uptime_desc">Uptime Terlama</option>
                         <option value="username_asc">Username (A-Z)</option>
                         <option value="device_asc">Device Name (A-Z)</option>
                     </select>
                 </div>
             </div>
 
-            <!-- Horizontal Filter Chips (Touch Friendly Carousel) -->
+            <!-- Horizontal Profile Filter Chips -->
             <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 text-xs -mx-1 px-1">
                 <!-- All Filter -->
                 <button 
@@ -85,7 +183,7 @@
                         ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 border-zinc-900 dark:border-zinc-100 font-semibold shadow-xs' 
                         : 'bg-zinc-50 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-700'"
                 >
-                    Semua (<span x-text="users.length"></span>)
+                    Semua Profil (<span x-text="formatNumber(users.length)"></span>)
                 </button>
 
                 <!-- Dynamic Profile Chips -->
@@ -128,9 +226,17 @@
                                 <span x-text="user.username.substring(0,2).toUpperCase()"></span>
                             </div>
                             <div class="min-w-0">
-                                <div class="flex items-center gap-1.5">
+                                <div class="flex items-center gap-1.5 flex-wrap">
                                     <a :href="'/users/' + user.username" class="font-bold text-sm text-zinc-900 dark:text-zinc-100 hover:underline truncate" x-text="user.username"></a>
-                                    <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0" title="Online"></span>
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" title="Online"></span>
+                                    <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[9px] font-bold uppercase border"
+                                        :class="{
+                                            'bg-emerald-50 text-emerald-700 border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800': user.category === 'voucher',
+                                            'bg-sky-50 text-sky-700 border-sky-300 dark:bg-sky-950/60 dark:text-sky-300 dark:border-sky-800': user.category === 'bulanan',
+                                            'bg-purple-50 text-purple-700 border-purple-300 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-800': user.category === 'pribadi',
+                                        }"
+                                        x-text="user.category || 'voucher'"
+                                    ></span>
                                 </div>
                                 <div class="text-[11px] text-zinc-500 dark:text-zinc-400 flex items-center gap-1 font-mono">
                                     <span x-text="user.ip_address || '-'"></span>
@@ -139,7 +245,7 @@
                         </div>
                         <div class="text-right shrink-0">
                             <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700" x-text="user.profile || '-'"></span>
-                            <div class="text-[10px] text-zinc-400 font-mono mt-0.5" x-text="'⏱ ' + (user.uptime || '-')"></div>
+                            <div class="text-[10px] text-zinc-400 font-mono mt-0.5" x-text="'⏱ ' + (user.uptime_formatted || user.uptime || '-')"></div>
                         </div>
                     </div>
 
@@ -147,7 +253,7 @@
                     <div class="p-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/70 dark:border-zinc-700/50 flex items-center justify-between text-xs">
                         <div class="flex items-center gap-2 min-w-0">
                             <!-- Device Icon -->
-                            <span class="text-base shrink-0" x-text="getDeviceIcon(user.device_type)"></span>
+                            <span class="shrink-0 flex items-center justify-center" x-html="getDeviceIcon(user.device_type)"></span>
                             <div class="min-w-0">
                                 <div class="font-semibold text-zinc-900 dark:text-zinc-100 truncate text-[11px]" x-text="user.device_display_name || user.device_name || 'Perangkat Hotspot'"></div>
                                 <div class="text-[10px] text-zinc-400 font-mono truncate" x-text="'MAC: ' + (user.mac_address || '-')"></div>
@@ -178,7 +284,7 @@
                     <div class="grid grid-cols-2 gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800/80">
                         <a 
                             :href="'/users/' + user.username" 
-                            class="flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-semibold rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 transition-colors"
+                            class="flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-semibold rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 transition-colors"
                         >
                             <svg class="w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -192,7 +298,7 @@
                             class="flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-semibold rounded-lg bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/50 transition-colors"
                         >
                             <svg class="w-4 h-4 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                             </svg>
                             <span>Putus / Kick</span>
                         </button>
@@ -207,20 +313,21 @@
                 <table class="w-full text-left text-xs">
                     <thead class="bg-zinc-50/80 dark:bg-zinc-800/50 text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase border-b border-zinc-200 dark:border-zinc-800">
                         <tr>
-                            <th class="py-3.5 px-4">User & Perangkat</th>
-                            <th class="py-3.5 px-4">IP / MAC Address</th>
-                            <th class="py-3.5 px-4">Profile</th>
-                            <th class="py-3.5 px-4">Uptime</th>
-                            <th class="py-3.5 px-4">Live Rate (Rx / Tx)</th>
-                            <th class="py-3.5 px-4">Total Data Sesi</th>
-                            <th class="py-3.5 px-4 text-right">Aksi</th>
+                            <th class="py-3.5 px-4 text-left">User & Perangkat</th>
+                            <th class="py-3.5 px-4 text-left">IP / MAC Address</th>
+                            <th class="py-3.5 px-4 text-center">Kategori</th>
+                            <th class="py-3.5 px-4 text-left">Paket Profil</th>
+                            <th class="py-3.5 px-4 text-center">Uptime</th>
+                            <th class="py-3.5 px-4 text-right">Live Rate (Rx / Tx)</th>
+                            <th class="py-3.5 px-4 text-right">Total Kuota Sesi</th>
+                            <th class="py-3.5 px-4 text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
                         <template x-for="user in filteredUsers" :key="user.id || user.username">
                             <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors">
                                 <!-- User & Device Name Column -->
-                                <td class="py-3.5 px-4">
+                                <td class="py-3.5 px-4 align-middle">
                                     <div class="flex items-center gap-3">
                                         <div class="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-bold text-xs flex items-center justify-center shrink-0 border border-zinc-200/60 dark:border-zinc-700/60">
                                             <span x-text="user.username.substring(0,2).toUpperCase()"></span>
@@ -230,8 +337,8 @@
                                                 <a :href="'/users/' + user.username" class="font-bold text-zinc-900 dark:text-zinc-100 hover:underline truncate" x-text="user.username"></a>
                                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
                                             </div>
-                                            <div class="text-[11px] text-zinc-500 dark:text-zinc-400 flex items-center gap-1 mt-0.5 truncate">
-                                                <span x-text="getDeviceIcon(user.device_type)"></span>
+                                            <div class="text-[11px] text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5 mt-0.5 truncate">
+                                                <span class="shrink-0 flex items-center" x-html="getDeviceIcon(user.device_type)"></span>
                                                 <span class="truncate" x-text="user.device_display_name || user.device_name || 'Perangkat Hotspot'"></span>
                                             </div>
                                         </div>
@@ -239,48 +346,90 @@
                                 </td>
 
                                 <!-- IP & MAC -->
-                                <td class="py-3.5 px-4 font-mono text-[11px]">
-                                    <div class="text-zinc-900 dark:text-zinc-100 font-medium" x-text="user.ip_address || '-'"></div>
-                                    <div class="text-[10px] text-zinc-400" x-text="user.mac_address || '-'"></div>
+                                <td class="py-3.5 px-4 font-mono text-[11px] align-middle">
+                                    <div class="text-zinc-900 dark:text-zinc-100 font-medium flex items-center gap-1.5">
+                                        <span x-text="user.ip_address || '-'"></span>
+                                        <button type="button" @click="copyText(user.ip_address, 'IP Address')" class="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors" title="Salin IP">
+                                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <div class="text-[10px] text-zinc-400 mt-0.5 flex items-center gap-1">
+                                        <span x-text="user.mac_address || '-'"></span>
+                                        <button type="button" @click="copyText(user.mac_address, 'MAC Address')" class="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors" title="Salin MAC">
+                                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </td>
+
+                                <!-- Kategori -->
+                                <td class="py-3.5 px-4 text-center align-middle">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase border"
+                                        :class="{
+                                            'bg-emerald-50 text-emerald-700 border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800': user.category === 'voucher',
+                                            'bg-sky-50 text-sky-700 border-sky-300 dark:bg-sky-950/60 dark:text-sky-300 dark:border-sky-800': user.category === 'bulanan',
+                                            'bg-purple-50 text-purple-700 border-purple-300 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-800': user.category === 'pribadi',
+                                        }"
+                                        x-text="user.category || 'voucher'"
+                                    ></span>
                                 </td>
 
                                 <!-- Profile -->
-                                <td class="py-3.5 px-4">
+                                <td class="py-3.5 px-4 align-middle">
                                     <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700" x-text="user.profile || '-'"></span>
                                 </td>
 
                                 <!-- Uptime -->
-                                <td class="py-3.5 px-4 font-mono text-zinc-500 dark:text-zinc-400" x-text="user.uptime || '-'"></td>
+                                <td class="py-3.5 px-4 text-center align-middle font-mono text-[11px] text-zinc-700 dark:text-zinc-300">
+                                    <div class="inline-flex items-center gap-1">
+                                        <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <span x-text="user.uptime_formatted || user.uptime || '-'"></span>
+                                    </div>
+                                </td>
 
                                 <!-- Combined Live Rate (Rx / Tx) Column -->
-                                <td class="py-3.5 px-4 font-mono whitespace-nowrap">
-                                    <div class="flex items-center gap-1.5">
-                                        <span class="text-emerald-600 dark:text-emerald-400 font-semibold" x-text="'↓ ' + formatRate(user.current_rx_bps)"></span>
-                                        <span class="text-sky-600 dark:text-sky-400 text-[11px]" x-text="'↑ ' + formatRate(user.current_tx_bps)"></span>
+                                <td class="py-3.5 px-4 text-right align-middle font-mono whitespace-nowrap">
+                                    <div class="inline-flex flex-col items-end">
+                                        <span class="text-emerald-600 dark:text-emerald-400 font-semibold text-xs" x-text="'↓ ' + formatRate(user.current_rx_bps)"></span>
+                                        <span class="text-sky-600 dark:text-sky-400 text-[10px]" x-text="'↑ ' + formatRate(user.current_tx_bps)"></span>
                                     </div>
                                 </td>
 
                                 <!-- Total Data -->
-                                <td class="py-3.5 px-4 font-mono font-semibold text-zinc-800 dark:text-zinc-200" x-text="formatBytes(user.total_bytes || (user.total_bytes_in + user.total_bytes_out) || 0)"></td>
+                                <td class="py-3.5 px-4 text-right align-middle font-mono font-bold text-zinc-800 dark:text-zinc-200 text-xs" x-text="formatBytes(user.total_bytes || (user.total_bytes_in + user.total_bytes_out) || 0)"></td>
 
                                 <!-- Actions -->
-                                <td class="py-3.5 px-4 text-right">
-                                    <div class="flex items-center justify-end gap-1">
-                                        <a :href="'/users/' + user.username" class="p-1.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors" title="Detail User">
-                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <td class="py-3.5 px-4 text-center align-middle">
+                                    <div class="inline-flex items-center justify-center gap-1.5">
+                                        <!-- Tombol Detail -->
+                                        <a 
+                                            :href="'/users/' + user.username" 
+                                            class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 transition-colors shadow-2xs" 
+                                            title="Lihat Detail Profil User"
+                                        >
+                                            <svg class="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                             </svg>
+                                            <span>Detail</span>
                                         </a>
+
+                                        <!-- Tombol Putus/Kick Sesi -->
                                         <button 
                                             type="button" 
                                             @click="promptDisconnect(user)" 
-                                            class="p-1.5 text-rose-500 hover:text-rose-700 dark:hover:text-rose-400 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors" 
-                                            title="Putus Koneksi"
+                                            class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/50 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/50 transition-colors shadow-2xs" 
+                                            title="Putuskan Sesi Aktif"
                                         >
-                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            <svg class="w-3.5 h-3.5 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                                             </svg>
+                                            <span>Kick</span>
                                         </button>
                                     </div>
                                 </td>
@@ -326,9 +475,23 @@
                     <!-- Target User Summary Box -->
                     <template x-if="targetUser">
                         <div class="mt-4 p-3 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/70 dark:border-zinc-700/60 space-y-1.5 text-xs">
-                            <div class="flex justify-between">
+                            <div class="flex justify-between items-center">
                                 <span class="text-zinc-500 dark:text-zinc-400">Username:</span>
-                                <strong class="text-zinc-900 dark:text-zinc-100" x-text="targetUser.username"></strong>
+                                <div class="flex items-center gap-1.5">
+                                    <strong class="text-zinc-900 dark:text-zinc-100" x-text="targetUser.username"></strong>
+                                    <span class="px-1.5 py-0.2 rounded text-[9px] font-bold uppercase border"
+                                        :class="{
+                                            'bg-emerald-50 text-emerald-700 border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800': targetUser.category === 'voucher',
+                                            'bg-sky-50 text-sky-700 border-sky-300 dark:bg-sky-950/60 dark:text-sky-300 dark:border-sky-800': targetUser.category === 'bulanan',
+                                            'bg-purple-50 text-purple-700 border-purple-300 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-800': targetUser.category === 'pribadi',
+                                        }"
+                                        x-text="targetUser.category || 'voucher'"
+                                    ></span>
+                                </div>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-zinc-500 dark:text-zinc-400">Paket:</span>
+                                <span class="text-zinc-700 dark:text-zinc-300 font-medium" x-text="targetUser.profile || '-'"></span>
                             </div>
                             <div class="flex justify-between">
                                 <span class="text-zinc-500 dark:text-zinc-400">Perangkat:</span>
@@ -337,6 +500,10 @@
                             <div class="flex justify-between">
                                 <span class="text-zinc-500 dark:text-zinc-400">IP & MAC:</span>
                                 <span class="text-zinc-700 dark:text-zinc-300 font-mono" x-text="targetUser.ip_address + ' • ' + (targetUser.mac_address || '-')"></span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-zinc-500 dark:text-zinc-400">Durasi Aktif:</span>
+                                <span class="text-zinc-700 dark:text-zinc-300 font-mono" x-text="targetUser.uptime_formatted || targetUser.uptime || '-'"></span>
                             </div>
                         </div>
                     </template>
@@ -368,6 +535,7 @@
         function userLiveMonitoring() {
             return {
                 search: '',
+                categoryFilter: 'all',
                 selectedProfile: '',
                 sortBy: 'rate_desc',
                 isLiveActive: true,
@@ -375,6 +543,7 @@
                 disconnectModalOpen: false,
                 targetUser: null,
                 users: @json($sessions ?? []),
+                stats: @json($stats ?? []),
                 init() {
                     this.startPolling();
                 },
@@ -394,6 +563,9 @@
                             .then(data => {
                                 if (data && Array.isArray(data.sessions)) {
                                     this.users = [...data.sessions];
+                                    if (data.stats) {
+                                        this.stats = data.stats;
+                                    }
                                 }
                             })
                             .catch(() => {});
@@ -411,13 +583,16 @@
                     }
                 },
                 getDeviceIcon(type) {
-                    switch(type) {
-                        case 'phone': return '📱';
-                        case 'laptop': return '💻';
-                        case 'pc': return '🖥️';
-                        case 'tablet': return '📟';
-                        default: return '📡';
+                    if (type === 'phone') {
+                        return '<svg class="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>';
                     }
+                    if (type === 'laptop' || type === 'pc' || type === 'desktop' || type === 'computer') {
+                        return '<svg class="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>';
+                    }
+                    if (type === 'tablet') {
+                        return '<svg class="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>';
+                    }
+                    return '<svg class="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>';
                 },
                 formatRate(bps) {
                     if (!bps || bps <= 0) return '0 Kbps';
@@ -452,13 +627,18 @@
                         const profileName = u.profile || u.user?.profile?.name || '';
                         const matchesProfile = !this.selectedProfile || profileName === this.selectedProfile;
 
-                        return matchesSearch && matchesProfile;
+                        const userCategory = u.category || 'voucher';
+                        const matchesCategory = this.categoryFilter === 'all' || userCategory === this.categoryFilter;
+
+                        return matchesSearch && matchesProfile && matchesCategory;
                     });
 
                     if (this.sortBy === 'rate_desc') {
                         list.sort((a, b) => (b.current_rx_bps || 0) - (a.current_rx_bps || 0));
                     } else if (this.sortBy === 'bytes_desc') {
                         list.sort((a, b) => ((b.total_bytes || (b.total_bytes_in + b.total_bytes_out)) || 0) - ((a.total_bytes || (a.total_bytes_in + a.total_bytes_out)) || 0));
+                    } else if (this.sortBy === 'uptime_desc') {
+                        list.sort((a, b) => (b.uptime_seconds || 0) - (a.uptime_seconds || 0));
                     } else if (this.sortBy === 'username_asc') {
                         list.sort((a, b) => (a.username || '').localeCompare(b.username || ''));
                     } else if (this.sortBy === 'device_asc') {
@@ -466,6 +646,28 @@
                     }
 
                     return list;
+                },
+                copyText(text, label) {
+                    if (!text || text === '-') return;
+                    if (navigator.clipboard && window.isSecureContext) {
+                        navigator.clipboard.writeText(text).then(() => {
+                            if (window.showToast) {
+                                window.showToast(`${label} disalin!`, 'info');
+                            }
+                        }).catch(() => {
+                            alert(`${label} disalin: ${text}`);
+                        });
+                    } else {
+                        const input = document.createElement('input');
+                        input.value = text;
+                        document.body.appendChild(input);
+                        input.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(input);
+                        if (window.showToast) {
+                            window.showToast(`${label} disalin!`, 'info');
+                        }
+                    }
                 },
                 promptDisconnect(user) {
                     this.targetUser = user;

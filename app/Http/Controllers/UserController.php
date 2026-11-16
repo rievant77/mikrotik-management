@@ -20,13 +20,16 @@ class UserController extends Controller
 {
     public function index(Request $request, RouterOsService $routerOs): View
     {
-        $profiles = HotspotProfile::all();
+        $profiles = HotspotProfile::orderByRaw("CASE WHEN category = 'voucher' THEN 1 WHEN category = 'bulanan' THEN 2 ELSE 3 END")
+            ->orderBy('name')
+            ->get();
 
         // 1. Fetch live active sessions directly from MikroTik RouterOS API
         $rawSessions = $routerOs->getActiveHotspotSessions();
         $sessions = $this->mapActiveSessions($rawSessions, $routerOs);
+        $stats = $this->calculateSessionStats($sessions);
 
-        return view('users.index', compact('sessions', 'profiles'));
+        return view('users.index', compact('sessions', 'profiles', 'stats'));
     }
 
     /**
@@ -36,14 +39,32 @@ class UserController extends Controller
     {
         $rawSessions = $routerOs->getActiveHotspotSessions();
         $sessions = $this->mapActiveSessions($rawSessions, $routerOs);
+        $stats = $this->calculateSessionStats($sessions);
 
         return response()->json([
             'sessions' => $sessions->values(),
             'count' => $sessions->count(),
+            'stats' => $stats,
             'timestamp' => now()->format('H:i:s'),
         ])->header('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0')
           ->header('Pragma', 'no-cache')
           ->header('Expires', '0');
+    }
+
+    /**
+     * Calculate summary statistics for active sessions.
+     */
+    protected function calculateSessionStats(\Illuminate\Support\Collection $sessions): array
+    {
+        return [
+            'total' => $sessions->count(),
+            'voucher' => $sessions->where('category', 'voucher')->count(),
+            'bulanan' => $sessions->where('category', 'bulanan')->count(),
+            'pribadi' => $sessions->where('category', 'pribadi')->count(),
+            'total_rx_bps' => (int) $sessions->sum('current_rx_bps'),
+            'total_tx_bps' => (int) $sessions->sum('current_tx_bps'),
+            'total_bytes' => (int) $sessions->sum('total_bytes'),
+        ];
     }
 
     /**
@@ -72,23 +93,34 @@ class UserController extends Controller
             $deviceName = DeviceHelper::resolveDeviceName($hostname, $mac);
             $deviceType = DeviceHelper::getDeviceType($hostname ?: $deviceName);
 
+            $category = $userModel?->profile?->category ?? 'voucher';
+            $uptimeRaw = $raw['uptime'] ?? '0s';
+            $uptimeSeconds = FormatHelper::parseUptime($uptimeRaw);
+            $uptimeFormatted = FormatHelper::formatUptime($uptimeSeconds);
+
+            $rxBps = (int) ($raw['rx-rate'] ?? 0);
+            $txBps = (int) ($raw['tx-rate'] ?? 0);
+
             return [
                 'id' => $raw['.id'] ?? ($username . '-' . $idx),
                 'username' => $username,
+                'category' => $category,
                 'ip_address' => $ip,
                 'mac_address' => $mac,
                 'hostname' => $hostname,
                 'device_name' => $deviceName,
                 'device_display_name' => $hostname ?: $deviceName,
                 'device_type' => $deviceType,
-                'uptime' => $raw['uptime'] ?? '0s',
+                'uptime' => $uptimeRaw,
+                'uptime_seconds' => $uptimeSeconds,
+                'uptime_formatted' => $uptimeFormatted,
                 'bytes_in' => $bytesIn,
                 'bytes_out' => $bytesOut,
                 'total_bytes_in' => $bytesIn,
                 'total_bytes_out' => $bytesOut,
                 'total_bytes' => $bytesIn + $bytesOut,
-                'current_rx_bps' => (int) ($raw['rx-rate'] ?? 0),
-                'current_tx_bps' => (int) ($raw['tx-rate'] ?? 0),
+                'current_rx_bps' => $rxBps,
+                'current_tx_bps' => $txBps,
                 'profile' => $userModel?->profile?->name ?? ($raw['profile'] ?? '-'),
                 'interface' => 'hotspot',
                 'status' => 'active',
@@ -272,7 +304,7 @@ class UserController extends Controller
             for ($i = $daysDiff - 1; $i >= 0; $i--) {
                 $date = $chartEnd->copy()->subDays($i);
                 $dKey = $date->format('Y-m-d');
-                $chartCategories[] = $date->format('d M');
+                $chartCategories[] = $date->locale('id')->translatedFormat('d M');
 
                 $summary = $dailyKeyed->get($dKey);
                 $rxMb = $summary ? round($summary->total_bytes_out / 1024 / 1024, 2) : 0;
@@ -479,7 +511,9 @@ class UserController extends Controller
 
         // Preload hotspot user profiles
         $hotspotUsers = HotspotUser::with('profile')->get()->keyBy('username');
-        $profiles = HotspotProfile::all();
+        $profiles = HotspotProfile::orderByRaw("CASE WHEN category = 'voucher' THEN 1 WHEN category = 'bulanan' THEN 2 ELSE 3 END")
+            ->orderBy('name')
+            ->get();
 
         // 4. Merge data across users active in THIS specific period
         $activeUsernames = $dbSummaries->keys();
@@ -511,9 +545,11 @@ class UserController extends Controller
             }
 
             $totalUsage = $totalIn + $totalOut;
+            $category = $userModel?->profile?->category ?? 'voucher';
 
             return [
                 'username' => $username,
+                'category' => $category,
                 'profile_name' => $userModel?->profile?->name ?? ($live['profile'] ?? '-'),
                 'is_online' => $onlineUserMap->has($username),
                 'total_sessions' => max(1, $totalSessions),
@@ -525,7 +561,7 @@ class UserController extends Controller
                 'total_out_formatted' => FormatHelper::formatBytes($totalOut),
                 'total_usage' => $totalUsage,
                 'total_usage_formatted' => FormatHelper::formatBytes($totalUsage),
-                'last_seen' => $onlineUserMap->has($username) ? 'Sedang Online' : ($db?->last_seen_date ? Carbon::parse($db->last_seen_date)->format('d M Y') : 'Hari ini'),
+                'last_seen' => $onlineUserMap->has($username) ? 'Sedang Online' : ($db?->last_seen_date ? FormatHelper::formatDateShort(Carbon::parse($db->last_seen_date)) : 'Hari ini'),
             ];
         })->filter(fn($s) => $s['total_usage'] > 0 || $s['is_online'])->sortByDesc('total_usage')->values();
 
@@ -558,7 +594,7 @@ class UserController extends Controller
             $cursor = $startDate->copy();
             while ($cursor->lte($endDate)) {
                 $dKey = $cursor->format('Y-m-d');
-                $label = $cursor->format('d M');
+                $label = $cursor->locale('id')->translatedFormat('d M');
                 $chartCategories[] = $label;
 
                 $dData = $dailyTrendRaw->get($dKey);
@@ -593,14 +629,15 @@ class UserController extends Controller
             return response()->streamDownload(function () use ($summaries, $startDate, $endDate) {
                 $handle = fopen('php://output', 'w');
                 fputcsv($handle, ['Laporan Histori Pemakaian Kuota & Bandwidth MikroTik']);
-                fputcsv($handle, ['Periode', $startDate->format('d M Y') . ' s/d ' . $endDate->format('d M Y')]);
+                fputcsv($handle, ['Periode', FormatHelper::formatDateShort($startDate) . ' s/d ' . FormatHelper::formatDateShort($endDate)]);
                 fputcsv($handle, ['Generated At', now()->toDateTimeString()]);
                 fputcsv($handle, []);
-                fputcsv($handle, ['Username', 'Profile', 'Status', 'Sesi', 'Total Uptime', 'Upload (Bytes)', 'Download (Bytes)', 'Total Pemakaian (Bytes)', 'Total Pemakaian (Readable)']);
+                fputcsv($handle, ['Username', 'Kategori', 'Profile', 'Status', 'Sesi', 'Total Uptime', 'Upload (Bytes)', 'Download (Bytes)', 'Total Pemakaian (Bytes)', 'Total Pemakaian (Readable)']);
 
                 foreach ($summaries as $s) {
                     fputcsv($handle, [
                         $s['username'],
+                        strtoupper($s['category'] ?? 'voucher'),
                         $s['profile_name'],
                         $s['is_online'] ? 'Online' : 'Offline',
                         $s['total_sessions'],

@@ -73,12 +73,81 @@ window.parseNumber = (val) => {
 };
 
 // Format raw number into dot-separated thousand string (e.g. 50000 -> "50.000")
-window.formatNumber = (val) => {
-    if (val === null || val === undefined || val === '') return '';
-    const num = typeof val === 'number' ? Math.round(val) : window.parseNumber(val);
-    if (num === 0) return '0';
-    return new Intl.NumberFormat('id-ID').format(num);
+window.formatNumber = (val, decimals = 0) => {
+    if (val === null || val === undefined || val === '') return '0';
+    const num = typeof val === 'number' ? val : window.parseNumber(val);
+    return new Intl.NumberFormat('id-ID', {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+    }).format(num);
 };
+
+// Parse flexible date input into valid Date object
+window.parseDateObj = (dateVal) => {
+    if (!dateVal || dateVal === '-') return null;
+    if (dateVal instanceof Date) return isNaN(dateVal.getTime()) ? null : dateVal;
+    
+    if (typeof dateVal === 'string') {
+        let str = dateVal.trim();
+        if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
+            str = str.replace(' ', 'T');
+        }
+        const parsed = new Date(str);
+        if (!isNaN(parsed.getTime())) return parsed;
+
+        const fallback = new Date(dateVal.replace(/-/g, '/'));
+        if (!isNaN(fallback.getTime())) return fallback;
+    }
+    const d = new Date(dateVal);
+    return isNaN(d.getTime()) ? null : d;
+};
+
+// Format date into Indonesian localized date string (e.g. "15 November 2026" or "15 Nov 2026")
+window.formatDateIndo = (dateVal, options = {}) => {
+    const d = window.parseDateObj(dateVal);
+    if (!d) return dateVal ? String(dateVal) : '-';
+
+    try {
+        const isShort = options.shortMonth || options.short;
+        const defaultOpts = {
+            day: 'numeric',
+            month: isShort ? 'short' : 'long',
+            year: 'numeric',
+            ...options
+        };
+        delete defaultOpts.shortMonth;
+        delete defaultOpts.short;
+        return new Intl.DateTimeFormat('id-ID', defaultOpts).format(d);
+    } catch (e) {
+        return String(dateVal);
+    }
+};
+
+// Format datetime into Indonesian localized format (e.g. "15 Nov 2026, 14:30")
+window.formatDateTimeIndo = (dateVal, withSeconds = false) => {
+    const d = window.parseDateObj(dateVal);
+    if (!d) return dateVal ? String(dateVal) : '-';
+
+    try {
+        const opts = {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+        };
+        if (withSeconds) {
+            opts.second = '2-digit';
+        }
+        return new Intl.DateTimeFormat('id-ID', opts).format(d);
+    } catch (e) {
+        return String(dateVal);
+    }
+};
+
+window.formatDate = window.formatDateIndo;
+window.formatDateTime = window.formatDateTimeIndo;
 
 // Alpine Custom Directive: x-money for live thousand separator currency inputs
 Alpine.directive('money', (el, { expression }, { evaluateLater, effect, cleanup }) => {
@@ -115,4 +184,32 @@ Alpine.directive('money', (el, { expression }, { evaluateLater, effect, cleanup 
     });
 });
 
+Alpine.magic('formatNumber', () => window.formatNumber);
+Alpine.magic('formatDate', () => window.formatDateIndo);
+Alpine.magic('formatDateTime', () => window.formatDateTimeIndo);
+Alpine.magic('formatRupiah', () => window.formatRupiah);
+Alpine.magic('formatBytes', () => window.formatBytes);
+
 Alpine.start();
+
+// PWA Service Worker Registration
+if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.endsWith('.lan') || window.location.hostname.endsWith('.test'))) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+                registration.addEventListener('updatefound', () => {
+                    const newWorker = registration.installing;
+                    if (newWorker) {
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                window.dispatchEvent(new CustomEvent('pwa-update-available'));
+                            }
+                        });
+                    }
+                });
+            })
+            .catch((err) => {
+                console.debug('PWA ServiceWorker registration notice:', err);
+            });
+    });
+}

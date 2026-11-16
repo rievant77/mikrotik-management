@@ -25,6 +25,7 @@ class PosManagerService
 
         // 1. Voucher Metrics
         $voucherSalesQuery = VoucherSale::where('status', 'completed')
+            ->forRevenue()
             ->whereBetween('activated_at', [$targetMonth, $targetMonthEnd]);
 
         $totalVoucherRevenue = (float) $voucherSalesQuery->sum('selling_price');
@@ -75,6 +76,7 @@ class PosManagerService
         $dailyProfitSeries = [];
 
         $vouchersByDay = VoucherSale::where('status', 'completed')
+            ->forRevenue()
             ->whereBetween('activated_at', [$targetMonth, $targetMonthEnd])
             ->get()
             ->groupBy(function ($v) {
@@ -90,7 +92,7 @@ class PosManagerService
 
         for ($day = 1; $day <= $daysInMonth; $day++) {
             $dateStr = $targetMonth->copy()->day($day)->toDateString();
-            $label = $targetMonth->copy()->day($day)->format('d M');
+            $label = $targetMonth->copy()->day($day)->locale('id')->translatedFormat('d M');
             $categories[] = $label;
 
             $vouchers = $vouchersByDay->get($dateStr, collect());
@@ -113,6 +115,7 @@ class PosManagerService
 
         // 6. Top Selling Voucher Profiles
         $topVoucherProfiles = VoucherSale::where('status', 'completed')
+            ->forRevenue()
             ->whereBetween('activated_at', [$targetMonth, $targetMonthEnd])
             ->selectRaw('profile_name, COUNT(*) as count, SUM(selling_price) as revenue, SUM(profit) as profit')
             ->groupBy('profile_name')
@@ -168,7 +171,7 @@ class PosManagerService
     public function generateMonthlyInvoices(string $billingMonth, ?array $customerIds = null): array
     {
         $targetMonth = Carbon::parse($billingMonth)->startOfMonth();
-        $query = MonthlyCustomer::where('is_active', true);
+        $query = MonthlyCustomer::with('profile')->where('is_active', true);
         if (!empty($customerIds)) {
             $query->whereIn('id', $customerIds);
         }
@@ -202,7 +205,7 @@ class PosManagerService
                     'monthly_customer_id' => $c->id,
                     'billing_month' => $targetMonth->toDateString(),
                     'amount' => (float) $c->monthly_price,
-                    'cost_price' => (float) ($c->cost_price ?? 0),
+                    'cost_price' => (float) ($c->cost_price ?: ($c->profile?->cost_price ?? 0)),
                     'amount_paid' => 0,
                     'balance_due' => (float) $c->monthly_price,
                     'due_date' => $dueDate,
@@ -475,6 +478,7 @@ class PosManagerService
         // Cash Vouchers in this shift
         $voucherCash = (float) VoucherSale::where('shift_id', $shift->id)
             ->where('status', 'completed')
+            ->forRevenue()
             ->sum('selling_price');
 
         // Cash Monthly Payments in this shift

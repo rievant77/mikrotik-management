@@ -31,10 +31,16 @@
             </div>
         </div>
 
-        <!-- 5 KPI Metrics Summary -->
+        <!-- 5 KPI Metrics Summary (Interactive Clickable Filters) -->
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
-            <!-- Total Online -->
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-xs">
+            <!-- 1. Total Online (Filter: All) -->
+            <button 
+                type="button"
+                @click="categoryFilter = 'all'" 
+                class="bg-white dark:bg-zinc-900 border rounded-xl p-4 shadow-xs text-left cursor-pointer transition-all duration-150 hover:shadow-sm"
+                :class="categoryFilter === 'all' ? 'ring-2 ring-zinc-900 dark:ring-zinc-100 border-transparent bg-zinc-50/60 dark:bg-zinc-800/50' : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700'"
+                title="Klik untuk melihat semua user online"
+            >
                 <div class="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
                     <span class="text-xs font-medium uppercase tracking-wider">Total Online</span>
                     <svg class="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -44,11 +50,20 @@
                 <h3 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mt-2 font-mono" x-text="formatNumber(stats.total || users.length)">
                     {{ \App\Support\FormatHelper::formatNumber($stats['total'] ?? count($sessions)) }}
                 </h3>
-                <p class="text-[11px] text-zinc-400 dark:text-zinc-500 mt-1">Sesi hotspot aktif</p>
-            </div>
+                <div class="flex items-center justify-between mt-1">
+                    <p class="text-[11px] text-zinc-400 dark:text-zinc-500">Sesi hotspot aktif</p>
+                    <span x-show="categoryFilter === 'all'" class="text-[10px] font-semibold text-zinc-700 dark:text-zinc-300">Semua</span>
+                </div>
+            </button>
 
-            <!-- Voucher (Profit) -->
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-xs">
+            <!-- 2. Voucher (Profit) -->
+            <button 
+                type="button"
+                @click="categoryFilter = (categoryFilter === 'voucher' ? 'all' : 'voucher')" 
+                class="bg-white dark:bg-zinc-900 border rounded-xl p-4 shadow-xs text-left cursor-pointer transition-all duration-150 hover:shadow-sm"
+                :class="categoryFilter === 'voucher' ? 'ring-2 ring-emerald-500 border-transparent bg-emerald-50/30 dark:bg-emerald-950/20' : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700'"
+                title="Klik untuk memfilter user voucher saja"
+            >
                 <div class="flex items-center justify-between text-emerald-600 dark:text-emerald-400">
                     <span class="text-xs font-medium uppercase tracking-wider flex items-center gap-1">
                         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -61,11 +76,20 @@
                 <h3 class="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-2 font-mono" x-text="formatNumber(stats.voucher)">
                     {{ \App\Support\FormatHelper::formatNumber($stats['voucher'] ?? 0) }}
                 </h3>
-                <p class="text-[11px] text-zinc-400 dark:text-zinc-500 mt-1">Paket Voucher Profit</p>
-            </div>
+                <div class="flex items-center justify-between mt-1">
+                    <p class="text-[11px] text-zinc-400 dark:text-zinc-500">Paket Voucher</p>
+                    <span x-show="categoryFilter === 'voucher'" class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">✓ Filter Aktif</span>
+                </div>
+            </button>
 
-            <!-- Bulanan (Profit) -->
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-xs">
+            <!-- 3. Bulanan (Profit) -->
+            <button 
+                type="button"
+                @click="categoryFilter = (categoryFilter === 'bulanan' ? 'all' : 'bulanan')" 
+                class="bg-white dark:bg-zinc-900 border rounded-xl p-4 shadow-xs text-left cursor-pointer transition-all duration-150 hover:shadow-sm"
+                :class="categoryFilter === 'bulanan' ? 'ring-2 ring-sky-500 border-transparent bg-sky-50/30 dark:bg-sky-950/20' : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700'"
+                title="Klik untuk memfilter user bulanan saja"
+            >
                 <div class="flex items-center justify-between text-sky-600 dark:text-sky-400">
                     <span class="text-xs font-medium uppercase tracking-wider flex items-center gap-1">
                         <span class="w-2 h-2 rounded-full bg-sky-500"></span>
@@ -78,11 +102,20 @@
                 <h3 class="text-2xl font-bold text-sky-600 dark:text-sky-400 mt-2 font-mono" x-text="formatNumber(stats.bulanan)">
                     {{ \App\Support\FormatHelper::formatNumber($stats['bulanan'] ?? 0) }}
                 </h3>
-                <p class="text-[11px] text-zinc-400 dark:text-zinc-500 mt-1">Langganan Rumahan</p>
-            </div>
+                <div class="flex items-center justify-between mt-1">
+                    <p class="text-[11px] text-zinc-400 dark:text-zinc-500">Langganan Rumah</p>
+                    <span x-show="categoryFilter === 'bulanan'" class="text-[10px] font-semibold text-sky-600 dark:text-sky-400">✓ Filter Aktif</span>
+                </div>
+            </button>
 
-            <!-- Pribadi (Non-Profit) -->
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-xs">
+            <!-- 4. Pribadi (Non-Profit) -->
+            <button 
+                type="button"
+                @click="categoryFilter = (categoryFilter === 'pribadi' ? 'all' : 'pribadi')" 
+                class="bg-white dark:bg-zinc-900 border rounded-xl p-4 shadow-xs text-left cursor-pointer transition-all duration-150 hover:shadow-sm"
+                :class="categoryFilter === 'pribadi' ? 'ring-2 ring-purple-500 border-transparent bg-purple-50/30 dark:bg-purple-950/20' : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700'"
+                title="Klik untuk memfilter user pribadi saja"
+            >
                 <div class="flex items-center justify-between text-purple-600 dark:text-purple-400">
                     <span class="text-xs font-medium uppercase tracking-wider flex items-center gap-1">
                         <span class="w-2 h-2 rounded-full bg-purple-500"></span>
@@ -95,11 +128,20 @@
                 <h3 class="text-2xl font-bold text-purple-600 dark:text-purple-400 mt-2 font-mono" x-text="formatNumber(stats.pribadi)">
                     {{ \App\Support\FormatHelper::formatNumber($stats['pribadi'] ?? 0) }}
                 </h3>
-                <p class="text-[11px] text-zinc-400 dark:text-zinc-500 mt-1">Owner & Non-Profit</p>
-            </div>
+                <div class="flex items-center justify-between mt-1">
+                    <p class="text-[11px] text-zinc-400 dark:text-zinc-500">Non-Profit</p>
+                    <span x-show="categoryFilter === 'pribadi'" class="text-[10px] font-semibold text-purple-600 dark:text-purple-400">✓ Filter Aktif</span>
+                </div>
+            </button>
 
-            <!-- Total Live Traffic -->
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-xs col-span-2 md:col-span-1">
+            <!-- 5. Total Live Traffic (Sort Toggle) -->
+            <button 
+                type="button"
+                @click="sortBy = (sortBy === 'rate_desc' ? 'uptime_desc' : 'rate_desc')" 
+                class="bg-white dark:bg-zinc-900 border rounded-xl p-4 shadow-xs col-span-2 md:col-span-1 text-left cursor-pointer transition-all duration-150 hover:shadow-sm"
+                :class="sortBy === 'rate_desc' ? 'ring-2 ring-emerald-500/70 border-transparent bg-zinc-50/60 dark:bg-zinc-800/50' : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700'"
+                title="Klik untuk mengurutkan berdasarkan pemakaian trafik tertinggi"
+            >
                 <div class="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
                     <span class="text-xs font-medium uppercase tracking-wider">Trafik Live</span>
                     <svg class="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -110,8 +152,11 @@
                     <div class="text-xs text-emerald-600 dark:text-emerald-400 font-bold" x-text="'↓ ' + formatRate(stats.total_rx_bps)"></div>
                     <div class="text-[11px] text-sky-600 dark:text-sky-400 font-medium mt-0.5" x-text="'↑ ' + formatRate(stats.total_tx_bps)"></div>
                 </div>
-                <p class="text-[10px] text-zinc-400 dark:text-zinc-500 mt-1" x-text="'Total: ' + formatBytes(stats.total_bytes)">Akumulasi Sesi</p>
-            </div>
+                <div class="flex items-center justify-between mt-1">
+                    <p class="text-[10px] text-zinc-400 dark:text-zinc-500" x-text="'Total: ' + formatBytes(stats.total_bytes)">Akumulasi Sesi</p>
+                    <span x-show="sortBy === 'rate_desc'" class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">✓ Sort Trafik</span>
+                </div>
+            </button>
         </div>
 
         <!-- Filter & Search Toolbar -->

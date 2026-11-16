@@ -177,8 +177,13 @@ class RouterSettingController extends Controller
     {
         $validated = $request->validate([
             'hotspot_name' => 'required|string|max:150',
+            'header_subtext' => 'nullable|string|max:150',
             'login_url' => 'nullable|string|max:150',
+            'contact_phone' => 'nullable|string|max:50',
             'footer_text' => 'nullable|string|max:255',
+            'terms_text' => 'nullable|string|max:255',
+            'wa_template' => 'nullable|string',
+            'show_qr' => 'boolean',
         ]);
 
         $setting = RouterSetting::where('is_active', true)->first();

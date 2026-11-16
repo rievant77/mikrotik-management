@@ -23,6 +23,10 @@ class RouterSetting extends Model
         'hotspot_name',
         'login_url',
         'footer_text',
+        'header_subtext',
+        'terms_text',
+        'wa_template',
+        'show_qr',
         'last_successful_poll_at',
         'last_error_at',
         'last_error_message',
@@ -31,6 +35,7 @@ class RouterSetting extends Model
     protected $casts = [
         'use_ssl' => 'boolean',
         'is_active' => 'boolean',
+        'show_qr' => 'boolean',
         'password' => 'encrypted',
         'last_successful_poll_at' => 'datetime',
         'last_error_at' => 'datetime',

@@ -1,27 +1,141 @@
-*.log
-.DS_Store
+# ==============================================================================
+# Environment & Sensitive Credentials
+# ==============================================================================
 .env
-.env.backup
-.env.production
-.phpactor.json
-.phpunit.result.cache
-/.codex
-/.cursor/
-/.idea
-/.nova
-/.phpunit.cache
-/.vscode
-/.zed
+.env.*
+!.env.example
 /auth.json
+*.pem
+*.key
+/storage/*.key
+oauth-private.key
+oauth-public.key
+
+# ==============================================================================
+# Dependencies
+# ==============================================================================
 /node_modules
+/vendor
+
+# ==============================================================================
+# Build & Compiled Assets
+# ==============================================================================
 /public/build
-/public/fonts-manifest.dev.json
 /public/hot
 /public/storage
-/storage/*.key
+/public/fonts-manifest.dev.json
+
+# ==============================================================================
+# User Uploads & Media (Avatars, Branding Logos, etc.)
+# ==============================================================================
+/public/uploads/*
+!/public/uploads/.gitkeep
+
+# ==============================================================================
+# Laravel & Framework Cache / Storage
+# ==============================================================================
 /storage/pail
-/vendor
-_ide_helper.php
+/storage/framework/cache/*
+!/storage/framework/cache/.gitignore
+/storage/framework/sessions/*
+!/storage/framework/sessions/.gitignore
+/storage/framework/testing/*
+!/storage/framework/testing/.gitignore
+/storage/framework/views/*
+!/storage/framework/views/.gitignore
+/storage/logs/*
+!/storage/logs/.gitignore
+/storage/app/public/*
+!/storage/app/public/.gitignore
+/storage/app/private/*
+!/storage/app/private/.gitignore
+bootstrap/cache/*.php
+!bootstrap/cache/.gitignore
+
+# ==============================================================================
+# Logs & Debugging
+# ==============================================================================
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ==============================================================================
+# Testing & Code Coverage
+# ==============================================================================
+.phpunit.result.cache
+/.phpunit.cache
+phpunit.no-coverage.xml
+/coverage
+/coverage-html
+*.coverage
+
+# ==============================================================================
+# Databases, SQLite & Database Dumps
+# ==============================================================================
+*.sqlite
+*.sqlite-journal
+*.sqlite-shm
+*.sqlite-wal
+*.sql
+*.sql.gz
+*.dump
+
+# ==============================================================================
+# Temporary Files, Archives & Backups
+# ==============================================================================
+*.bak
+*.backup
+*.tmp
+*.temp
+*.zip
+*.tar
+*.tar.gz
+
+# ==============================================================================
+# Local Docker / Vagrant / Dev Environment Overrides
+# ==============================================================================
+docker-compose.override.yml
+docker-compose.override.yaml
 Homestead.json
 Homestead.yaml
+
+# ==============================================================================
+# IDEs, Editors & Tooling
+# ==============================================================================
+.idea/
+.vscode/
+.nova/
+.zed/
+.fleet/
+.cursor/
+.codex/
+.superpowers/
+.claude/
+.antigravity/
+.chat/
+*.code-workspace
+*.sublime-project
+*.sublime-workspace
+.phpactor.json
+_ide_helper.php
+_ide_helper_models.php
+.phpstorm.meta.php
+*.swp
+*.swo
+*~
+
+# ==============================================================================
+# Operating System Files
+# ==============================================================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+[Dd]esktop.ini
+$RECYCLE.BIN/

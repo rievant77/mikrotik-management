@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AuditLog;
 use App\Models\HotspotProfile;
 use App\Models\HotspotUser;
+use App\Models\RouterSetting;
 use App\Services\RouterOsService;
 use App\Services\VoucherBatchService;
 use Illuminate\Http\JsonResponse;
@@ -112,6 +113,8 @@ class VoucherController extends Controller
         $allUsers = $statsUsersQuery->get();
         $totalVouchers = $allUsers->count();
         $onlineCount = $allUsers->whereIn('username', array_keys($activeUserMap))->count();
+        $activeCount = $allUsers->where('is_active', true)->count();
+        $inactiveCount = $allUsers->where('is_active', false)->count();
         $totalBatches = $allUsers->pluck('comment')->filter()->unique()->count();
         $inventoryValue = $allUsers->sum(function ($u) {
             // Pribadi is non-profit internal usage (excluded from inventory value)
@@ -124,6 +127,8 @@ class VoucherController extends Controller
         $stats = [
             'total' => $totalVouchers,
             'online' => $onlineCount,
+            'active' => $activeCount,
+            'inactive' => $inactiveCount,
             'batches' => $totalBatches,
             'inventory_value' => (float) $inventoryValue,
         ];
@@ -140,12 +145,15 @@ class VoucherController extends Controller
             ->limit(30)
             ->pluck('comment');
 
+        $routerSetting = RouterSetting::where('is_active', true)->first() ?? RouterSetting::first();
+
         return view('vouchers.index', compact(
             'vouchers',
             'stats',
             'profiles',
             'batches',
-            'activeUserMap'
+            'activeUserMap',
+            'routerSetting'
         ));
     }
 

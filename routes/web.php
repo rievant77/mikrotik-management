@@ -74,7 +74,7 @@ Route::middleware('auth')->group(function () {
         Route::put('/profiles/{profile}', [HotspotProfileController::class, 'update'])->name('hotspot.profiles.update');
         Route::delete('/profiles/{profile}', [HotspotProfileController::class, 'destroy'])->name('hotspot.profiles.destroy');
 
-        Route::get('/users', [HotspotUserController::class, 'index'])->name('hotspot.users');
+        Route::get('/users', [VoucherController::class, 'index'])->name('hotspot.users');
         Route::post('/users', [HotspotUserController::class, 'store'])->name('hotspot.users.store');
         Route::post('/users/sync', [HotspotUserController::class, 'syncFromRouter'])->name('hotspot.users.sync');
         Route::post('/users/{user}/toggle', [HotspotUserController::class, 'toggleStatus'])->name('hotspot.users.toggle');

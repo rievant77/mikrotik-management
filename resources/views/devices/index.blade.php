@@ -22,10 +22,16 @@
             </div>
         </div>
 
-        <!-- 6 KPI Metrics Summary -->
+        <!-- 6 KPI Metrics Summary (Interactive Clickable Status Filters) -->
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
-            <!-- Total Devices -->
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-xs">
+            <!-- 1. Total Devices (Filter: All) -->
+            <button 
+                type="button"
+                @click="statusFilter = 'all'" 
+                class="bg-white dark:bg-zinc-900 border rounded-xl p-4 shadow-xs text-left cursor-pointer transition-all duration-150 hover:shadow-sm"
+                :class="statusFilter === 'all' ? 'ring-2 ring-zinc-900 dark:ring-zinc-100 border-transparent bg-zinc-50/60 dark:bg-zinc-800/50' : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700'"
+                title="Klik untuk melihat semua perangkat"
+            >
                 <div class="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
                     <span class="text-xs font-medium uppercase tracking-wider">Total Perangkat</span>
                     <svg class="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -35,11 +41,20 @@
                 <h3 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mt-2 font-mono" x-text="formatNumber(stats.total || devices.length)">
                     {{ \App\Support\FormatHelper::formatNumber($stats['total'] ?? count($devices)) }}
                 </h3>
-                <p class="text-[11px] text-zinc-400 dark:text-zinc-500 mt-1">Inventaris MikroTik</p>
-            </div>
+                <div class="flex items-center justify-between mt-1">
+                    <p class="text-[11px] text-zinc-400 dark:text-zinc-500">Semua Device</p>
+                    <span x-show="statusFilter === 'all'" class="text-[10px] font-semibold text-zinc-700 dark:text-zinc-300">Semua</span>
+                </div>
+            </button>
 
-            <!-- Online Hotspot Active -->
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-xs">
+            <!-- 2. Online Hotspot Active -->
+            <button 
+                type="button"
+                @click="statusFilter = (statusFilter === 'online' ? 'all' : 'online')" 
+                class="bg-white dark:bg-zinc-900 border rounded-xl p-4 shadow-xs text-left cursor-pointer transition-all duration-150 hover:shadow-sm"
+                :class="statusFilter === 'online' ? 'ring-2 ring-emerald-500 border-transparent bg-emerald-50/30 dark:bg-emerald-950/20' : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700'"
+                title="Klik untuk memfilter perangkat online hotspot"
+            >
                 <div class="flex items-center justify-between text-emerald-600 dark:text-emerald-400">
                     <span class="text-xs font-medium uppercase tracking-wider flex items-center gap-1">
                         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -52,15 +67,24 @@
                 <h3 class="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-2 font-mono" x-text="formatNumber(stats.online)">
                     {{ \App\Support\FormatHelper::formatNumber($stats['online'] ?? 0) }}
                 </h3>
-                <p class="text-[11px] text-zinc-400 dark:text-zinc-500 mt-1">Aktif berinternet</p>
-            </div>
+                <div class="flex items-center justify-between mt-1">
+                    <p class="text-[11px] text-zinc-400 dark:text-zinc-500">Aktif Hotspot</p>
+                    <span x-show="statusFilter === 'online'" class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">✓ Filter Aktif</span>
+                </div>
+            </button>
 
-            <!-- Bypassed Devices (PC / CCTV / Server) -->
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-xs">
+            <!-- 3. Bypassed Devices -->
+            <button 
+                type="button"
+                @click="statusFilter = (statusFilter === 'bypassed' ? 'all' : 'bypassed')" 
+                class="bg-white dark:bg-zinc-900 border rounded-xl p-4 shadow-xs text-left cursor-pointer transition-all duration-150 hover:shadow-sm"
+                :class="statusFilter === 'bypassed' ? 'ring-2 ring-teal-500 border-transparent bg-teal-50/30 dark:bg-teal-950/20' : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700'"
+                title="Klik untuk memfilter perangkat Bypass IP (PC/CCTV)"
+            >
                 <div class="flex items-center justify-between text-teal-600 dark:text-teal-400">
                     <span class="text-xs font-medium uppercase tracking-wider flex items-center gap-1">
                         <span class="w-2 h-2 rounded-full bg-teal-500"></span>
-                        Bypass IP
+                        Bypass
                     </span>
                     <svg class="w-4 h-4 text-teal-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -69,11 +93,20 @@
                 <h3 class="text-2xl font-bold text-teal-600 dark:text-teal-400 mt-2 font-mono" x-text="formatNumber(stats.bypassed || 0)">
                     {{ \App\Support\FormatHelper::formatNumber($stats['bypassed'] ?? 0) }}
                 </h3>
-                <p class="text-[11px] text-zinc-400 dark:text-zinc-500 mt-1">PC, CCTV & Server</p>
-            </div>
+                <div class="flex items-center justify-between mt-1">
+                    <p class="text-[11px] text-zinc-400 dark:text-zinc-500">PC & CCTV</p>
+                    <span x-show="statusFilter === 'bypassed'" class="text-[10px] font-semibold text-teal-600 dark:text-teal-400">✓ Filter Aktif</span>
+                </div>
+            </button>
 
-            <!-- Standby (Connected Not Logged In) -->
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-xs">
+            <!-- 4. Standby (Connected Not Logged In) -->
+            <button 
+                type="button"
+                @click="statusFilter = (statusFilter === 'standby' ? 'all' : 'standby')" 
+                class="bg-white dark:bg-zinc-900 border rounded-xl p-4 shadow-xs text-left cursor-pointer transition-all duration-150 hover:shadow-sm"
+                :class="statusFilter === 'standby' ? 'ring-2 ring-amber-500 border-transparent bg-amber-50/30 dark:bg-amber-950/20' : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700'"
+                title="Klik untuk memfilter perangkat standby (belum login)"
+            >
                 <div class="flex items-center justify-between text-amber-600 dark:text-amber-400">
                     <span class="text-xs font-medium uppercase tracking-wider">Standby</span>
                     <svg class="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -83,11 +116,20 @@
                 <h3 class="text-2xl font-bold text-amber-600 dark:text-amber-400 mt-2 font-mono" x-text="formatNumber(stats.standby)">
                     {{ \App\Support\FormatHelper::formatNumber($stats['standby'] ?? 0) }}
                 </h3>
-                <p class="text-[11px] text-zinc-400 dark:text-zinc-500 mt-1">WiFi, belum login</p>
-            </div>
+                <div class="flex items-center justify-between mt-1">
+                    <p class="text-[11px] text-zinc-400 dark:text-zinc-500">Belum Login</p>
+                    <span x-show="statusFilter === 'standby'" class="text-[10px] font-semibold text-amber-600 dark:text-amber-400">✓ Filter Aktif</span>
+                </div>
+            </button>
 
-            <!-- Blocked Devices -->
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-xs">
+            <!-- 5. Blocked Devices -->
+            <button 
+                type="button"
+                @click="statusFilter = (statusFilter === 'blocked' ? 'all' : 'blocked')" 
+                class="bg-white dark:bg-zinc-900 border rounded-xl p-4 shadow-xs text-left cursor-pointer transition-all duration-150 hover:shadow-sm"
+                :class="statusFilter === 'blocked' ? 'ring-2 ring-rose-500 border-transparent bg-rose-50/30 dark:bg-rose-950/20' : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700'"
+                title="Klik untuk memfilter perangkat yang diblokir"
+            >
                 <div class="flex items-center justify-between text-rose-600 dark:text-rose-400">
                     <span class="text-xs font-medium uppercase tracking-wider flex items-center gap-1">
                         <span class="w-2 h-2 rounded-full bg-rose-500"></span>
@@ -100,11 +142,20 @@
                 <h3 class="text-2xl font-bold text-rose-600 dark:text-rose-400 mt-2 font-mono" x-text="formatNumber(stats.blocked || 0)">
                     {{ \App\Support\FormatHelper::formatNumber($stats['blocked'] ?? 0) }}
                 </h3>
-                <p class="text-[11px] text-zinc-400 dark:text-zinc-500 mt-1">Blokir IP Binding</p>
-            </div>
+                <div class="flex items-center justify-between mt-1">
+                    <p class="text-[11px] text-zinc-400 dark:text-zinc-500">IP Binding</p>
+                    <span x-show="statusFilter === 'blocked'" class="text-[10px] font-semibold text-rose-600 dark:text-rose-400">✓ Filter Aktif</span>
+                </div>
+            </button>
 
-            <!-- Offline / Expired -->
-            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-xs">
+            <!-- 6. Offline / Expired -->
+            <button 
+                type="button"
+                @click="statusFilter = (statusFilter === 'offline' ? 'all' : 'offline')" 
+                class="bg-white dark:bg-zinc-900 border rounded-xl p-4 shadow-xs text-left cursor-pointer transition-all duration-150 hover:shadow-sm"
+                :class="statusFilter === 'offline' ? 'ring-2 ring-zinc-500 border-transparent bg-zinc-100/60 dark:bg-zinc-800/60' : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700'"
+                title="Klik untuk memfilter perangkat offline / expired"
+            >
                 <div class="flex items-center justify-between text-zinc-400 dark:text-zinc-500">
                     <span class="text-xs font-medium uppercase tracking-wider">Offline / Idle</span>
                     <svg class="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -114,8 +165,11 @@
                 <h3 class="text-2xl font-bold text-zinc-600 dark:text-zinc-300 mt-2 font-mono" x-text="formatNumber(stats.offline)">
                     {{ \App\Support\FormatHelper::formatNumber($stats['offline'] ?? 0) }}
                 </h3>
-                <p class="text-[11px] text-zinc-400 dark:text-zinc-500 mt-1">Sewa IP idle</p>
-            </div>
+                <div class="flex items-center justify-between mt-1">
+                    <p class="text-[11px] text-zinc-400 dark:text-zinc-500">Lease Idle</p>
+                    <span x-show="statusFilter === 'offline'" class="text-[10px] font-semibold text-zinc-500 dark:text-zinc-400">✓ Filter Aktif</span>
+                </div>
+            </button>
         </div>
 
         <!-- Filter Toolbar & Touch-Friendly Chips -->

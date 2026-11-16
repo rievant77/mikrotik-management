@@ -280,6 +280,11 @@ class FrontendPagesTest extends TestCase
         $printGridRes->assertSee('TESTVC01');
         $printGridRes->assertSee('TESTVC02');
         $printGridRes->assertSee('shape-rendering="crispEdges"', false);
+        $printGridRes->assertSee('Daftar Voucher');
+        $printGridEmbeddedRes = $this->get('/vouchers/print/grid?ids=' . $v1->id . '&embedded=1');
+        $printGridEmbeddedRes->assertStatus(200);
+        $printGridEmbeddedRes->assertDontSee('Daftar Voucher');
+        $printGridEmbeddedRes->assertDontSee('Cetak (Ctrl+P)');
 
         // Test selective thermal print 58mm & 80mm with real QR Code & Barcode
         $print58Res = $this->get('/vouchers/print/58mm?ids=' . $v1->id . ',' . $v2->id);
@@ -288,11 +293,21 @@ class FrontendPagesTest extends TestCase
         $print58Res->assertSee('TESTVC02');
         $print58Res->assertSee('Scan QR untuk Login Otomatis');
         $print58Res->assertSee('shape-rendering="crispEdges"', false);
+        $print58Res->assertSee('Daftar Voucher');
+        $print58EmbeddedRes = $this->get('/vouchers/print/58mm?ids=' . $v1->id . '&embedded=1');
+        $print58EmbeddedRes->assertStatus(200);
+        $print58EmbeddedRes->assertDontSee('Daftar Voucher');
+        $print58EmbeddedRes->assertDontSee('Cetak Struk (Ctrl+P)');
 
         $print80Res = $this->get('/vouchers/print/80mm?ids=' . $v1->id);
         $print80Res->assertStatus(200);
         $print80Res->assertSee('TESTVC01');
         $print80Res->assertSee('shape-rendering="crispEdges"', false);
+        $print80Res->assertSee('Daftar Voucher');
+        $print80EmbeddedRes = $this->get('/vouchers/print/80mm?ids=' . $v1->id . '&embedded=1');
+        $print80EmbeddedRes->assertStatus(200);
+        $print80EmbeddedRes->assertDontSee('Daftar Voucher');
+        $print80EmbeddedRes->assertDontSee('Cetak Struk 80mm');
 
         // Test batch delete vouchers
         $deleteBatchRes = $this->postJson('/vouchers/batch-delete', [

@@ -12,11 +12,18 @@
             @page { margin: 0; size: 80mm auto; }
             .receipt-break { page-break-after: always; break-after: page; }
         }
+        .in-iframe .print-top-bar { display: none !important; }
     </style>
+    <script>
+        if (window.self !== window.top) {
+            document.documentElement.classList.add('in-iframe');
+        }
+    </script>
 </head>
-<body class="bg-zinc-100 dark:bg-zinc-950 p-4 text-zinc-900 flex flex-col items-center">
+<body class="bg-zinc-100 dark:bg-zinc-950 p-4 {{ request()->has('embedded') ? '!p-2 !bg-zinc-50 dark:!bg-zinc-900' : '' }} text-zinc-900 flex flex-col items-center">
 
-    <div class="no-print mb-4 flex items-center gap-2">
+    @if(!request()->has('embedded') && !request()->has('popup'))
+    <div class="no-print mb-4 flex items-center gap-2 print-top-bar">
         <a href="{{ route('vouchers.index') }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200">
             <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -30,12 +37,13 @@
             Cetak Struk 80mm (Ctrl+P)
         </button>
     </div>
+    @endif
 
     @forelse($vouchers as $voucher)
         <!-- 80mm Thermal Paper Container -->
         <div class="w-[72mm] bg-white p-3 border border-zinc-300 print:border-0 text-center font-mono text-xs leading-tight print:p-1 shadow-md print:shadow-none mb-6 print:mb-0 receipt-break">
             <div class="font-bold text-sm">{{ $routerSetting->hotspot_name ?? 'MIKROTIK HOTSPOT NETWORK' }}</div>
-            <div class="text-[10px] text-zinc-500 mt-0.5">High Speed Fiber Hotspot Connection</div>
+            <div class="text-[10px] text-zinc-500 mt-0.5">{{ $routerSetting->header_subtext ?? 'High Speed Fiber Hotspot Connection' }}</div>
             <div class="my-2 border-t border-dashed border-zinc-400"></div>
 
             <div class="flex justify-between text-xs py-0.5">
@@ -54,7 +62,7 @@
             </div>
 
             <div class="my-3 p-2 bg-zinc-100 border border-zinc-300 rounded">
-                <div class="text-[10px] text-zinc-500 uppercase">KODE LOGIN HOTSPOT</div>
+                <div class="text-[10px] text-zinc-500 uppercase">{{ ($voucher->password && $voucher->password !== $voucher->username) ? 'USERNAME / LOGIN' : 'KODE LOGIN HOTSPOT' }}</div>
                 <div class="text-lg font-extrabold tracking-wider my-1">{{ $voucher->username }}</div>
                 @if($voucher->password && $voucher->password !== $voucher->username)
                     <div class="text-[10px] text-zinc-600">Password: <strong>{{ $voucher->password }}</strong></div>
@@ -62,6 +70,7 @@
             </div>
 
             <!-- Real Scannable QR Code & 1D Barcode -->
+            @if(!isset($routerSetting->show_qr) || $routerSetting->show_qr)
             <div class="my-3 flex items-center justify-center gap-4 bg-zinc-50 p-2.5 rounded-lg border border-zinc-200">
                 <div class="p-1 bg-white border border-zinc-300 rounded shrink-0">
                     {!! \App\Support\BarcodeHelper::generateQrSvg(\App\Support\BarcodeHelper::getHotspotLoginUrl($routerSetting->login_url ?? null, $voucher->username, $voucher->password), 80) !!}
@@ -73,6 +82,7 @@
                     </div>
                 </div>
             </div>
+            @endif
 
             <div class="text-[10px] text-zinc-500">Hubungkan WiFi & buka halaman:</div>
             <div class="font-bold text-xs mt-0.5">{{ $routerSetting->login_url ?? 'http://hotspot.lan' }}</div>

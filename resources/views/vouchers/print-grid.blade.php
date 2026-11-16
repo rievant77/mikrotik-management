@@ -11,12 +11,19 @@
             body { background: white !important; padding: 0 !important; }
             @page { margin: 8mm; size: A4 portrait; }
         }
+        .in-iframe .print-top-bar { display: none !important; }
     </style>
+    <script>
+        if (window.self !== window.top) {
+            document.documentElement.classList.add('in-iframe');
+        }
+    </script>
 </head>
-<body class="bg-zinc-100 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 p-4 sm:p-8">
+<body class="bg-zinc-100 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 p-4 sm:p-8 {{ request()->has('embedded') ? '!p-2 !bg-zinc-50 dark:!bg-zinc-900' : '' }}">
 
-    <!-- Top Action Bar (hidden on print) -->
-    <div class="max-w-5xl mx-auto mb-6 flex flex-col md:flex-row items-center justify-between gap-4 bg-white dark:bg-zinc-900 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-xs no-print">
+    @if(!request()->has('embedded') && !request()->has('popup'))
+    <!-- Top Action Bar (hidden on print and when embedded) -->
+    <div class="max-w-5xl mx-auto mb-6 flex flex-col md:flex-row items-center justify-between gap-4 bg-white dark:bg-zinc-900 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-xs no-print print-top-bar">
         <div class="flex items-center gap-3">
             <a href="{{ route('vouchers.index') }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors">
                 <svg class="w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -49,6 +56,7 @@
             </button>
         </div>
     </div>
+    @endif
 
     <!-- Voucher Sheet Grid -->
     <div class="max-w-5xl mx-auto bg-white text-zinc-900 p-6 rounded-xl border border-zinc-300 print:border-0 print:p-0 print:m-0 print:shadow-none shadow-md">
@@ -68,7 +76,7 @@
                     <!-- Credential & QR Code Section -->
                     <div class="my-2 flex items-center justify-between gap-2">
                         <div>
-                            <div class="text-[10px] text-zinc-500 uppercase">KODE LOGIN:</div>
+                            <div class="text-[10px] text-zinc-500 uppercase">{{ ($v->password && $v->password !== $v->username) ? 'USERNAME / LOGIN:' : 'KODE LOGIN:' }}</div>
                             <div class="font-mono text-base font-extrabold tracking-wider text-zinc-900 mt-0.5">
                                 {{ $v->username }}
                             </div>
@@ -78,9 +86,11 @@
                             <div class="text-[10px] text-zinc-500 mt-1">Masa Aktif: <strong>{{ $v->profile?->validity ?? ($v->uptime_limit ?: '3 Jam') }}</strong></div>
                         </div>
                         <!-- Real Scannable QR Code -->
+                        @if(!isset($routerSetting->show_qr) || $routerSetting->show_qr)
                         <div class="w-14 h-14 p-0.5 border border-zinc-300 rounded bg-white flex items-center justify-center shrink-0" title="Scan QR untuk login otomatis">
                             {!! \App\Support\BarcodeHelper::generateQrSvg(\App\Support\BarcodeHelper::getHotspotLoginUrl($routerSetting->login_url ?? null, $v->username, $v->password), 50) !!}
                         </div>
+                        @endif
                     </div>
 
                     <!-- Voucher Footer -->

@@ -40,7 +40,7 @@
                     @click="openPrintPreview('58mm')" 
                     class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors shadow-xs cursor-pointer"
                 >
-                    <svg class="w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="w-4 h-4 text-zinc-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                     </svg>
                     <span>Cetak</span>
@@ -62,7 +62,7 @@
             >
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-medium text-zinc-500 dark:text-zinc-400">Total Voucher</span>
-                    <svg class="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="w-4 h-4 text-zinc-400 dark:text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
                     </svg>
                 </div>
@@ -70,7 +70,7 @@
                     {{ \App\Support\FormatHelper::formatNumber($stats['total']) }}
                 </div>
                 <div class="flex items-center justify-between mt-1">
-                    <span class="text-[11px] text-zinc-400">Semua Tersimpan</span>
+                    <span class="text-[11px] text-zinc-500 dark:text-zinc-400">Semua Tersimpan</span>
                     @if($currentStatus === 'all')
                         <span class="text-[10px] font-semibold text-zinc-700 dark:text-zinc-300">Semua</span>
                     @endif
@@ -91,7 +91,7 @@
                     {{ \App\Support\FormatHelper::formatNumber($stats['online']) }}
                 </div>
                 <div class="flex items-center justify-between mt-1">
-                    <span class="text-[11px] text-zinc-400">Aktif di Router</span>
+                    <span class="text-[11px] text-zinc-500 dark:text-zinc-400">Aktif di Router</span>
                     @if($currentStatus === 'online')
                         <span class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">✓ Filter Aktif</span>
                     @endif
@@ -114,7 +114,7 @@
                     {{ \App\Support\FormatHelper::formatNumber($stats['active'] ?? $stats['total']) }}
                 </div>
                 <div class="flex items-center justify-between mt-1">
-                    <span class="text-[11px] text-zinc-400">Ready / Siap Pakai</span>
+                    <span class="text-[11px] text-zinc-500 dark:text-zinc-400">Ready / Siap Pakai</span>
                     @if($currentStatus === 'active')
                         <span class="text-[10px] font-semibold text-sky-600 dark:text-sky-400">✓ Filter Aktif</span>
                     @endif
@@ -137,7 +137,7 @@
                     {{ \App\Support\FormatHelper::formatNumber($stats['inactive'] ?? 0) }}
                 </div>
                 <div class="flex items-center justify-between mt-1">
-                    <span class="text-[11px] text-zinc-400">Habis / Dinonaktifkan</span>
+                    <span class="text-[11px] text-zinc-500 dark:text-zinc-400">Habis / Dinonaktifkan</span>
                     @if(in_array($currentStatus, ['inactive', 'disabled']))
                         <span class="text-[10px] font-semibold text-rose-600 dark:text-rose-400">✓ Filter Aktif</span>
                     @endif
@@ -155,7 +155,7 @@
                 <div class="mt-2 text-xl sm:text-2xl font-extrabold text-zinc-900 dark:text-zinc-100 font-mono">
                     {{ \App\Support\FormatHelper::formatRupiah($stats['inventory_value']) }}
                 </div>
-                <span class="text-[11px] text-zinc-400 mt-1 block truncate">
+                <span class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1 block truncate">
                     @if(request('category') === 'pribadi')
                         Non-profit (dikecualikan)
                     @else
@@ -178,9 +178,9 @@
                                 name="search" 
                                 value="{{ request('search') }}" 
                                 placeholder="Kode username, pass, batch..." 
-                                class="w-full pl-8 pr-3 py-2 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-400"
+                                class="w-full pl-8 pr-3 py-2 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:focus:ring-zinc-600"
                             >
-                            <svg class="w-4 h-4 text-zinc-400 absolute left-2.5 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg class="w-4 h-4 text-zinc-400 dark:text-zinc-500 absolute left-2.5 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </div>
@@ -316,7 +316,7 @@
                                 class="rounded border-zinc-300 dark:border-zinc-700 text-zinc-900 focus:ring-zinc-900 dark:bg-zinc-800 mt-0.5"
                             >
                             <div>
-                                <span class="text-[10px] text-zinc-400 block font-medium">
+                                <span class="text-[10px] text-zinc-500 dark:text-zinc-400 block font-medium">
                                     {{ ($v->password && $v->password !== $v->username) ? 'Username' : 'Kode Login' }}
                                 </span>
                                 <div class="flex items-center gap-1.5">
@@ -326,7 +326,7 @@
                                     <button 
                                         type="button" 
                                         @click="copyText('{{ $v->username }}', '{{ ($v->password && $v->password !== $v->username) ? 'Username' : 'Kode Login' }}')" 
-                                        class="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200"
+                                        class="p-1 text-zinc-400 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-200"
                                         title="Salin {{ ($v->password && $v->password !== $v->username) ? 'Username' : 'Kode Login' }}"
                                     >
                                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -363,7 +363,7 @@
                     <!-- Meta Details -->
                     <div class="mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800/80 grid grid-cols-2 gap-2 text-xs">
                         <div>
-                            <span class="text-[10px] text-zinc-400 block">Paket & Harga:</span>
+                            <span class="text-[10px] text-zinc-500 dark:text-zinc-400 block">Paket & Harga:</span>
                             <div class="flex items-center gap-1.5 flex-wrap">
                                 <span class="font-bold text-zinc-800 dark:text-zinc-200">{{ $v->profile?->name ?? 'Default' }}</span>
                                 @php
@@ -388,7 +388,7 @@
                             </span>
                         </div>
                         <div>
-                            <span class="text-[10px] text-zinc-400 block">Masa Aktif / Limit:</span>
+                            <span class="text-[10px] text-zinc-500 dark:text-zinc-400 block">Masa Aktif / Limit:</span>
                             <span class="font-mono text-zinc-700 dark:text-zinc-300">{{ $v->profile?->validity ?? ($v->uptime_limit ?: '-') }}</span>
                             @if($isOnline && !empty($activeUserMap[$v->username]))
                                 @php
@@ -409,7 +409,7 @@
                     </div>
 
                     @if($v->comment)
-                        <div class="mt-2 text-[10px] text-zinc-400 bg-zinc-100 dark:bg-zinc-800/50 px-2 py-1 rounded truncate">
+                        <div class="mt-2 text-[10px] text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800/50 px-2 py-1 rounded truncate">
                             {{ $v->comment }}
                         </div>
                     @endif
@@ -423,7 +423,7 @@
                                 class="px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 transition-colors flex items-center gap-1 cursor-pointer"
                                 title="Pratinjau & Cetak Voucher"
                             >
-                                <svg class="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg class="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                                 </svg>
                                 <span>Cetak</span>
@@ -463,7 +463,7 @@
                     </div>
                 </div>
             @empty
-                <div class="p-8 text-center bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 text-zinc-400 text-xs">
+                <div class="p-8 text-center bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 text-xs">
                     Tidak ada voucher yang sesuai dengan filter pencarian.
                 </div>
             @endforelse
@@ -520,7 +520,7 @@
                                         <button 
                                             type="button" 
                                             @click="copyText('{{ $v->username }}', 'Kode Voucher')" 
-                                            class="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200"
+                                            class="p-1 text-zinc-400 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-200"
                                             title="Salin Kode"
                                         >
                                             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -529,7 +529,7 @@
                                         </button>
                                     </div>
                                     @if($v->password && $v->password !== $v->username)
-                                        <div class="text-[10px] text-zinc-400 font-mono">Pass: {{ $v->password }}</div>
+                                        <div class="text-[10px] text-zinc-500 dark:text-zinc-400 font-mono">Pass: {{ $v->password }}</div>
                                     @endif
                                 </td>
 
@@ -601,7 +601,7 @@
                                             <button 
                                                 type="button" 
                                                 @click="toggleStatus({{ $v->id }})" 
-                                                class="text-[10px] text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 hover:underline cursor-pointer"
+                                                class="text-[10px] text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 hover:underline cursor-pointer"
                                                 title="Klik untuk non-aktifkan"
                                             >
                                                 {{ $v->is_active ? 'Aktif' : 'In-Active' }}
@@ -614,7 +614,7 @@
                                             class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium transition-colors cursor-pointer {{ $v->is_active ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20' : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-500 dark:text-zinc-400 border border-zinc-300 dark:border-zinc-600 hover:bg-zinc-300' }}"
                                             title="{{ $v->is_active ? 'Klik untuk non-aktifkan' : 'Klik untuk aktifkan' }}"
                                         >
-                                            <span class="w-1.5 h-1.5 rounded-full {{ $v->is_active ? 'bg-emerald-500' : 'bg-zinc-400' }}"></span>
+                                            <span class="w-1.5 h-1.5 rounded-full {{ $v->is_active ? 'bg-emerald-500' : 'bg-zinc-400 dark:bg-zinc-500' }}"></span>
                                             <span>{{ $v->is_active ? 'Ready' : 'In-Active' }}</span>
                                         </button>
                                     @endif
@@ -629,7 +629,7 @@
                                             class="px-2.5 py-1 text-xs font-medium rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 transition-colors border border-zinc-200 dark:border-zinc-700 flex items-center gap-1 cursor-pointer"
                                             title="Pratinjau & Cetak Voucher"
                                         >
-                                            <svg class="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg class="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                                             </svg>
                                             <span>Cetak</span>
@@ -666,7 +666,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="py-8 text-center text-zinc-400 text-xs">
+                                <td colspan="7" class="py-8 text-center text-zinc-500 dark:text-zinc-400 text-xs">
                                     Tidak ada voucher yang ditemukan.
                                 </td>
                             </tr>
@@ -706,7 +706,7 @@
                     @click="openPrintPreview('58mm')" 
                     class="px-3.5 py-1.5 font-semibold rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-100 dark:bg-zinc-700/80 dark:hover:bg-zinc-700 dark:text-zinc-100 border border-zinc-700 dark:border-zinc-600 transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
                 >
-                    <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                     </svg>
                     <span>Cetak Voucher</span>
@@ -736,7 +736,7 @@
                 <button 
                     type="button" 
                     @click="selectedVouchers = []" 
-                    class="p-1.5 hover:bg-zinc-800 dark:hover:bg-zinc-700 rounded-lg text-zinc-400 hover:text-zinc-100 dark:hover:text-zinc-100 transition-colors"
+                    class="p-1.5 hover:bg-zinc-800 dark:hover:bg-zinc-700 rounded-lg text-zinc-400 hover:text-zinc-100 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors"
                     title="Batal Seleksi"
                 >
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -851,7 +851,7 @@
                         <button 
                             type="button" 
                             @click="openInNewTab()" 
-                            class="p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                            class="p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
                             title="Buka di tab browser baru"
                         >
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -865,7 +865,7 @@
                 <div class="relative w-full h-[62vh] rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-950">
                     <div x-show="iframeLoading" class="absolute inset-0 flex flex-col items-center justify-center bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xs z-10">
                         <div class="w-7 h-7 border-2 border-zinc-300 dark:border-zinc-700 border-t-zinc-900 dark:border-t-zinc-100 rounded-full animate-spin"></div>
-                        <span class="text-xs text-zinc-500 mt-2 font-medium">Memuat pratinjau cetak...</span>
+                        <span class="text-xs text-zinc-500 dark:text-zinc-400 mt-2 font-medium">Memuat pratinjau cetak...</span>
                     </div>
 
                     <iframe 
@@ -878,7 +878,7 @@
                 </div>
 
                 <!-- Modal Footer -->
-                <div class="flex items-center justify-between text-xs text-zinc-400 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                <div class="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400 pt-2 border-t border-zinc-100 dark:border-zinc-800">
                     <span>Tips: Anda bisa mencetak langsung dari pop-up ini tanpa perlu membuka tab baru.</span>
                     <button 
                         type="button" 
@@ -904,7 +904,7 @@
                         placeholder="Contoh: 08123456789 atau 628123456789" 
                         class="w-full px-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 font-mono focus:ring-2 focus:ring-emerald-500"
                     >
-                    <p class="text-[11px] text-zinc-400 mt-1">Kosongkan jika ingin memilih kontak langsung di aplikasi WhatsApp.</p>
+                    <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1">Kosongkan jika ingin memilih kontak langsung di aplikasi WhatsApp.</p>
                 </div>
 
                 <div>
@@ -924,7 +924,7 @@
                         @click="copyWhatsAppText()" 
                         class="px-3 py-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 font-medium transition-colors flex items-center gap-1.5 cursor-pointer"
                     >
-                        <svg class="w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg class="w-4 h-4 text-zinc-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                         </svg>
                         <span>Salin Pesan</span>

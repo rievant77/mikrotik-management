@@ -156,7 +156,7 @@
                 <!-- Empty Invoices State -->
                 <template x-if="filteredInvoices.length === 0">
                     <div class="p-12 text-center">
-                        <div class="w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mx-auto text-zinc-400">
+                        <div class="w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mx-auto text-zinc-400 dark:text-zinc-500">
                             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
@@ -386,7 +386,7 @@
                                 </button>
                             </div>
                             <div class="relative">
-                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-xs font-bold text-zinc-500 select-none">Rp</span>
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-xs font-bold text-zinc-500 dark:text-zinc-400 select-none">Rp</span>
                                 <input 
                                     type="text" 
                                     inputmode="numeric"
@@ -439,7 +439,7 @@
                         <div class="flex items-center justify-between pb-3 border-b border-zinc-200 dark:border-zinc-700">
                             <div>
                                 <span class="font-mono font-bold text-zinc-900 dark:text-zinc-100 text-sm" x-text="activeInvoice.invoice_number"></span>
-                                <span class="text-zinc-400 mx-1">•</span>
+                                <span class="text-zinc-400 dark:text-zinc-500 mx-1">•</span>
                                 <span class="font-bold text-zinc-900 dark:text-zinc-100" x-text="activeInvoice.customer ? activeInvoice.customer.name : ''"></span>
                             </div>
                             <div class="text-right font-mono">
@@ -509,7 +509,7 @@
                     <div>
                         <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Tarif Bulanan Default *</label>
                         <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-xs font-bold text-zinc-500 select-none">Rp</span>
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-xs font-bold text-zinc-500 dark:text-zinc-400 select-none">Rp</span>
                             <input 
                                 type="text" 
                                 inputmode="numeric"
@@ -524,7 +524,7 @@
                     <div>
                         <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Modal / Upstream Bulanan (Rp)</label>
                         <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-xs font-bold text-zinc-500 select-none">Rp</span>
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-xs font-bold text-zinc-500 dark:text-zinc-400 select-none">Rp</span>
                             <input 
                                 type="text" 
                                 inputmode="numeric"

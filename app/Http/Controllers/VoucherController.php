@@ -21,15 +21,15 @@ class VoucherController extends Controller
     {
         // 1. Fetch live active sessions & reconcile disabled status with MikroTik
         $activeUserMap = [];
-        if (!app()->environment('testing')) {
-            try {
-                $activeSessions = $routerOs->getActiveHotspotSessions();
-                foreach ($activeSessions as $s) {
-                    if (!empty($s['user'])) {
-                        $activeUserMap[$s['user']] = $s;
-                    }
+        try {
+            $activeSessions = $routerOs->getActiveHotspotSessions();
+            foreach ($activeSessions as $s) {
+                if (!empty($s['user'])) {
+                    $activeUserMap[$s['user']] = $s;
                 }
+            }
 
+            if (!app()->environment('testing')) {
                 $remoteUsers = $routerOs->getHotspotUsers();
                 if (!empty($remoteUsers)) {
                     foreach ($remoteUsers as $u) {
@@ -42,9 +42,9 @@ class VoucherController extends Controller
 
                 // Sweep and process expired users according to their profile expired_mode
                 app(\App\Services\VoucherExpiryService::class)->sweepExpiredUsers($routerOs);
-            } catch (\Throwable $e) {
-                // Non-blocking
             }
+        } catch (\Throwable $e) {
+            // Non-blocking
         }
 
         $search = $request->get('search');
@@ -97,7 +97,8 @@ class VoucherController extends Controller
             $query->where('is_active', true);
         } // if $status === 'all', don't filter is_active
 
-        $vouchers = $query->latest('id')->paginate(50)->withQueryString();
+        $perPage = (int) $request->get('per_page', 25);
+        $vouchers = $query->latest('id')->paginate($perPage)->withQueryString();
 
         // 2. Fetch KPI statistics (scoped by category filter if applied)
         $statsUsersQuery = HotspotUser::with('profile');
@@ -146,9 +147,11 @@ class VoucherController extends Controller
             ->pluck('comment');
 
         $routerSetting = RouterSetting::where('is_active', true)->first() ?? RouterSetting::first();
+        $users = $vouchers;
 
         return view('vouchers.index', compact(
             'vouchers',
+            'users',
             'stats',
             'profiles',
             'batches',

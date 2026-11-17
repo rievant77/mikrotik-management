@@ -42,7 +42,7 @@
             <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-xs">
                 <div class="pb-4 border-b border-zinc-100 dark:border-zinc-800">
                     <h2 class="text-base font-bold text-zinc-900 dark:text-zinc-100">Informasi Akun Administrator</h2>
-                    <p class="text-xs text-zinc-500">Perbarui nama dan email yang digunakan untuk masuk ke sistem</p>
+                    <p class="text-xs text-zinc-500 dark:text-zinc-400">Perbarui nama dan email yang digunakan untuk masuk ke sistem</p>
                 </div>
 
                 <form @submit.prevent="saveProfile()" class="mt-6 space-y-6">
@@ -78,7 +78,7 @@
                                         Hapus Foto
                                     </button>
                                 </div>
-                                <p class="text-[11px] text-zinc-400">Format: JPG, PNG, WEBP, SVG (Maks. 2MB)</p>
+                                <p class="text-[11px] text-zinc-500 dark:text-zinc-400">Format: JPG, PNG, WEBP, SVG (Maks. 2MB)</p>
                             </div>
                         </div>
                     </div>
@@ -123,7 +123,7 @@
             <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-xs">
                 <div class="pb-4 border-b border-zinc-100 dark:border-zinc-800">
                     <h2 class="text-base font-bold text-zinc-900 dark:text-zinc-100">Ganti Kata Sandi (Password)</h2>
-                    <p class="text-xs text-zinc-500">Pastikan akun Anda menggunakan kombinasi password yang kuat dan aman</p>
+                    <p class="text-xs text-zinc-500 dark:text-zinc-400">Pastikan akun Anda menggunakan kombinasi password yang kuat dan aman</p>
                 </div>
 
                 <form @submit.prevent="savePassword()" class="mt-6 space-y-4 max-w-xl">
@@ -137,7 +137,7 @@
                                 placeholder="Masukkan password lama" 
                                 class="w-full px-3.5 py-2.5 pr-10 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-400"
                             >
-                            <button type="button" @click="showCurrentPass = !showCurrentPass" class="absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-400 hover:text-zinc-600">
+                            <button type="button" @click="showCurrentPass = !showCurrentPass" class="absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300">
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -158,7 +158,7 @@
                                     placeholder="Min. 6 karakter" 
                                     class="w-full px-3.5 py-2.5 pr-10 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-400"
                                 >
-                                <button type="button" @click="showNewPass = !showNewPass" class="absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-400 hover:text-zinc-600">
+                                <button type="button" @click="showNewPass = !showNewPass" class="absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300">
                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -203,7 +203,7 @@
                 <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-xs">
                     <div class="pb-4 border-b border-zinc-100 dark:border-zinc-800">
                         <h2 class="text-base font-bold text-zinc-900 dark:text-zinc-100">Nama & Identitas Aplikasi</h2>
-                        <p class="text-xs text-zinc-500">Nama dan teks ini ditampilkan pada Sidebar, Header Navbar, dan Halaman Login</p>
+                        <p class="text-xs text-zinc-500 dark:text-zinc-400">Nama dan teks ini ditampilkan pada Sidebar, Header Navbar, dan Halaman Login</p>
                     </div>
 
                     <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -245,7 +245,7 @@
                         <div>
                             <div class="pb-4 border-b border-zinc-100 dark:border-zinc-800">
                                 <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Logo / Ikon Aplikasi</h3>
-                                <p class="text-xs text-zinc-500">Ikon yang tampil di pojok atas Sidebar dan Halaman Login</p>
+                                <p class="text-xs text-zinc-500 dark:text-zinc-400">Ikon yang tampil di pojok atas Sidebar dan Halaman Login</p>
                             </div>
 
                             <div class="py-6 flex flex-col items-center justify-center">
@@ -266,7 +266,7 @@
                                     </div>
                                     <div class="text-left">
                                         <strong class="text-xs font-bold text-zinc-900 dark:text-zinc-100 block" x-text="brandForm.app_name || 'MikroTik Manager'"></strong>
-                                        <span class="text-[10px] text-zinc-400 block" x-text="brandForm.tagline || 'Hotspot & Bandwidth'"></span>
+                                        <span class="text-[10px] text-zinc-500 dark:text-zinc-400 block" x-text="brandForm.tagline || 'Hotspot & Bandwidth'"></span>
                                     </div>
                                 </div>
                             </div>
@@ -293,7 +293,7 @@
                         <div>
                             <div class="pb-4 border-b border-zinc-100 dark:border-zinc-800">
                                 <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Favicon Browser Web</h3>
-                                <p class="text-xs text-zinc-500">Ikon kecil yang tampil pada tab browser pengguna</p>
+                                <p class="text-xs text-zinc-500 dark:text-zinc-400">Ikon kecil yang tampil pada tab browser pengguna</p>
                             </div>
 
                             <div class="py-6 flex flex-col items-center justify-center">
@@ -313,7 +313,7 @@
                                         </template>
                                     </div>
                                     <span x-text="(brandForm.app_name || 'MikroTik Manager') + ' - Dashboard'"></span>
-                                    <span class="text-zinc-400 text-[10px] ml-2">✕</span>
+                                    <span class="text-zinc-400 dark:text-zinc-500 text-[10px] ml-2">✕</span>
                                 </div>
                             </div>
                         </div>

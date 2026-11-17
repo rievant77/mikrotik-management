@@ -54,7 +54,7 @@
             <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-xs relative overflow-hidden">
                 <div class="absolute top-0 left-0 h-1 w-full bg-rose-500"></div>
                 <div class="flex items-center justify-between">
-                    <span class="text-xs font-bold text-zinc-500 uppercase tracking-wider">Streaming Video</span>
+                    <span class="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Streaming Video</span>
                     <div class="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center font-bold text-sm">
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
@@ -66,7 +66,7 @@
                     <div class="text-2xl font-bold text-zinc-900 dark:text-zinc-100" x-text="analytics.categories.video.formatted_bytes || '0 B'"></div>
                     <div class="flex items-center justify-between mt-1">
                         <span class="text-xs font-semibold text-rose-600 dark:text-rose-400" x-text="(analytics.categories.video.percentage || 0) + '% dari total'"></span>
-                        <span class="text-[11px] text-zinc-400">YouTube, TikTok, Netflix</span>
+                        <span class="text-[11px] text-zinc-500 dark:text-zinc-400">YouTube, TikTok, Netflix</span>
                     </div>
                 </div>
             </div>
@@ -75,7 +75,7 @@
             <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-xs relative overflow-hidden">
                 <div class="absolute top-0 left-0 h-1 w-full bg-blue-500"></div>
                 <div class="flex items-center justify-between">
-                    <span class="text-xs font-bold text-zinc-500 uppercase tracking-wider">Sosmed & Chat</span>
+                    <span class="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Sosmed & Chat</span>
                     <div class="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-sm">
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -86,7 +86,7 @@
                     <div class="text-2xl font-bold text-zinc-900 dark:text-zinc-100" x-text="analytics.categories.social_media.formatted_bytes || '0 B'"></div>
                     <div class="flex items-center justify-between mt-1">
                         <span class="text-xs font-semibold text-blue-600 dark:text-blue-400" x-text="(analytics.categories.social_media.percentage || 0) + '% dari total'"></span>
-                        <span class="text-[11px] text-zinc-400">WhatsApp, IG, FB, X</span>
+                        <span class="text-[11px] text-zinc-500 dark:text-zinc-400">WhatsApp, IG, FB, X</span>
                     </div>
                 </div>
             </div>
@@ -95,7 +95,7 @@
             <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-xs relative overflow-hidden">
                 <div class="absolute top-0 left-0 h-1 w-full bg-emerald-500"></div>
                 <div class="flex items-center justify-between">
-                    <span class="text-xs font-bold text-zinc-500 uppercase tracking-wider">Online Gaming</span>
+                    <span class="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Online Gaming</span>
                     <div class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold text-sm">
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
@@ -106,7 +106,7 @@
                     <div class="text-2xl font-bold text-zinc-900 dark:text-zinc-100" x-text="analytics.categories.gaming.formatted_bytes || '0 B'"></div>
                     <div class="flex items-center justify-between mt-1">
                         <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400" x-text="(analytics.categories.gaming.percentage || 0) + '% dari total'"></span>
-                        <span class="text-[11px] text-zinc-400">MLBB, Free Fire, PUBG</span>
+                        <span class="text-[11px] text-zinc-500 dark:text-zinc-400">MLBB, Free Fire, PUBG</span>
                     </div>
                 </div>
             </div>
@@ -115,7 +115,7 @@
             <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-xs relative overflow-hidden">
                 <div class="absolute top-0 left-0 h-1 w-full bg-amber-500"></div>
                 <div class="flex items-center justify-between">
-                    <span class="text-xs font-bold text-zinc-500 uppercase tracking-wider">Cloud & Browsing</span>
+                    <span class="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Cloud & Browsing</span>
                     <div class="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold text-sm">
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 00-9.78 2.096A4.001 4.001 0 003 15z" />
@@ -126,7 +126,7 @@
                     <div class="text-2xl font-bold text-zinc-900 dark:text-zinc-100" x-text="analytics.categories.browsing.formatted_bytes || '0 B'"></div>
                     <div class="flex items-center justify-between mt-1">
                         <span class="text-xs font-semibold text-amber-600 dark:text-amber-400" x-text="(analytics.categories.browsing.percentage || 0) + '% dari total'"></span>
-                        <span class="text-[11px] text-zinc-400">Meet, Drive, E-Commerce</span>
+                        <span class="text-[11px] text-zinc-500 dark:text-zinc-400">Meet, Drive, E-Commerce</span>
                     </div>
                 </div>
             </div>
@@ -139,7 +139,7 @@
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <h2 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Distribusi Kategori</h2>
-                        <p class="text-xs text-zinc-500">Porsi konsumsi data berdasarkan jenis konten</p>
+                        <p class="text-xs text-zinc-500 dark:text-zinc-400">Porsi konsumsi data berdasarkan jenis konten</p>
                     </div>
                     <span class="text-xs font-mono font-bold text-zinc-700 dark:text-zinc-300" x-text="analytics.formatted_total_traffic"></span>
                 </div>
@@ -171,7 +171,7 @@
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <h2 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Tren Pemakaian 24 Jam (Hari Ini)</h2>
-                        <p class="text-xs text-zinc-500">Aktivitas konsumsi bandwidth per jam menurut kategori aplikasi</p>
+                        <p class="text-xs text-zinc-500 dark:text-zinc-400">Aktivitas konsumsi bandwidth per jam menurut kategori aplikasi</p>
                     </div>
                     <div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-[11px] font-medium text-zinc-600 dark:text-zinc-300">
                         <span>Puncak: 19:00 - 22:00</span>
@@ -235,7 +235,7 @@
                                         </div>
                                         <div>
                                             <span class="font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors block" x-text="item.platform"></span>
-                                            <span class="text-[11px] text-zinc-400" x-text="item.packets ? (formatNumber(item.packets) + ' packets') : 'Aktif'"></span>
+                                            <span class="text-[11px] text-zinc-500 dark:text-zinc-400" x-text="item.packets ? (formatNumber(item.packets) + ' packets') : 'Aktif'"></span>
                                         </div>
                                     </div>
                                 </td>
@@ -288,9 +288,9 @@
             </div>
 
             <!-- Table Card Footer Note -->
-            <div class="px-5 py-3 border-t border-zinc-100 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/50 text-[11px] text-zinc-500 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div class="px-5 py-3 border-t border-zinc-100 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/50 text-[11px] text-zinc-500 dark:text-zinc-400 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div class="flex items-center gap-1.5">
-                    <svg class="w-3.5 h-3.5 text-zinc-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <span>Dihitung dari kernel MikroTik via Firewall Mangle (<span class="font-mono text-zinc-600 dark:text-zinc-400">/ip/firewall/mangle</span>), TLS SNI, dan port TCP/UDP.</span>
@@ -348,14 +348,14 @@
                                     <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100" x-text="selectedPlatform?.platform || 'Detail Aplikasi'"></h3>
                                     <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300" x-text="selectedPlatform?.category || 'Aplikasi'"></span>
                                 </div>
-                                <p class="text-xs text-zinc-500 mt-0.5">Peringkat pengguna hotspot yang paling banyak mengakses aplikasi ini</p>
+                                <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Peringkat pengguna hotspot yang paling banyak mengakses aplikasi ini</p>
                             </div>
                         </div>
 
                         <button 
                             type="button" 
                             @click="showRankModal = false"
-                            class="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                            class="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                         >
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -368,17 +368,17 @@
                         <!-- Summary 3-Column Strip -->
                         <div class="grid grid-cols-3 gap-3">
                             <div class="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800">
-                                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Total Bandwidth</span>
+                                <span class="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block">Total Bandwidth</span>
                                 <span class="text-base font-bold text-zinc-900 dark:text-zinc-100 font-mono mt-0.5 block" x-text="rankData?.formatted_total_bytes || selectedPlatform?.formatted_bytes || '0 B'"></span>
                             </div>
                             <div class="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800">
-                                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Pengguna Aktif</span>
+                                <span class="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block">Pengguna Aktif</span>
                                 <span class="text-base font-bold text-indigo-600 dark:text-indigo-400 mt-0.5 block">
                                     <span x-text="formatNumber(rankData?.active_users_count || (rankData?.users?.length || 0))"></span> User
                                 </span>
                             </div>
                             <div class="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800">
-                                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Kategori</span>
+                                <span class="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block">Kategori</span>
                                 <span class="text-xs font-semibold text-zinc-800 dark:text-zinc-200 mt-1 block truncate" x-text="rankData?.category || selectedPlatform?.category"></span>
                             </div>
                         </div>
@@ -389,14 +389,14 @@
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
-                            <span class="text-xs text-zinc-500 font-medium">Memindai socket koneksi & pengguna aktif di router...</span>
+                            <span class="text-xs text-zinc-500 dark:text-zinc-400 font-medium">Memindai socket koneksi & pengguna aktif di router...</span>
                         </div>
 
                         <!-- Leaderboard Table -->
                         <div x-show="!rankLoading" class="rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
                             <div class="max-h-80 overflow-y-auto">
                                 <table class="w-full text-left border-collapse text-xs">
-                                    <thead class="sticky top-0 bg-zinc-50 dark:bg-zinc-800/90 backdrop-blur-xs z-10 border-b border-zinc-200 dark:border-zinc-800 text-zinc-500 font-semibold">
+                                    <thead class="sticky top-0 bg-zinc-50 dark:bg-zinc-800/90 backdrop-blur-xs z-10 border-b border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 font-semibold">
                                         <tr>
                                             <th class="py-2.5 px-3 w-12 text-center">Rank</th>
                                             <th class="py-2.5 px-3">Pengguna & Perangkat</th>
@@ -420,7 +420,7 @@
                                                         <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-orange-100 text-orange-800 dark:bg-orange-900/60 dark:text-orange-300 font-bold text-xs">3</span>
                                                     </template>
                                                     <template x-if="u.rank > 3">
-                                                        <span class="text-zinc-400 font-mono text-xs font-semibold" x-text="'#' + u.rank"></span>
+                                                        <span class="text-zinc-500 dark:text-zinc-400 font-mono text-xs font-semibold" x-text="'#' + u.rank"></span>
                                                     </template>
                                                 </td>
 
@@ -430,7 +430,7 @@
                                                         <span class="w-2 h-2 rounded-full shrink-0" :class="u.is_online ? 'bg-emerald-500 animate-pulse' : 'bg-zinc-300 dark:bg-zinc-600'"></span>
                                                         <div>
                                                             <span class="font-bold text-zinc-900 dark:text-zinc-100 block" x-text="u.username"></span>
-                                                            <div class="flex items-center gap-1.5 text-[11px] text-zinc-400 font-mono">
+                                                            <div class="flex items-center gap-1.5 text-[11px] text-zinc-500 dark:text-zinc-400 font-mono">
                                                                 <span x-text="u.device_name !== '-' ? u.device_name : u.ip_address"></span>
                                                                 <span class="text-zinc-300 dark:text-zinc-600">•</span>
                                                                 <span x-text="u.ip_address"></span>
@@ -455,7 +455,7 @@
                                                 <!-- Data Volume -->
                                                 <td class="py-3 px-3 text-right">
                                                     <span class="font-bold text-zinc-900 dark:text-zinc-100 font-mono text-xs block" x-text="u.formatted_bytes"></span>
-                                                    <span class="text-[10px] text-zinc-400" x-text="u.connections ? (formatNumber(u.connections) + ' koneksi') : 'Aktif'"></span>
+                                                    <span class="text-[10px] text-zinc-500 dark:text-zinc-400" x-text="u.connections ? (formatNumber(u.connections) + ' koneksi') : 'Aktif'"></span>
                                                 </td>
 
                                                 <!-- Percentage Bar -->
@@ -464,7 +464,7 @@
                                                         <div class="flex-1 h-2 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
                                                             <div class="h-full bg-indigo-600 rounded-full transition-all duration-300" :style="'width: ' + (u.percentage || 0) + '%'"></div>
                                                         </div>
-                                                        <span class="text-[10px] font-mono font-semibold text-zinc-500 w-8 text-right" x-text="(u.percentage || 0) + '%'"></span>
+                                                        <span class="text-[10px] font-mono font-semibold text-zinc-500 dark:text-zinc-400 w-8 text-right" x-text="(u.percentage || 0) + '%'"></span>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -473,12 +473,12 @@
                                         <!-- Empty State -->
                                         <template x-if="!rankData?.users || rankData.users.length === 0">
                                             <tr>
-                                                <td colspan="5" class="py-8 text-center text-zinc-400">
+                                                <td colspan="5" class="py-8 text-center text-zinc-500 dark:text-zinc-400">
                                                     <svg class="w-8 h-8 mx-auto text-zinc-300 dark:text-zinc-700 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                                                     </svg>
                                                     <p class="font-medium text-xs text-zinc-600 dark:text-zinc-400">Belum ada user yang terdeteksi aktif pada aplikasi ini.</p>
-                                                    <p class="text-[11px] text-zinc-400 mt-0.5">Filter mangle di MikroTik akan otomatis mencatat data saat ada user yang mengakses.</p>
+                                                    <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">Filter mangle di MikroTik akan otomatis mencatat data saat ada user yang mengakses.</p>
                                                 </td>
                                             </tr>
                                         </template>
@@ -541,7 +541,7 @@
                     <div class="px-6 py-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
                         <div>
                             <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100">Kelola Signature & Port Aplikasi</h3>
-                            <p class="text-xs text-zinc-500 mt-0.5">Kustomisasi port game online, domain CDN, dan TLS SNI agar klasifikasi bandwidth selalu presisi</p>
+                            <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Kustomisasi port game online, domain CDN, dan TLS SNI agar klasifikasi bandwidth selalu presisi</p>
                         </div>
 
                         <div class="flex items-center gap-2">
@@ -559,7 +559,7 @@
                             <button 
                                 type="button" 
                                 @click="showSignatureModal = false"
-                                class="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                                class="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                             >
                                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -628,9 +628,9 @@
                                 type="text" 
                                 x-model="sigSearchQuery" 
                                 placeholder="Cari aplikasi atau port..." 
-                                class="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+                                class="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
                             >
-                            <svg class="w-4 h-4 text-zinc-400 absolute left-2.5 top-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg class="w-4 h-4 text-zinc-400 dark:text-zinc-500 absolute left-2.5 top-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </div>
@@ -656,7 +656,7 @@
                                             <tr class="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30 transition-colors">
                                                 <td class="py-3 px-3">
                                                     <span class="font-bold text-zinc-900 dark:text-zinc-100 block" x-text="sig.name"></span>
-                                                    <span class="font-mono text-[10px] text-zinc-400" x-text="sig.mark_name"></span>
+                                                    <span class="font-mono text-[10px] text-zinc-500 dark:text-zinc-400" x-text="sig.mark_name"></span>
                                                 </td>
                                                 <td class="py-3 px-3">
                                                     <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold"
@@ -685,7 +685,7 @@
                                                             </div>
                                                         </template>
                                                         <template x-if="!sig.udp_ports && !sig.tcp_ports">
-                                                            <span class="text-zinc-400 text-[11px]">Default (80/443)</span>
+                                                            <span class="text-zinc-500 dark:text-zinc-400 text-[11px]">Default (80/443)</span>
                                                         </template>
                                                     </div>
                                                 </td>
@@ -710,7 +710,7 @@
                                                         <button 
                                                             type="button" 
                                                             @click="openEditSignature(sig)" 
-                                                            class="p-1 rounded-lg text-zinc-400 hover:text-indigo-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                                                            class="p-1 rounded-lg text-zinc-400 dark:text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                                                             title="Edit Port & Domain"
                                                         >
                                                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -721,7 +721,7 @@
                                                             <button 
                                                                 type="button" 
                                                                 @click="deleteSignature(sig)" 
-                                                                class="p-1 rounded-lg text-zinc-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
+                                                                class="p-1 rounded-lg text-zinc-400 dark:text-zinc-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
                                                                 title="Hapus Signature"
                                                             >
                                                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -798,7 +798,7 @@
                 >
                     <div class="px-6 py-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
                         <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100" x-text="editingSignature ? 'Edit Signature: ' + editingSignature.name : 'Tambah Platform / Game Baru'"></h3>
-                        <button type="button" @click="showEditSignatureModal = false" class="p-1 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200">
+                        <button type="button" @click="showEditSignatureModal = false" class="p-1 rounded-lg text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-200">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                             </svg>
@@ -814,7 +814,7 @@
                                 x-model="sigForm.name" 
                                 required 
                                 placeholder="Contoh: Mobile Legends: Bang Bang"
-                                class="w-full px-3 py-2 text-xs rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500"
+                                class="w-full px-3 py-2 text-xs rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:ring-2 focus:ring-indigo-500"
                             >
                         </div>
 
@@ -840,9 +840,9 @@
                                 type="text" 
                                 x-model="sigForm.udp_ports" 
                                 placeholder="Contoh: 5000-5200,30000-30200,10003"
-                                class="w-full px-3 py-2 text-xs rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-mono focus:ring-2 focus:ring-indigo-500"
+                                class="w-full px-3 py-2 text-xs rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 font-mono focus:ring-2 focus:ring-indigo-500"
                             >
-                            <span class="text-[10px] text-zinc-400 mt-1 block">Pisahkan dengan koma atau tanda hubung untuk rentang port.</span>
+                            <span class="text-[10px] text-zinc-500 dark:text-zinc-400 mt-1 block">Pisahkan dengan koma atau tanda hubung untuk rentang port.</span>
                         </div>
 
                         <!-- Port TCP -->
@@ -852,7 +852,7 @@
                                 type="text" 
                                 x-model="sigForm.tcp_ports" 
                                 placeholder="Contoh: 5000-5200,5500-5700"
-                                class="w-full px-3 py-2 text-xs rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-mono focus:ring-2 focus:ring-indigo-500"
+                                class="w-full px-3 py-2 text-xs rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 font-mono focus:ring-2 focus:ring-indigo-500"
                             >
                         </div>
 
@@ -863,9 +863,9 @@
                                 type="text" 
                                 x-model="sigForm.fqdn_domains" 
                                 placeholder="Contoh: mobilelegends.com, moonton.com"
-                                class="w-full px-3 py-2 text-xs rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-mono focus:ring-2 focus:ring-indigo-500"
+                                class="w-full px-3 py-2 text-xs rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 font-mono focus:ring-2 focus:ring-indigo-500"
                             >
-                            <span class="text-[10px] text-zinc-400 mt-1 block">MikroTik akan otomatis me-resolve domain ini ke IP publik.</span>
+                            <span class="text-[10px] text-zinc-500 dark:text-zinc-400 mt-1 block">MikroTik akan otomatis me-resolve domain ini ke IP publik.</span>
                         </div>
 
                         <!-- TLS Host SNI -->
@@ -875,13 +875,13 @@
                                 type="text" 
                                 x-model="sigForm.tls_host" 
                                 placeholder="Contoh: *mobilelegends.com,*moonton.com"
-                                class="w-full px-3 py-2 text-xs rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-mono focus:ring-2 focus:ring-indigo-500"
+                                class="w-full px-3 py-2 text-xs rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 font-mono focus:ring-2 focus:ring-indigo-500"
                             >
                         </div>
 
                         <!-- QUIC Checkbox -->
                         <div class="flex items-center gap-2 pt-1">
-                            <input type="checkbox" id="is_quic" x-model="sigForm.is_quic" class="rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500">
+                            <input type="checkbox" id="is_quic" x-model="sigForm.is_quic" class="rounded border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 text-indigo-600 focus:ring-indigo-500">
                             <label for="is_quic" class="text-xs text-zinc-700 dark:text-zinc-300">Dukung QUIC (HTTP/3 over UDP port 443)</label>
                         </div>
 

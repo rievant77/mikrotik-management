@@ -56,6 +56,7 @@ class AppServiceProvider extends ServiceProvider
                 }
             }
             $view->with('appSetting', $setting);
+            $view->with('routerResource', \Illuminate\Support\Facades\Cache::get('router:system_resource', []));
         });
     }
 }

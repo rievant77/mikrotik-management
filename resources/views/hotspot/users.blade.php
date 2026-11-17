@@ -16,7 +16,7 @@
                     <span>Tambah User</span>
                 </button>
                 <a href="{{ route('hotspot.generate') }}" class="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-medium rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors shadow-xs">
-                    <svg class="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="w-4 h-4 text-zinc-400 dark:text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
                     </svg>
                     <span>Generate Massal</span>
@@ -37,9 +37,9 @@
                                 name="search" 
                                 value="{{ request('search') }}" 
                                 placeholder="Cari nama username..." 
-                                class="w-full pl-8 pr-3 py-2 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-400"
+                                class="w-full pl-8 pr-3 py-2 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:focus:ring-zinc-600"
                             >
-                            <svg class="w-4 h-4 text-zinc-400 absolute left-2.5 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg class="w-4 h-4 text-zinc-400 dark:text-zinc-500 absolute left-2.5 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </div>
@@ -141,7 +141,7 @@
                                         <button 
                                             type="button" 
                                             @click="copyText('{{ $user->username }}', 'Username')" 
-                                            class="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200"
+                                            class="p-1 text-zinc-400 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-200"
                                             title="Salin Username"
                                         >
                                             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -150,7 +150,7 @@
                                         </button>
                                     </div>
                                     @if($user->comment)
-                                        <div class="text-[10px] text-zinc-400 truncate max-w-[180px]" title="{{ $user->comment }}">{{ $user->comment }}</div>
+                                        <div class="text-[10px] text-zinc-500 dark:text-zinc-400 truncate max-w-[180px]" title="{{ $user->comment }}">{{ $user->comment }}</div>
                                     @endif
                                 </td>
 
@@ -182,7 +182,7 @@
                                         {{ $user->profile?->name ?? 'Default' }}
                                     </span>
                                     @if($user->profile && $user->profile->selling_price > 0)
-                                        <div class="text-[10px] text-zinc-400 font-mono">
+                                        <div class="text-[10px] text-zinc-500 dark:text-zinc-400 font-mono">
                                             {{ \App\Support\FormatHelper::formatRupiah($user->profile->selling_price) }}
                                         </div>
                                     @endif
@@ -225,7 +225,7 @@
                                             <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Online
                                             </span>
-                                            <button @click="toggleStatus({{ $user->id }})" class="text-[10px] text-zinc-400 hover:text-zinc-600 hover:underline">
+                                            <button @click="toggleStatus({{ $user->id }})" class="text-[10px] text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:underline">
                                                 {{ $user->is_active ? 'Aktif' : 'In-Active' }}
                                             </button>
                                         </div>
@@ -262,7 +262,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="p-8 text-center text-zinc-400 text-xs">
+                                <td colspan="7" class="p-8 text-center text-zinc-500 dark:text-zinc-400 text-xs">
                                     Tidak ada user hotspot yang cocok dengan filter yang dipilih.
                                 </td>
                             </tr>
@@ -313,7 +313,7 @@
                     <input type="text" x-model="userForm.comment" placeholder="e.g. Voucher retail" class="w-full px-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100">
                 </div>
                 <div class="flex items-center gap-2 pt-1">
-                    <input type="checkbox" id="userIsActive" x-model="userForm.is_active" class="rounded text-zinc-900 focus:ring-zinc-500">
+                    <input type="checkbox" id="userIsActive" x-model="userForm.is_active" class="rounded border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 text-zinc-900 focus:ring-zinc-500">
                     <label for="userIsActive" class="font-medium text-zinc-700 dark:text-zinc-300 cursor-pointer">User Aktif (Bisa Login Hotspot)</label>
                 </div>
                 <div class="flex justify-end gap-2 pt-4 border-t border-zinc-100 dark:border-zinc-800">

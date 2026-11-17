@@ -37,7 +37,7 @@
                     </div>
                     <div class="mt-1.5 sm:mt-2 flex items-baseline justify-between gap-1">
                         <span class="text-xl sm:text-3xl font-extrabold text-zinc-900 dark:text-zinc-100 tracking-tight font-mono" x-text="formatNumber(stats.onlineUsers)">{{ \App\Support\FormatHelper::formatNumber($onlineUsersCount ?? 0) }}</span>
-                        <span class="text-[10px] sm:text-xs text-zinc-400 truncate">/ {{ \App\Support\FormatHelper::formatNumber($totalHotspotUsers ?? 0) }} Akun</span>
+                        <span class="text-[10px] sm:text-xs text-zinc-500 dark:text-zinc-400 truncate">/ {{ \App\Support\FormatHelper::formatNumber($totalHotspotUsers ?? 0) }} Akun</span>
                     </div>
                 </div>
                 <div class="mt-2.5 pt-2.5 sm:mt-3 sm:pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between text-[10px] sm:text-xs text-zinc-500 dark:text-zinc-400">
@@ -51,13 +51,13 @@
                 <div>
                     <div class="flex items-center justify-between">
                         <span class="text-[11px] sm:text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Perangkat</span>
-                        <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-zinc-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
                     </div>
                     <div class="mt-1.5 sm:mt-2 flex items-baseline justify-between gap-1">
                         <span class="text-xl sm:text-3xl font-extrabold text-zinc-900 dark:text-zinc-100 tracking-tight font-mono" x-text="formatNumber(stats.totalDevices)">{{ \App\Support\FormatHelper::formatNumber($totalDevicesCount ?? 0) }}</span>
-                        <span class="text-[10px] sm:text-xs text-zinc-400 truncate">Device (MAC)</span>
+                        <span class="text-[10px] sm:text-xs text-zinc-500 dark:text-zinc-400 truncate">Device (MAC)</span>
                     </div>
                 </div>
                 <div class="mt-2.5 pt-2.5 sm:mt-3 sm:pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between text-[10px] sm:text-xs text-zinc-500 dark:text-zinc-400">
@@ -100,7 +100,7 @@
                         <span class="text-lg sm:text-2xl font-extrabold tracking-tight font-mono truncate"
                             :class="stats.monthlyUnpaidCount > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-zinc-900 dark:text-zinc-100'"
                             x-text="stats.monthlyUnpaidAmountFormatted">{{ \App\Support\FormatHelper::formatRupiah($monthlyUnpaidAmount) }}</span>
-                        <span class="text-[10px] sm:text-xs text-zinc-400 shrink-0">Piutang</span>
+                        <span class="text-[10px] sm:text-xs text-zinc-500 dark:text-zinc-400 shrink-0">Piutang</span>
                     </div>
                 </div>
                 <div class="mt-2.5 pt-2.5 sm:mt-3 sm:pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between text-[10px] sm:text-xs text-zinc-500 dark:text-zinc-400">
@@ -163,7 +163,7 @@
             </div>
 
             <!-- Sub-chart info footer -->
-            <div class="mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex flex-wrap items-center justify-between text-[11px] text-zinc-400">
+            <div class="mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex flex-wrap items-center justify-between text-[11px] text-zinc-500 dark:text-zinc-400">
                 <div class="flex items-center gap-4">
                     <div class="flex items-center gap-1.5">
                         <span class="w-3 h-1 rounded bg-emerald-500"></span>
@@ -215,9 +215,9 @@
                 <!-- 1. Identitas & Model Router -->
                 <div class="bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/80 dark:border-zinc-700/60 rounded-xl p-3 sm:p-4 flex flex-col justify-between">
                     <div>
-                        <div class="flex items-center justify-between text-[11px] sm:text-xs text-zinc-400 font-medium">
+                        <div class="flex items-center justify-between text-[11px] sm:text-xs text-zinc-500 dark:text-zinc-400 font-medium">
                             <span>Model & Board</span>
-                            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-zinc-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
                             </svg>
                         </div>
@@ -241,13 +241,13 @@
                 <!-- 2. CPU Load & Processor -->
                 <div class="bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/80 dark:border-zinc-700/60 rounded-xl p-3 sm:p-4 flex flex-col justify-between">
                     <div>
-                        <div class="flex items-center justify-between text-[11px] sm:text-xs text-zinc-400 font-medium">
+                        <div class="flex items-center justify-between text-[11px] sm:text-xs text-zinc-500 dark:text-zinc-400 font-medium">
                             <span>Beban CPU</span>
                             <span class="font-mono font-semibold" :class="routerInfo.cpu_load > 85 ? 'text-rose-500' : (routerInfo.cpu_load > 60 ? 'text-amber-500' : 'text-emerald-500')" x-text="routerInfo.cpu_load + '%'">{{ $routerInfo['cpu_load'] }}%</span>
                         </div>
                         <div class="mt-1 flex items-baseline gap-1.5 sm:gap-2">
                             <h4 class="text-lg sm:text-2xl font-extrabold text-zinc-900 dark:text-zinc-100 font-mono" x-text="routerInfo.cpu_load + '%'">{{ $routerInfo['cpu_load'] }}%</h4>
-                            <span class="text-[10px] sm:text-xs text-zinc-400 truncate" x-text="(routerInfo.cpu_count || 1) + ' Core' + (routerInfo.cpu_freq ? ' @ ' + routerInfo.cpu_freq : '')">{{ $routerInfo['cpu_count'] }} Core</span>
+                            <span class="text-[10px] sm:text-xs text-zinc-500 dark:text-zinc-400 truncate" x-text="(routerInfo.cpu_count || 1) + ' Core' + (routerInfo.cpu_freq ? ' @ ' + routerInfo.cpu_freq : '')">{{ $routerInfo['cpu_count'] }} Core</span>
                         </div>
                         <div class="w-full h-1.5 sm:h-2 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden mt-2 sm:mt-3">
                             <div class="h-full rounded-full transition-all duration-500"
@@ -264,13 +264,13 @@
                 <!-- 3. RAM / Memory Resource -->
                 <div class="bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/80 dark:border-zinc-700/60 rounded-xl p-3 sm:p-4 flex flex-col justify-between">
                     <div>
-                        <div class="flex items-center justify-between text-[11px] sm:text-xs text-zinc-400 font-medium">
+                        <div class="flex items-center justify-between text-[11px] sm:text-xs text-zinc-500 dark:text-zinc-400 font-medium">
                             <span class="truncate">Pemakaian Memori (RAM)</span>
                             <span class="font-mono font-semibold text-zinc-700 dark:text-zinc-300" x-text="routerInfo.memory_percent + '%'">{{ $routerInfo['memory_percent'] }}%</span>
                         </div>
                         <div class="mt-1 flex items-baseline justify-between gap-1">
                             <h4 class="text-sm sm:text-lg font-bold text-zinc-900 dark:text-zinc-100 font-mono truncate" x-text="routerInfo.free_memory">{{ $routerInfo['free_memory'] }}</h4>
-                            <span class="text-[10px] sm:text-[11px] text-zinc-400 shrink-0">Free RAM</span>
+                            <span class="text-[10px] sm:text-[11px] text-zinc-500 dark:text-zinc-400 shrink-0">Free RAM</span>
                         </div>
                         <div class="w-full h-1.5 sm:h-2 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden mt-2 sm:mt-3">
                             <div class="h-full bg-indigo-500 rounded-full transition-all duration-500" :style="'width: ' + Math.min(100, Math.max(2, routerInfo.memory_percent)) + '%'"></div>
@@ -285,9 +285,9 @@
                 <!-- 4. Uptime & Storage -->
                 <div class="bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/80 dark:border-zinc-700/60 rounded-xl p-3 sm:p-4 flex flex-col justify-between">
                     <div>
-                        <div class="flex items-center justify-between text-[11px] sm:text-xs text-zinc-400 font-medium">
+                        <div class="flex items-center justify-between text-[11px] sm:text-xs text-zinc-500 dark:text-zinc-400 font-medium">
                             <span class="truncate">Uptime & Storage</span>
-                            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-zinc-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-zinc-500 dark:text-zinc-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
@@ -317,10 +317,10 @@
             <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 shadow-xs">
                 <div class="flex items-center justify-between pb-4 border-b border-zinc-100 dark:border-zinc-800">
                     <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Top Bandwidth Consumers</h3>
-                    <span class="text-xs text-zinc-400">Saat Ini</span>
+                    <span class="text-xs text-zinc-500 dark:text-zinc-400">Saat Ini</span>
                 </div>
                 <template x-if="topConsumers.length === 0">
-                    <div class="py-8 text-center text-xs text-zinc-400">
+                    <div class="py-8 text-center text-xs text-zinc-500 dark:text-zinc-400">
                         Belum ada data pemakaian aktif.
                     </div>
                 </template>
@@ -339,7 +339,7 @@
                             <div class="w-full h-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
                                 <div class="h-full bg-emerald-500 rounded-full" :style="'width: ' + Math.min(100, Math.max(5, (user.current_rx_bps / 5000000) * 100)) + '%'"></div>
                             </div>
-                            <div class="flex justify-between text-[10px] text-zinc-400 mt-1">
+                            <div class="flex justify-between text-[10px] text-zinc-500 dark:text-zinc-400 mt-1">
                                 <span x-text="'IP: ' + (user.ip_address || '-')"></span>
                                 <span x-text="'Total: ' + (user.total_bytes || '0 B')"></span>
                             </div>
@@ -362,7 +362,7 @@
                     </div>
 
                     <template x-if="recentUsers.length === 0">
-                        <div class="py-12 text-center text-xs text-zinc-400">
+                        <div class="py-12 text-center text-xs text-zinc-500 dark:text-zinc-400">
                             Tidak ada sesi aktif saat ini.
                         </div>
                     </template>
@@ -370,7 +370,7 @@
                     <!-- Responsive Table -->
                     <div class="overflow-x-auto mt-2" x-show="recentUsers.length > 0">
                         <table class="w-full text-left text-xs">
-                            <thead class="text-[11px] font-semibold text-zinc-400 uppercase border-b border-zinc-100 dark:border-zinc-800/80">
+                            <thead class="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase border-b border-zinc-100 dark:border-zinc-800/80">
                                 <tr>
                                     <th class="py-3 px-2">User / IP</th>
                                     <th class="py-3 px-2">Uptime</th>
@@ -383,7 +383,7 @@
                                     <tr class="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/40 transition-colors">
                                         <td class="py-3 px-2">
                                             <div class="font-medium text-zinc-900 dark:text-zinc-100" x-text="user.username"></div>
-                                            <div class="text-[10px] text-zinc-400" x-text="(user.ip_address || '-') + ' • ' + (user.mac_address || '-')"></div>
+                                            <div class="text-[10px] text-zinc-500 dark:text-zinc-400" x-text="(user.ip_address || '-') + ' • ' + (user.mac_address || '-')"></div>
                                         </td>
                                         <td class="py-3 px-2 text-zinc-500 dark:text-zinc-400 font-mono" x-text="user.uptime || '-'"></td>
                                         <td class="py-3 px-2 font-mono text-[11px]">
@@ -391,7 +391,7 @@
                                             <span class="text-sky-600 dark:text-sky-400 ml-1" x-text="'↑ ' + (user.current_tx_bps ? (Math.round(user.current_tx_bps/1000) + ' Kbps') : '0 Kbps')"></span>
                                         </td>
                                         <td class="py-3 px-2 text-right">
-                                            <a :href="'/users/' + user.username" class="p-1.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 inline-block" title="Detail User">
+                                            <a :href="'/users/' + user.username" class="p-1.5 text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 inline-block" title="Detail User">
                                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                                                 </svg>
@@ -584,7 +584,10 @@
                         if (data.today_revenue_formatted) this.stats.todayRevenueFormatted = data.today_revenue_formatted;
                         if (data.today_vouchers_sold !== undefined) this.stats.todayVouchersSold = data.today_vouchers_sold;
                         if (data.cpu_load !== undefined) this.stats.cpuLoad = data.cpu_load;
-                        if (data.router_info) this.routerInfo = data.router_info;
+                        if (data.router_info) {
+                            this.routerInfo = data.router_info;
+                            window.dispatchEvent(new CustomEvent('router-telemetry-update', { detail: data.router_info }));
+                        }
                         if (data.timestamp) this.lastPollTimestamp = data.timestamp;
                         if (data.top_consumers) this.topConsumers = data.top_consumers;
                         if (data.recent_users) this.recentUsers = data.recent_users;

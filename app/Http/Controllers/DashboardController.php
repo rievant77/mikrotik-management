@@ -14,6 +14,7 @@ use App\Services\RouterOsService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -41,6 +42,9 @@ class DashboardController extends Controller
 
         $routerSetting = RouterSetting::where('is_active', true)->first();
         $resource = $routerOs->getSystemResource();
+        if (!empty($resource)) {
+            Cache::put('router:system_resource', $resource, 120);
+        }
         $routerInfo = $this->formatRouterInfo($routerSetting, $resource);
 
         // Top bandwidth consumers from live sessions
@@ -129,6 +133,9 @@ class DashboardController extends Controller
 
         $routerSetting = RouterSetting::where('is_active', true)->first();
         $resource = $routerOs->getSystemResource();
+        if (!empty($resource)) {
+            Cache::put('router:system_resource', $resource, 120);
+        }
         $routerInfo = $this->formatRouterInfo($routerSetting, $resource);
 
         $cpuLoad = $routerInfo['cpu_load'];

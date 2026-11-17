@@ -15,7 +15,7 @@
                         type="month" 
                         x-model="selectedMonth" 
                         @change="changeMonth()" 
-                        class="px-2.5 py-1 text-xs font-bold font-mono rounded bg-transparent border-0 text-zinc-900 dark:text-zinc-100 focus:ring-0"
+                        class="px-2.5 py-1 text-xs font-bold font-mono rounded bg-transparent dark:bg-transparent border-0 dark:border-0 text-zinc-900 dark:text-zinc-100 focus:ring-0"
                     >
                     <button type="button" @click="setThisMonth()" class="px-2.5 py-1 text-xs font-semibold rounded bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 transition-colors">
                         Bulan Ini

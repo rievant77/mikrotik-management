@@ -23,7 +23,7 @@
                     <span x-text="isLiveActive ? 'Live 2s' : 'Paused'"></span>
                 </button>
                 <a href="{{ route('users.historical') }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors shadow-xs">
-                    <svg class="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="w-4 h-4 text-zinc-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <span>Histori</span>
@@ -43,7 +43,7 @@
             >
                 <div class="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
                     <span class="text-xs font-medium uppercase tracking-wider">Total Online</span>
-                    <svg class="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="w-4 h-4 text-zinc-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                     </svg>
                 </div>
@@ -51,7 +51,7 @@
                     {{ \App\Support\FormatHelper::formatNumber($stats['total'] ?? count($sessions)) }}
                 </h3>
                 <div class="flex items-center justify-between mt-1">
-                    <p class="text-[11px] text-zinc-400 dark:text-zinc-500">Sesi hotspot aktif</p>
+                    <p class="text-[11px] text-zinc-500 dark:text-zinc-400">Sesi hotspot aktif</p>
                     <span x-show="categoryFilter === 'all'" class="text-[10px] font-semibold text-zinc-700 dark:text-zinc-300">Semua</span>
                 </div>
             </button>
@@ -144,7 +144,7 @@
             >
                 <div class="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
                     <span class="text-xs font-medium uppercase tracking-wider">Trafik Live</span>
-                    <svg class="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="w-4 h-4 text-zinc-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
                 </div>
@@ -153,7 +153,7 @@
                     <div class="text-[11px] text-sky-600 dark:text-sky-400 font-medium mt-0.5" x-text="'↑ ' + formatRate(stats.total_tx_bps)"></div>
                 </div>
                 <div class="flex items-center justify-between mt-1">
-                    <p class="text-[10px] text-zinc-400 dark:text-zinc-500" x-text="'Total: ' + formatBytes(stats.total_bytes)">Akumulasi Sesi</p>
+                    <p class="text-[10px] text-zinc-500 dark:text-zinc-400" x-text="'Total: ' + formatBytes(stats.total_bytes)">Akumulasi Sesi</p>
                     <span x-show="sortBy === 'rate_desc'" class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">✓ Sort Trafik</span>
                 </div>
             </button>
@@ -165,7 +165,7 @@
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
                 <!-- Search Input with Clear Button -->
                 <div class="relative flex-1">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-500 dark:text-zinc-400">
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
@@ -174,13 +174,13 @@
                         type="text" 
                         x-model="search" 
                         placeholder="Cari username, nama perangkat, IP, MAC..." 
-                        class="w-full pl-9 pr-8 py-2 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:focus:ring-zinc-600"
+                        class="w-full pl-9 pr-8 py-2 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:focus:ring-zinc-600"
                     >
                     <button 
                         type="button" 
                         x-show="search.length > 0" 
                         @click="search = ''" 
-                        class="absolute inset-y-0 right-0 pr-2.5 flex items-center text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+                        class="absolute inset-y-0 right-0 pr-2.5 flex items-center text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200"
                     >
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -250,7 +250,7 @@
         <!-- Empty State -->
         <template x-if="filteredUsers.length === 0">
             <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-10 text-center shadow-xs">
-                <div class="w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mx-auto text-zinc-400">
+                <div class="w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mx-auto text-zinc-500 dark:text-zinc-400">
                     <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                     </svg>
@@ -276,7 +276,7 @@
                                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" title="Online"></span>
                                     <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[9px] font-bold uppercase border"
                                         :class="{
-                                            'bg-emerald-50 text-emerald-700 border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800': user.category === 'voucher',
+                                             'bg-emerald-50 text-emerald-700 border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800': user.category === 'voucher',
                                             'bg-sky-50 text-sky-700 border-sky-300 dark:bg-sky-950/60 dark:text-sky-300 dark:border-sky-800': user.category === 'bulanan',
                                             'bg-purple-50 text-purple-700 border-purple-300 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-800': user.category === 'pribadi',
                                         }"
@@ -290,7 +290,7 @@
                         </div>
                         <div class="text-right shrink-0">
                             <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700" x-text="user.profile || '-'"></span>
-                            <div class="text-[10px] text-zinc-400 font-mono mt-0.5" x-text="'⏱ ' + (user.uptime_formatted || user.uptime || '-')"></div>
+                            <div class="text-[10px] text-zinc-500 dark:text-zinc-400 font-mono mt-0.5" x-text="'⏱ ' + (user.uptime_formatted || user.uptime || '-')"></div>
                         </div>
                     </div>
 
@@ -301,7 +301,7 @@
                             <span class="shrink-0 flex items-center justify-center" x-html="getDeviceIcon(user.device_type)"></span>
                             <div class="min-w-0">
                                 <div class="font-semibold text-zinc-900 dark:text-zinc-100 truncate text-[11px]" x-text="user.device_display_name || user.device_name || 'Perangkat Hotspot'"></div>
-                                <div class="text-[10px] text-zinc-400 font-mono truncate" x-text="'MAC: ' + (user.mac_address || '-')"></div>
+                                <div class="text-[10px] text-zinc-500 dark:text-zinc-400 font-mono truncate" x-text="'MAC: ' + (user.mac_address || '-')"></div>
                             </div>
                         </div>
                         <span class="text-[10px] uppercase font-semibold px-1.5 py-0.5 rounded bg-zinc-200/70 dark:bg-zinc-700/60 text-zinc-600 dark:text-zinc-300 shrink-0" x-text="user.device_type || 'Device'"></span>
@@ -311,7 +311,7 @@
                     <div class="grid grid-cols-2 gap-2 pt-1 border-t border-zinc-100 dark:border-zinc-800/80">
                         <!-- Live Rates -->
                         <div class="space-y-0.5">
-                            <span class="text-[10px] text-zinc-400 uppercase font-medium">Live Bandwidth</span>
+                            <span class="text-[10px] text-zinc-500 dark:text-zinc-400 uppercase font-medium">Live Bandwidth</span>
                             <div class="font-mono text-xs flex items-center gap-1.5">
                                 <span class="text-emerald-600 dark:text-emerald-400 font-semibold" x-text="'↓ ' + formatRate(user.current_rx_bps)"></span>
                                 <span class="text-sky-600 dark:text-sky-400 text-[11px]" x-text="'↑ ' + formatRate(user.current_tx_bps)"></span>
@@ -320,7 +320,7 @@
 
                         <!-- Total Data -->
                         <div class="space-y-0.5 text-right">
-                            <span class="text-[10px] text-zinc-400 uppercase font-medium">Total Kuota Sesi</span>
+                            <span class="text-[10px] text-zinc-500 dark:text-zinc-400 uppercase font-medium">Total Kuota Sesi</span>
                             <div class="font-mono text-xs font-bold text-zinc-800 dark:text-zinc-200" x-text="formatBytes(user.total_bytes || (user.total_bytes_in + user.total_bytes_out) || 0)"></div>
                         </div>
                     </div>
@@ -331,7 +331,7 @@
                             :href="'/users/' + user.username" 
                             class="flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-semibold rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 transition-colors"
                         >
-                            <svg class="w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg class="w-4 h-4 text-zinc-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                             </svg>
@@ -394,15 +394,15 @@
                                 <td class="py-3.5 px-4 font-mono text-[11px] align-middle">
                                     <div class="text-zinc-900 dark:text-zinc-100 font-medium flex items-center gap-1.5">
                                         <span x-text="user.ip_address || '-'"></span>
-                                        <button type="button" @click="copyText(user.ip_address, 'IP Address')" class="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors" title="Salin IP">
+                                        <button type="button" @click="copyText(user.ip_address, 'IP Address')" class="text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors" title="Salin IP">
                                             <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                                             </svg>
                                         </button>
                                     </div>
-                                    <div class="text-[10px] text-zinc-400 mt-0.5 flex items-center gap-1">
+                                    <div class="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5 flex items-center gap-1">
                                         <span x-text="user.mac_address || '-'"></span>
-                                        <button type="button" @click="copyText(user.mac_address, 'MAC Address')" class="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors" title="Salin MAC">
+                                        <button type="button" @click="copyText(user.mac_address, 'MAC Address')" class="text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors" title="Salin MAC">
                                             <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                                             </svg>
@@ -430,7 +430,7 @@
                                 <!-- Uptime -->
                                 <td class="py-3.5 px-4 text-center align-middle font-mono text-[11px] text-zinc-700 dark:text-zinc-300">
                                     <div class="inline-flex items-center gap-1">
-                                        <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <svg class="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
                                         <span x-text="user.uptime_formatted || user.uptime || '-'"></span>
@@ -457,7 +457,7 @@
                                             class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 transition-colors shadow-2xs" 
                                             title="Lihat Detail Profil User"
                                         >
-                                            <svg class="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg class="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                             </svg>

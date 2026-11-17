@@ -31,14 +31,14 @@
         <!-- Database Records Summary Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 shadow-xs">
-                <div class="flex items-center justify-between text-xs text-zinc-400 font-bold uppercase">
+                <div class="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400 font-bold uppercase">
                     <span>Transaksi POS & Kas</span>
-                    <svg class="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="w-4 h-4 text-zinc-400 dark:text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                     </svg>
                 </div>
                 <div class="mt-2 text-2xl font-bold font-mono text-zinc-900 dark:text-zinc-100" x-text="formatNumber((counts.voucher_sales || 0) + (counts.monthly_invoices || 0) + (counts.monthly_payments || 0)) + ' Record'"></div>
-                <div class="mt-2 text-[11px] text-zinc-500 flex flex-col gap-0.5">
+                <div class="mt-2 text-[11px] text-zinc-500 dark:text-zinc-400 flex flex-col gap-0.5">
                     <div class="flex justify-between"><span>Penjualan Voucher:</span> <strong class="font-mono text-zinc-700 dark:text-zinc-300" x-text="formatNumber(counts.voucher_sales || 0)"></strong></div>
                     <div class="flex justify-between"><span>Tagihan Bulanan:</span> <strong class="font-mono text-zinc-700 dark:text-zinc-300" x-text="formatNumber(counts.monthly_invoices || 0)"></strong></div>
                     <div class="flex justify-between"><span>Pembayaran Masuk:</span> <strong class="font-mono text-zinc-700 dark:text-zinc-300" x-text="formatNumber(counts.monthly_payments || 0)"></strong></div>
@@ -46,42 +46,42 @@
             </div>
 
             <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 shadow-xs">
-                <div class="flex items-center justify-between text-xs text-zinc-400 font-bold uppercase">
+                <div class="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400 font-bold uppercase">
                     <span>Pengguna & Pelanggan</span>
-                    <svg class="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="w-4 h-4 text-zinc-400 dark:text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                     </svg>
                 </div>
                 <div class="mt-2 text-2xl font-bold font-mono text-zinc-900 dark:text-zinc-100" x-text="formatNumber((counts.hotspot_users || 0) + (counts.monthly_customers || 0)) + ' User'"></div>
-                <div class="mt-2 text-[11px] text-zinc-500 flex flex-col gap-0.5">
+                <div class="mt-2 text-[11px] text-zinc-500 dark:text-zinc-400 flex flex-col gap-0.5">
                     <div class="flex justify-between"><span>Hotspot Users:</span> <strong class="font-mono text-zinc-700 dark:text-zinc-300" x-text="formatNumber(counts.hotspot_users || 0)"></strong></div>
                     <div class="flex justify-between"><span>Pelanggan Bulanan:</span> <strong class="font-mono text-zinc-700 dark:text-zinc-300" x-text="formatNumber(counts.monthly_customers || 0)"></strong></div>
                 </div>
             </div>
 
             <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 shadow-xs">
-                <div class="flex items-center justify-between text-xs text-zinc-400 font-bold uppercase">
+                <div class="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400 font-bold uppercase">
                     <span>Traffic & Log FUP</span>
-                    <svg class="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="w-4 h-4 text-zinc-400 dark:text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
                 </div>
                 <div class="mt-2 text-2xl font-bold font-mono text-zinc-900 dark:text-zinc-100" x-text="formatNumber((counts.daily_summaries || 0) + (counts.hourly_samples || 0) + (counts.fup_trackers || 0)) + ' Log'"></div>
-                <div class="mt-2 text-[11px] text-zinc-500 flex flex-col gap-0.5">
+                <div class="mt-2 text-[11px] text-zinc-500 dark:text-zinc-400 flex flex-col gap-0.5">
                     <div class="flex justify-between"><span>Daily Traffic:</span> <strong class="font-mono text-zinc-700 dark:text-zinc-300" x-text="formatNumber(counts.daily_summaries || 0)"></strong></div>
                     <div class="flex justify-between"><span>FUP Trackers:</span> <strong class="font-mono text-zinc-700 dark:text-zinc-300" x-text="formatNumber(counts.fup_trackers || 0)"></strong></div>
                 </div>
             </div>
 
             <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 shadow-xs">
-                <div class="flex items-center justify-between text-xs text-zinc-400 font-bold uppercase">
+                <div class="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400 font-bold uppercase">
                     <span>Audit Log Sistem</span>
-                    <svg class="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="w-4 h-4 text-zinc-400 dark:text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                 </div>
                 <div class="mt-2 text-2xl font-bold font-mono text-zinc-900 dark:text-zinc-100" x-text="formatNumber(counts.audit_logs || 0) + ' Log'"></div>
-                <div class="mt-2 text-[11px] text-zinc-500">
+                <div class="mt-2 text-[11px] text-zinc-500 dark:text-zinc-400">
                     Aktivitas sistem & riwayat aksi admin
                 </div>
             </div>
@@ -100,7 +100,7 @@
                         </div>
                         <div>
                             <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">1. Reset Data Penjualan & Keuangan POS</h3>
-                            <p class="text-[11px] text-zinc-400">Hapus riwayat penjualan voucher, tagihan bulanan, dan pembayaran kasir</p>
+                            <p class="text-[11px] text-zinc-500 dark:text-zinc-400">Hapus riwayat penjualan voucher, tagihan bulanan, dan pembayaran kasir</p>
                         </div>
                     </div>
                     <div class="py-4 space-y-3 text-xs text-zinc-600 dark:text-zinc-400">
@@ -108,7 +108,7 @@
                         <div>
                             <label class="block font-medium text-zinc-700 dark:text-zinc-300 mb-1">Opsi Tanggal Batas (Opsional)</label>
                             <input type="date" x-model="salesResetDate" class="w-full px-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 text-xs">
-                            <span class="text-[10px] text-zinc-400 mt-1 block">Biarkan kosong untuk menghapus SELURUH riwayat penjualan.</span>
+                            <span class="text-[10px] text-zinc-500 dark:text-zinc-400 mt-1 block">Biarkan kosong untuk menghapus SELURUH riwayat penjualan.</span>
                         </div>
                     </div>
                 </div>
@@ -130,18 +130,18 @@
                         </div>
                         <div>
                             <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">2. Reset Pengguna Hotspot & Voucher</h3>
-                            <p class="text-[11px] text-zinc-400">Hapus seluruh user hotspot di database dan router MikroTik</p>
+                            <p class="text-[11px] text-zinc-500 dark:text-zinc-400">Hapus seluruh user hotspot di database dan router MikroTik</p>
                         </div>
                     </div>
                     <div class="py-4 space-y-3 text-xs text-zinc-600 dark:text-zinc-400">
                         <p>Menghapus user hotspot yang ada di database aplikasi serta menjalankan perintah <code class="px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 font-mono text-[11px]">/ip/hotspot/user/remove</code> di MikroTik.</p>
                         <div class="space-y-2 pt-1">
                             <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="checkbox" x-model="usersDeleteRouter" class="rounded border-zinc-300 text-emerald-600 focus:ring-emerald-500">
+                                <input type="checkbox" x-model="usersDeleteRouter" class="rounded border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 text-emerald-600 focus:ring-emerald-500">
                                 <span class="font-medium text-zinc-700 dark:text-zinc-300">Hapus juga dari Router MikroTik (Sinkronisasi Langsung)</span>
                             </label>
                             <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="checkbox" x-model="usersIncludeMonthly" class="rounded border-zinc-300 text-emerald-600 focus:ring-emerald-500">
+                                <input type="checkbox" x-model="usersIncludeMonthly" class="rounded border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 text-emerald-600 focus:ring-emerald-500">
                                 <span class="font-medium text-zinc-700 dark:text-zinc-300">Sertakan juga Pelanggan Bulanan (Master Customers)</span>
                             </label>
                         </div>
@@ -165,7 +165,7 @@
                         </div>
                         <div>
                             <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">3. Reset Counter Internet & Kuota FUP</h3>
-                            <p class="text-[11px] text-zinc-400">Kembalikan traffic bytes ke 0 & pulihkan kecepatan normal FUP</p>
+                            <p class="text-[11px] text-zinc-500 dark:text-zinc-400">Kembalikan traffic bytes ke 0 & pulihkan kecepatan normal FUP</p>
                         </div>
                     </div>
                     <div class="py-4 space-y-3 text-xs text-zinc-600 dark:text-zinc-400">
@@ -194,7 +194,7 @@
                         </div>
                         <div>
                             <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">4. Bersihkan Audit Log Sistem</h3>
-                            <p class="text-[11px] text-zinc-400">Hapus riwayat aktivitas dan pencatatan audit log</p>
+                            <p class="text-[11px] text-zinc-500 dark:text-zinc-400">Hapus riwayat aktivitas dan pencatatan audit log</p>
                         </div>
                     </div>
                     <div class="py-4 space-y-3 text-xs text-zinc-600 dark:text-zinc-400">
@@ -260,7 +260,7 @@
                     <button 
                         type="submit" 
                         :disabled="confirmationInput.trim().toUpperCase() !== 'RESET' || isProcessing" 
-                        :class="confirmationInput.trim().toUpperCase() === 'RESET' && !isProcessing ? 'bg-rose-600 hover:bg-rose-700 text-white font-bold cursor-pointer' : 'bg-zinc-300 dark:bg-zinc-800 text-zinc-400 cursor-not-allowed'"
+                        :class="confirmationInput.trim().toUpperCase() === 'RESET' && !isProcessing ? 'bg-rose-600 hover:bg-rose-700 text-white font-bold cursor-pointer' : 'bg-zinc-300 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 cursor-not-allowed'"
                         class="px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
                     >
                         <span x-show="isProcessing">Memproses Reset...</span>

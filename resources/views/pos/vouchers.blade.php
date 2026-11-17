@@ -115,7 +115,7 @@
                             name="month" 
                             value="{{ $month !== 'all' ? $month : '' }}" 
                             onchange="this.form.submit()"
-                            class="px-2 py-1 text-xs font-bold font-mono rounded bg-transparent border-0 text-zinc-900 dark:text-zinc-100 focus:ring-0"
+                            class="px-2 py-1 text-xs font-bold font-mono rounded bg-transparent dark:bg-transparent border-0 dark:border-0 text-zinc-900 dark:text-zinc-100 focus:ring-0"
                         >
                         <a 
                             href="{{ route('pos.vouchers', array_merge(request()->except(['month', 'page']), ['month' => now()->format('Y-m')])) }}" 

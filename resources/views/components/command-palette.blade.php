@@ -36,7 +36,7 @@
         >
             <!-- Search Input Header -->
             <div class="relative flex items-center px-4 py-3 sm:px-6">
-                <svg class="pointer-events-none h-5 w-5 text-zinc-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="pointer-events-none h-5 w-5 text-zinc-500 dark:text-zinc-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
                 <input 
@@ -45,7 +45,7 @@
                     x-model="searchQuery" 
                     @input.debounce.200ms="performSearch()"
                     placeholder="Cari user hotspot, IP, MAC address, invoice, atau menu..." 
-                    class="h-10 w-full bg-transparent border-0 pl-3 pr-10 text-sm text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:ring-0"
+                    class="h-10 w-full bg-transparent border-0 pl-3 pr-10 text-sm text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-0"
                 >
                 <div class="flex items-center gap-2">
                     <!-- Loading Spinner -->
@@ -53,7 +53,7 @@
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    <button @click="closeSearch()" class="text-xs px-2 py-1 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-500 font-mono border border-zinc-200 dark:border-zinc-700">ESC</button>
+                    <button @click="closeSearch()" class="text-xs px-2 py-1 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 font-mono border border-zinc-200 dark:border-zinc-700">ESC</button>
                 </div>
             </div>
 
@@ -62,7 +62,7 @@
                 <!-- Group 1: Hotspot Users -->
                 <template x-if="results.users && results.users.length > 0">
                     <div>
-                        <div class="px-2 pb-1.5 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider flex items-center justify-between">
+                        <div class="px-2 pb-1.5 text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider flex items-center justify-between">
                             <span class="flex items-center gap-1.5">
                                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -80,7 +80,7 @@
                                         </div>
                                         <div>
                                             <span class="font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 block" x-text="user.title"></span>
-                                            <span class="text-[11px] text-zinc-400 block" x-text="user.subtitle"></span>
+                                            <span class="text-[11px] text-zinc-500 dark:text-zinc-400 block" x-text="user.subtitle"></span>
                                         </div>
                                     </div>
                                     <span class="text-[10px] px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 font-medium">Buka Profil &rarr;</span>
@@ -93,7 +93,7 @@
                 <!-- Group 2: Devices & DHCP Leases -->
                 <template x-if="results.devices && results.devices.length > 0">
                     <div>
-                        <div class="px-2 pb-1.5 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider flex items-center justify-between">
+                        <div class="px-2 pb-1.5 text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider flex items-center justify-between">
                             <span class="flex items-center gap-1.5">
                                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -113,7 +113,7 @@
                                         </div>
                                         <div>
                                             <span class="font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 block" x-text="device.title"></span>
-                                            <span class="text-[11px] text-zinc-400 block font-mono" x-text="device.subtitle"></span>
+                                            <span class="text-[11px] text-zinc-500 dark:text-zinc-400 block font-mono" x-text="device.subtitle"></span>
                                         </div>
                                     </div>
                                     <span class="text-[10px] px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 font-medium">Lihat di Live Devices &rarr;</span>
@@ -126,7 +126,7 @@
                 <!-- Group 3: Customers & Invoices -->
                 <template x-if="results.customers && results.customers.length > 0">
                     <div>
-                        <div class="px-2 pb-1.5 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider flex items-center justify-between">
+                        <div class="px-2 pb-1.5 text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider flex items-center justify-between">
                             <span class="flex items-center gap-1.5">
                                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -146,7 +146,7 @@
                                         </div>
                                         <div>
                                             <span class="font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-amber-600 dark:group-hover:text-amber-400 block" x-text="item.title"></span>
-                                            <span class="text-[11px] text-zinc-400 block" x-text="item.subtitle"></span>
+                                            <span class="text-[11px] text-zinc-500 dark:text-zinc-400 block" x-text="item.subtitle"></span>
                                         </div>
                                     </div>
                                     <span class="text-[10px] px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 font-medium">Buka Kasir &rarr;</span>
@@ -159,7 +159,7 @@
                 <!-- Group 4: Navigation / Quick Jump -->
                 <template x-if="results.navigation && results.navigation.length > 0">
                     <div>
-                        <div class="px-2 pb-1.5 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <div class="px-2 pb-1.5 text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
                             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                             </svg>
@@ -176,10 +176,10 @@
                                         </div>
                                         <div>
                                             <span class="font-bold text-zinc-900 dark:text-zinc-100 block" x-text="nav.title"></span>
-                                            <span class="text-[11px] text-zinc-400 block" x-text="nav.description"></span>
+                                            <span class="text-[11px] text-zinc-500 dark:text-zinc-400 block" x-text="nav.description"></span>
                                         </div>
                                     </div>
-                                    <span class="text-zinc-400 text-xs group-hover:text-zinc-600 dark:group-hover:text-zinc-200">↵</span>
+                                    <span class="text-zinc-500 dark:text-zinc-400 text-xs group-hover:text-zinc-700 dark:group-hover:text-zinc-200">↵</span>
                                 </a>
                             </template>
                         </div>
@@ -193,13 +193,13 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <p class="mt-2 text-xs font-semibold text-zinc-700 dark:text-zinc-300">Tidak ada hasil ditemukan</p>
-                        <p class="text-[11px] text-zinc-400 mt-0.5">Coba cari dengan kata kunci lain seperti username, alamat IP, nomor invoice, atau nama menu</p>
+                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">Coba cari dengan kata kunci lain seperti username, alamat IP, nomor invoice, atau nama menu</p>
                     </div>
                 </template>
             </div>
 
             <!-- Footer Hints -->
-            <div class="flex items-center justify-between px-4 py-2.5 sm:px-6 bg-zinc-50 dark:bg-zinc-800/50 text-[11px] text-zinc-400">
+            <div class="flex items-center justify-between px-4 py-2.5 sm:px-6 bg-zinc-50 dark:bg-zinc-800/50 text-[11px] text-zinc-500 dark:text-zinc-400">
                 <div class="flex items-center gap-4">
                     <span>Tekan <kbd class="font-mono bg-white dark:bg-zinc-700 px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-600 text-zinc-600 dark:text-zinc-300">↵</kbd> untuk memilih</span>
                     <span><kbd class="font-mono bg-white dark:bg-zinc-700 px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-600 text-zinc-600 dark:text-zinc-300">ESC</kbd> untuk menutup</span>

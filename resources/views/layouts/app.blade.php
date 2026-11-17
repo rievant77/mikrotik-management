@@ -215,20 +215,44 @@
             </div>
 
             <!-- Router Connection Status Widget in Sidebar Footer -->
-            <div class="p-4 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50">
+            @php
+                $cachedResource = $routerResource ?? \Illuminate\Support\Facades\Cache::get('router:system_resource', []);
+                $isRouterOnline = !empty($appSetting?->is_active) && !empty($appSetting?->last_successful_poll_at) && ($appSetting->last_error_at === null || $appSetting->last_successful_poll_at->gt($appSetting->last_error_at));
+                $boardName = $cachedResource['board-name'] ?? ($appSetting?->name ?? 'MikroTik');
+                $osVersion = !empty($cachedResource['version']) ? ('v' . $cachedResource['version']) : ($isRouterOnline ? 'RouterOS' : 'Offline');
+                $cpuDisplay = isset($cachedResource['cpu-load']) ? ('CPU: ' . $cachedResource['cpu-load'] . '%') : ($isRouterOnline ? 'Connected' : 'Disconnected');
+                $hostDisplay = $appSetting?->host ?? '127.0.0.1';
+            @endphp
+            <div class="p-4 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50"
+                 x-data="{
+                    isOnline: {{ $isRouterOnline ? 'true' : 'false' }},
+                    name: '{{ addslashes($boardName) }}',
+                    version: '{{ addslashes($osVersion) }}',
+                    cpu: '{{ addslashes($cpuDisplay) }}',
+                    host: '{{ addslashes($hostDisplay) }}'
+                 }"
+                 @router-telemetry-update.window="
+                    if ($event.detail) {
+                        isOnline = $event.detail.is_online ?? isOnline;
+                        if ($event.detail.board_name) name = $event.detail.board_name;
+                        if ($event.detail.version) version = 'v' + $event.detail.version;
+                        if ($event.detail.cpu_load !== undefined) cpu = 'CPU: ' + $event.detail.cpu_load + '%';
+                        if ($event.detail.host) host = $event.detail.host;
+                    }
+                 ">
                 <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <span class="relative flex h-2.5 w-2.5">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                    <div class="flex items-center gap-2 min-w-0">
+                        <span class="relative flex h-2.5 w-2.5 shrink-0">
+                            <span :class="isOnline ? 'animate-ping opacity-75 bg-emerald-400' : 'opacity-0'" class="absolute inline-flex h-full w-full rounded-full"></span>
+                            <span :class="isOnline ? 'bg-emerald-500' : 'bg-rose-500'" class="relative inline-flex rounded-full h-2.5 w-2.5"></span>
                         </span>
-                        <span class="text-xs font-semibold text-zinc-800 dark:text-zinc-200">CCR1009-Core</span>
+                        <span class="text-xs font-semibold text-zinc-800 dark:text-zinc-200 truncate" x-text="name">{{ $boardName }}</span>
                     </div>
-                    <span class="text-[10px] text-zinc-400">v7.16</span>
+                    <span class="text-[10px] text-zinc-500 dark:text-zinc-400 font-mono shrink-0 ml-1" x-text="version">{{ $osVersion }}</span>
                 </div>
-                <div class="mt-1 flex items-center justify-between text-[11px] text-zinc-500 dark:text-zinc-400">
-                    <span>CPU: 8%</span>
-                    <span>192.168.88.1</span>
+                <div class="mt-1 flex items-center justify-between text-[11px] text-zinc-600 dark:text-zinc-400">
+                    <span x-text="cpu">{{ $cpuDisplay }}</span>
+                    <span class="font-mono text-[10px] truncate ml-1" x-text="host">{{ $hostDisplay }}</span>
                 </div>
             </div>
         </aside>

@@ -222,6 +222,16 @@ class CollectorService
                 // Non-blocking
             }
 
+            // Cache system resource for sidebar widget
+            try {
+                $sysResource = $this->routerOs->getSystemResource();
+                if (!empty($sysResource)) {
+                    Cache::put('router:system_resource', $sysResource, 120);
+                }
+            } catch (\Throwable $e) {
+                // Non-blocking
+            }
+
             // Update Router status
             RouterSetting::where('is_active', true)->update([
                 'last_successful_poll_at' => $now,

@@ -584,7 +584,10 @@
                         if (data.today_revenue_formatted) this.stats.todayRevenueFormatted = data.today_revenue_formatted;
                         if (data.today_vouchers_sold !== undefined) this.stats.todayVouchersSold = data.today_vouchers_sold;
                         if (data.cpu_load !== undefined) this.stats.cpuLoad = data.cpu_load;
-                        if (data.router_info) this.routerInfo = data.router_info;
+                        if (data.router_info) {
+                            this.routerInfo = data.router_info;
+                            window.dispatchEvent(new CustomEvent('router-telemetry-update', { detail: data.router_info }));
+                        }
                         if (data.timestamp) this.lastPollTimestamp = data.timestamp;
                         if (data.top_consumers) this.topConsumers = data.top_consumers;
                         if (data.recent_users) this.recentUsers = data.recent_users;

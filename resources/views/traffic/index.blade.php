@@ -881,7 +881,7 @@
 
                         <!-- QUIC Checkbox -->
                         <div class="flex items-center gap-2 pt-1">
-                            <input type="checkbox" id="is_quic" x-model="sigForm.is_quic" class="rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500">
+                            <input type="checkbox" id="is_quic" x-model="sigForm.is_quic" class="rounded border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 text-indigo-600 focus:ring-indigo-500">
                             <label for="is_quic" class="text-xs text-zinc-700 dark:text-zinc-300">Dukung QUIC (HTTP/3 over UDP port 443)</label>
                         </div>
 

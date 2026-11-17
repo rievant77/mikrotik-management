@@ -273,7 +273,7 @@
                                 </div>
                                 <span class="font-bold text-sm">MikroTik Manager</span>
                             </div>
-                            <button @click="mobileMenuOpen = false" class="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200">
+                            <button @click="mobileMenuOpen = false" class="text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200">
                                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                 </svg>

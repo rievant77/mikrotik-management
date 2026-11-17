@@ -45,7 +45,7 @@
                     x-model="searchQuery" 
                     @input.debounce.200ms="performSearch()"
                     placeholder="Cari user hotspot, IP, MAC address, invoice, atau menu..." 
-                    class="h-10 w-full bg-transparent border-0 pl-3 pr-10 text-sm text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-0"
+                    class="h-10 w-full bg-transparent dark:bg-transparent border-0 dark:border-0 pl-3 pr-10 text-sm text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-0"
                 >
                 <div class="flex items-center gap-2">
                     <!-- Loading Spinner -->

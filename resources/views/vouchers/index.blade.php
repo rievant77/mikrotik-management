@@ -777,7 +777,7 @@
                     <input type="text" x-model="userForm.comment" placeholder="e.g. Voucher retail" class="w-full px-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100">
                 </div>
                 <div class="flex items-center gap-2 pt-1">
-                    <input type="checkbox" id="userIsActive" x-model="userForm.is_active" class="rounded text-zinc-900 focus:ring-zinc-500">
+                    <input type="checkbox" id="userIsActive" x-model="userForm.is_active" class="rounded border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 text-zinc-900 focus:ring-zinc-500">
                     <label for="userIsActive" class="font-medium text-zinc-700 dark:text-zinc-300 cursor-pointer">User Aktif (Bisa Login Hotspot)</label>
                 </div>
                 <div class="flex justify-end gap-2 pt-4 border-t border-zinc-100 dark:border-zinc-800">

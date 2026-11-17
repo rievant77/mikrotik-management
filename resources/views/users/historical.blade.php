@@ -40,11 +40,11 @@
             <form @submit.prevent="applyCustomRange()" class="flex flex-wrap items-center gap-3 text-xs">
                 <span class="font-medium text-zinc-700 dark:text-zinc-300">Rentang Kustom:</span>
                 <div class="flex items-center gap-2">
-                    <label class="text-zinc-400 text-[11px]">Dari:</label>
+                    <label class="text-zinc-500 dark:text-zinc-400 text-[11px]">Dari:</label>
                     <input type="date" x-model="customStart" class="px-2.5 py-1 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100">
                 </div>
                 <div class="flex items-center gap-2">
-                    <label class="text-zinc-400 text-[11px]">Sampai:</label>
+                    <label class="text-zinc-500 dark:text-zinc-400 text-[11px]">Sampai:</label>
                     <input type="date" x-model="customEnd" class="px-2.5 py-1 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100">
                 </div>
                 <button type="submit" class="px-3 py-1 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-semibold rounded-lg hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors shadow-xs">
@@ -56,29 +56,29 @@
         <!-- Summary Aggregated Stats -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-xs">
-                <span class="text-xs text-zinc-400 uppercase font-medium">Total Konsumsi (Rx + Tx)</span>
+                <span class="text-xs text-zinc-500 dark:text-zinc-400 uppercase font-medium">Total Konsumsi (Rx + Tx)</span>
                 <h4 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mt-1 font-mono">{{ \App\Support\FormatHelper::formatBytes($totalDataPeriod, 1) }}</h4>
-                <div class="flex items-center justify-between text-[11px] text-zinc-400 mt-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                <div class="flex items-center justify-between text-[11px] text-zinc-500 dark:text-zinc-400 mt-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
                     <span class="text-emerald-600 dark:text-emerald-400 font-medium">Rx: {{ \App\Support\FormatHelper::formatBytes(collect($summaries)->sum('total_out'), 1) }}</span>
                     <span class="text-sky-600 dark:text-sky-400 font-medium">Tx: {{ \App\Support\FormatHelper::formatBytes(collect($summaries)->sum('total_in'), 1) }}</span>
                 </div>
             </div>
             <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-xs">
-                <span class="text-xs text-zinc-400 uppercase font-medium">Total Sesi Tercatat</span>
+                <span class="text-xs text-zinc-500 dark:text-zinc-400 uppercase font-medium">Total Sesi Tercatat</span>
                 <h4 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mt-1">{{ \App\Support\FormatHelper::formatNumber($totalSessionsPeriod ?? 0) }} Sesi</h4>
-                <p class="text-[11px] text-zinc-400 mt-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">Akumulasi login koneksi</p>
+                <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">Akumulasi login koneksi</p>
             </div>
             <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-xs">
-                <span class="text-xs text-zinc-400 uppercase font-medium">Pengguna Unik Aktif</span>
+                <span class="text-xs text-zinc-500 dark:text-zinc-400 uppercase font-medium">Pengguna Unik Aktif</span>
                 <h4 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mt-1">{{ \App\Support\FormatHelper::formatNumber($uniqueUsersCount ?? 0) }} User</h4>
-                <p class="text-[11px] text-zinc-400 mt-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">Hotspot Voucher + Member</p>
+                <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">Hotspot Voucher + Member</p>
             </div>
             <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-xs">
-                <span class="text-xs text-zinc-400 uppercase font-medium">Rata-rata Kuota / User</span>
+                <span class="text-xs text-zinc-500 dark:text-zinc-400 uppercase font-medium">Rata-rata Kuota / User</span>
                 <h4 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mt-1 font-mono">
                     {{ \App\Support\FormatHelper::formatBytes($uniqueUsersCount > 0 ? ($totalDataPeriod / $uniqueUsersCount) : 0, 1) }}
                 </h4>
-                <p class="text-[11px] text-zinc-400 mt-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">Konsumsi rata-rata</p>
+                <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">Konsumsi rata-rata</p>
             </div>
         </div>
 
@@ -93,7 +93,7 @@
                             Tren Konsumsi Data Harian (MB)
                         @endif
                     </h3>
-                    <p class="text-[11px] text-zinc-400 mt-0.5">
+                    <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">
                         @if($isHourlyChart ?? false)
                             Distribusi volume data unduh (Rx) dan unggah (Tx) per-jam pada tanggal {{ \App\Support\FormatHelper::formatDateIndo($startDate) }}
                         @else
@@ -120,7 +120,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 <!-- Search Input -->
                 <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400 dark:text-zinc-500">
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
@@ -130,7 +130,7 @@
                         x-model="search" 
                         @input="currentPage = 1"
                         placeholder="Cari user..." 
-                        class="w-full pl-9 pr-3 py-2 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:focus:ring-zinc-600"
+                        class="w-full pl-9 pr-3 py-2 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:focus:ring-zinc-600"
                     >
                 </div>
 
@@ -182,7 +182,7 @@
         <!-- Empty State -->
         <template x-if="filteredSummaries.length === 0">
             <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-12 text-center shadow-xs">
-                <div class="w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mx-auto text-zinc-400">
+                <div class="w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mx-auto text-zinc-400 dark:text-zinc-500">
                     <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
@@ -198,7 +198,7 @@
                 <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">
                     Daftar Pengguna (<span x-text="formatNumber(filteredSummaries.length)"></span>)
                 </span>
-                <span class="text-[11px] text-zinc-400">Diurutkan berdasarkan pemakaian aktual</span>
+                <span class="text-[11px] text-zinc-500 dark:text-zinc-400">Diurutkan berdasarkan pemakaian aktual</span>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs">
@@ -227,7 +227,7 @@
                                         </div>
                                         <div class="min-w-0">
                                             <a :href="'/users/' + item.username" class="font-bold text-zinc-900 dark:text-zinc-100 hover:underline truncate block" x-text="item.username"></a>
-                                            <div class="text-[10px] text-zinc-400 truncate" x-text="'Terakhir: ' + (item.last_seen || '-')"></div>
+                                            <div class="text-[10px] text-zinc-500 dark:text-zinc-400 truncate" x-text="'Terakhir: ' + (item.last_seen || '-')"></div>
                                         </div>
                                     </div>
                                 </td>
@@ -328,7 +328,7 @@
                         type="button" 
                         @click="goToPage(currentPage - 1)" 
                         :disabled="currentPage === 1" 
-                        :class="currentPage === 1 ? 'opacity-40 cursor-not-allowed text-zinc-400' : 'hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300'"
+                        :class="currentPage === 1 ? 'opacity-40 cursor-not-allowed text-zinc-400 dark:text-zinc-600' : 'hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300'"
                         class="px-2.5 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 font-medium transition-colors"
                     >
                         &larr; Prev
@@ -341,7 +341,7 @@
                             :disabled="typeof p !== 'number'" 
                             :class="p === currentPage 
                                 ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 font-bold border-zinc-900 dark:border-zinc-100' 
-                                : (typeof p === 'number' ? 'hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700' : 'cursor-default border-transparent text-zinc-400')"
+                                : (typeof p === 'number' ? 'hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700' : 'cursor-default border-transparent text-zinc-400 dark:text-zinc-600')"
                             class="min-w-8 py-1.5 px-2 rounded-lg text-center font-medium transition-colors"
                             x-text="p"
                         >
@@ -352,7 +352,7 @@
                         type="button" 
                         @click="goToPage(currentPage + 1)" 
                         :disabled="currentPage === totalPages" 
-                        :class="currentPage === totalPages ? 'opacity-40 cursor-not-allowed text-zinc-400' : 'hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300'"
+                        :class="currentPage === totalPages ? 'opacity-40 cursor-not-allowed text-zinc-400 dark:text-zinc-600' : 'hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300'"
                         class="px-2.5 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 font-medium transition-colors"
                     >
                         Next &rarr;

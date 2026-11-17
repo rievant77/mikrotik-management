@@ -34,7 +34,7 @@
             >
                 <div class="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
                     <span class="text-xs font-medium uppercase tracking-wider">Total Perangkat</span>
-                    <svg class="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="w-4 h-4 text-zinc-400 dark:text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
                 </div>
@@ -156,9 +156,9 @@
                 :class="statusFilter === 'offline' ? 'ring-2 ring-zinc-500 border-transparent bg-zinc-100/60 dark:bg-zinc-800/60' : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700'"
                 title="Klik untuk memfilter perangkat offline / expired"
             >
-                <div class="flex items-center justify-between text-zinc-400 dark:text-zinc-500">
+                <div class="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
                     <span class="text-xs font-medium uppercase tracking-wider">Offline / Idle</span>
-                    <svg class="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="w-4 h-4 text-zinc-400 dark:text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                     </svg>
                 </div>
@@ -166,7 +166,7 @@
                     {{ \App\Support\FormatHelper::formatNumber($stats['offline'] ?? 0) }}
                 </h3>
                 <div class="flex items-center justify-between mt-1">
-                    <p class="text-[11px] text-zinc-400 dark:text-zinc-500">Lease Idle</p>
+                    <p class="text-[11px] text-zinc-500 dark:text-zinc-400">Lease Idle</p>
                     <span x-show="statusFilter === 'offline'" class="text-[10px] font-semibold text-zinc-500 dark:text-zinc-400">✓ Filter Aktif</span>
                 </div>
             </button>
@@ -180,7 +180,7 @@
                     type="text" 
                     x-model="search" 
                     placeholder="Cari Hostname, Brand (Samsung/Xiaomi/Apple), MAC, IP, User, atau Catatan..." 
-                    class="w-full pl-9 pr-8 py-2 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:focus:ring-zinc-600"
+                    class="w-full pl-9 pr-8 py-2 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:focus:ring-zinc-600"
                 >
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400 dark:text-zinc-500">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -191,7 +191,7 @@
                     type="button"
                     x-show="search.length > 0" 
                     @click="search = ''" 
-                    class="absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 text-xs font-bold"
+                    class="absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-200 text-xs font-bold"
                 >
                     ✕
                 </button>
@@ -275,7 +275,7 @@
                         <label class="text-zinc-500 dark:text-zinc-400 text-xs font-medium">Kategori:</label>
                         <select 
                             x-model="categoryFilter" 
-                            class="px-2.5 py-1.5 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 font-medium focus:outline-none focus:ring-1 focus:ring-zinc-400"
+                            class="px-2.5 py-1.5 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 font-medium focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600"
                         >
                             <option value="all">Semua Kategori</option>
                             <option value="voucher">Voucher (Profit)</option>
@@ -434,7 +434,7 @@
                                 <button 
                                     type="button"
                                     @click="copyText(device.ip_address, 'IP Address')" 
-                                    class="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors"
+                                    class="p-1 text-zinc-400 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-200 transition-colors"
                                     title="Salin IP"
                                 >
                                     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -452,7 +452,7 @@
                                 <button 
                                     type="button"
                                     @click="copyText(device.mac_address, 'MAC Address')" 
-                                    class="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors"
+                                    class="p-1 text-zinc-400 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-200 transition-colors"
                                     title="Salin MAC"
                                 >
                                     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -539,7 +539,7 @@
                                         <button 
                                             type="button"
                                             @click="copyText(device.mac_address, 'MAC Address')" 
-                                            class="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors"
+                                            class="p-1 text-zinc-400 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-200 transition-colors"
                                             title="Salin MAC"
                                         >
                                             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -556,7 +556,7 @@
                                         <button 
                                             type="button"
                                             @click="copyText(device.ip_address, 'IP Address')" 
-                                            class="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors"
+                                            class="p-1 text-zinc-400 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-200 transition-colors"
                                             title="Salin IP"
                                         >
                                             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -577,7 +577,7 @@
                                             <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-300 dark:border-rose-800">
                                                 Diblokir
                                             </span>
-                                            <div class="text-[10px] text-zinc-400 mt-0.5 truncate max-w-[140px]" x-text="device.binding_comment || 'IP Binding'"></div>
+                                            <div class="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5 truncate max-w-[140px]" x-text="device.binding_comment || 'IP Binding'"></div>
                                         </div>
                                     </template>
                                     <template x-if="!device.username && !(device.status === 'blocked' || device.is_blocked) && device.is_bypassed">
@@ -585,7 +585,7 @@
                                             <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300 border border-teal-300 dark:border-teal-800">
                                                 Bypassed
                                             </span>
-                                            <div class="text-[10px] text-zinc-400 mt-0.5 truncate max-w-[140px]" x-text="device.binding_comment || 'Tanpa Login'"></div>
+                                            <div class="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5 truncate max-w-[140px]" x-text="device.binding_comment || 'Tanpa Login'"></div>
                                         </div>
                                     </template>
                                     <template x-if="!device.username && !(device.status === 'blocked' || device.is_blocked) && !device.is_bypassed">
@@ -851,14 +851,14 @@
                                 <span class="text-zinc-500 dark:text-zinc-400 text-[11px]">IP Address</span>
                                 <div class="font-mono font-bold text-zinc-900 dark:text-zinc-100 mt-1 flex items-center justify-between">
                                     <span x-text="selectedDevice.ip_address || '-'"></span>
-                                    <button type="button" @click="copyText(selectedDevice.ip_address, 'IP Address')" class="text-xs text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200">Salin</button>
+                                    <button type="button" @click="copyText(selectedDevice.ip_address, 'IP Address')" class="text-xs text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200">Salin</button>
                                 </div>
                             </div>
                             <div class="bg-zinc-50 dark:bg-zinc-800/50 p-3 rounded-lg border border-zinc-200 dark:border-zinc-700">
                                 <span class="text-zinc-500 dark:text-zinc-400 text-[11px]">MAC Address</span>
                                 <div class="font-mono font-bold text-zinc-900 dark:text-zinc-100 mt-1 flex items-center justify-between">
                                     <span x-text="selectedDevice.mac_address || '-'"></span>
-                                    <button type="button" @click="copyText(selectedDevice.mac_address, 'MAC Address')" class="text-xs text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200">Salin</button>
+                                    <button type="button" @click="copyText(selectedDevice.mac_address, 'MAC Address')" class="text-xs text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200">Salin</button>
                                 </div>
                             </div>
                             <div class="bg-zinc-50 dark:bg-zinc-800/50 p-3 rounded-lg border border-zinc-200 dark:border-zinc-700">
@@ -875,7 +875,7 @@
                     <!-- TAB 2: Histori User & Akumulasi Kuota -->
                     <div x-show="activeModalTab === 'history'" class="space-y-3 text-xs">
                         <!-- Loading State -->
-                        <div x-show="loadingDetail" class="py-8 text-center text-zinc-400">
+                        <div x-show="loadingDetail" class="py-8 text-center text-zinc-500 dark:text-zinc-400">
                             <span class="inline-block animate-spin text-lg">⏳</span>
                             <p class="mt-2 text-xs">Mengambil riwayat sesi perangkat...</p>
                         </div>
@@ -887,15 +887,15 @@
                                 <span class="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Akumulasi Total Kuota Perangkat Ini</span>
                                 <div class="grid grid-cols-3 gap-2 mt-2 pt-2 border-t border-zinc-200/80 dark:border-zinc-700/80 text-center">
                                     <div>
-                                        <div class="text-[10px] text-zinc-400">Total Terpakai</div>
+                                        <div class="text-[10px] text-zinc-500 dark:text-zinc-400">Total Terpakai</div>
                                         <div class="text-sm font-bold text-zinc-900 dark:text-zinc-100 font-mono mt-0.5" x-text="deviceDetail?.quota_stats?.total_bytes_formatted || '0 B'"></div>
                                     </div>
                                     <div>
-                                        <div class="text-[10px] text-zinc-400">Download (Rx)</div>
+                                        <div class="text-[10px] text-zinc-500 dark:text-zinc-400">Download (Rx)</div>
                                         <div class="text-sm font-bold text-emerald-600 dark:text-emerald-400 font-mono mt-0.5" x-text="deviceDetail?.quota_stats?.download_formatted || '0 B'"></div>
                                     </div>
                                     <div>
-                                        <div class="text-[10px] text-zinc-400">Upload (Tx)</div>
+                                        <div class="text-[10px] text-zinc-500 dark:text-zinc-400">Upload (Tx)</div>
                                         <div class="text-sm font-bold text-sky-600 dark:text-sky-400 font-mono mt-0.5" x-text="deviceDetail?.quota_stats?.upload_formatted || '0 B'"></div>
                                     </div>
                                 </div>
@@ -905,7 +905,7 @@
                             <div>
                                 <div class="flex items-center justify-between mb-1.5">
                                     <span class="text-xs font-bold text-zinc-900 dark:text-zinc-100">Daftar Sesi & Voucher Terkait:</span>
-                                    <span class="text-[11px] text-zinc-400" x-text="formatNumber(deviceDetail?.quota_stats?.session_count || 0) + ' sesi terekam'"></span>
+                                    <span class="text-[11px] text-zinc-500 dark:text-zinc-400" x-text="formatNumber(deviceDetail?.quota_stats?.session_count || 0) + ' sesi terekam'"></span>
                                 </div>
 
                                 <div class="max-h-56 overflow-y-auto space-y-1.5 pr-0.5 no-scrollbar">
@@ -920,16 +920,16 @@
                                                         x-text="item.status"
                                                     ></span>
                                                 </div>
-                                                <div class="text-[10px] text-zinc-400 mt-0.5" x-text="item.started_at + ' • Durasi: ' + item.duration"></div>
+                                                <div class="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5" x-text="item.started_at + ' • Durasi: ' + item.duration"></div>
                                             </div>
                                             <div class="text-right">
                                                 <div class="font-mono font-bold text-zinc-800 dark:text-zinc-200 text-xs" x-text="item.total_bytes_formatted"></div>
-                                                <div class="text-[10px] text-zinc-400" x-text="'↓' + item.bytes_out_formatted + ' ↑' + item.bytes_in_formatted"></div>
+                                                <div class="text-[10px] text-zinc-500 dark:text-zinc-400" x-text="'↓' + item.bytes_out_formatted + ' ↑' + item.bytes_in_formatted"></div>
                                             </div>
                                         </div>
                                     </template>
                                     <template x-if="!deviceDetail?.session_history || deviceDetail.session_history.length === 0">
-                                        <div class="py-6 text-center text-zinc-400 bg-zinc-50 dark:bg-zinc-800/20 rounded-lg border border-dashed border-zinc-200 dark:border-zinc-700">
+                                        <div class="py-6 text-center text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-800/20 rounded-lg border border-dashed border-zinc-200 dark:border-zinc-700">
                                             Belum ada riwayat sesi login yang tersimpan untuk perangkat ini.
                                         </div>
                                     </template>
@@ -955,7 +955,7 @@
                                 type="button"
                                 @click="doKick()"
                                 :disabled="actionLoading || selectedDevice.status !== 'online'"
-                                :class="selectedDevice.status === 'online' ? 'bg-rose-600 hover:bg-rose-700 text-white shadow-xs' : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-400 cursor-not-allowed'"
+                                :class="selectedDevice.status === 'online' ? 'bg-rose-600 hover:bg-rose-700 text-white shadow-xs' : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-400 dark:text-zinc-500 cursor-not-allowed'"
                                 class="px-3.5 py-2 rounded-lg font-semibold text-xs shrink-0 transition-colors"
                             >
                                 <span x-text="actionLoading ? 'Memproses...' : 'Kick Sesi'"></span>
@@ -966,7 +966,7 @@
                         <div class="p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl border border-zinc-200 dark:border-zinc-700 flex items-center justify-between gap-3">
                             <div>
                                 <div class="font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
-                                    <svg class="w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <svg class="w-4 h-4 text-zinc-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                                     </svg>
                                     <span>Jadikan IP Statis (Make Static)</span>
@@ -977,7 +977,7 @@
                                 type="button"
                                 @click="doMakeStatic()"
                                 :disabled="actionLoading || !selectedDevice.dynamic"
-                                :class="selectedDevice.dynamic ? 'bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 shadow-xs' : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-400 cursor-not-allowed'"
+                                :class="selectedDevice.dynamic ? 'bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 shadow-xs' : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-400 dark:text-zinc-500 cursor-not-allowed'"
                                 class="px-3.5 py-2 rounded-lg font-semibold text-xs shrink-0 transition-colors"
                             >
                                 <span x-text="!selectedDevice.dynamic ? 'Sudah Statis' : (actionLoading ? 'Memproses...' : 'Jadikan Statis')"></span>
@@ -1026,7 +1026,7 @@
                         <!-- Action 4: Set Device Alias / Comment -->
                         <div class="p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl border border-zinc-200 dark:border-zinc-700 space-y-2">
                             <div class="font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
-                                <svg class="w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg class="w-4 h-4 text-zinc-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                                 </svg>
                                 <span>Beri Nama Alias / Catatan</span>
@@ -1036,7 +1036,7 @@
                                     type="text" 
                                     x-model="deviceAliasInput" 
                                     placeholder="Contoh: HP Kasir 1 / Laptop Admin" 
-                                    class="flex-1 px-3 py-1.5 text-xs rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-400"
+                                    class="flex-1 px-3 py-1.5 text-xs rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:focus:ring-zinc-600"
                                 >
                                 <button 
                                     type="button" 
@@ -1053,7 +1053,7 @@
                     <!-- TAB 4: Aktivitas & Riwayat Web -->
                     <div x-show="activeModalTab === 'web'" class="space-y-4 text-xs">
                         <!-- Loading State -->
-                        <div x-show="loadingWebActivity" class="py-8 text-center text-zinc-400">
+                        <div x-show="loadingWebActivity" class="py-8 text-center text-zinc-500 dark:text-zinc-400">
                             <span class="inline-block animate-spin text-lg">⏳</span>
                             <p class="mt-2 text-xs">Mengambil data koneksi & riwayat web dari MikroTik...</p>
                         </div>
@@ -1090,17 +1090,17 @@
                                                         <span class="font-bold text-zinc-900 dark:text-zinc-100 truncate" x-text="conn.domain"></span>
                                                         <span class="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300" x-text="conn.category_label"></span>
                                                     </div>
-                                                    <div class="text-[10px] text-zinc-400 font-mono" x-text="conn.dst_ip + ':' + conn.port + ' (' + conn.protocol + ' ' + conn.state + ')'"></div>
+                                                    <div class="text-[10px] text-zinc-500 dark:text-zinc-400 font-mono" x-text="conn.dst_ip + ':' + conn.port + ' (' + conn.protocol + ' ' + conn.state + ')'"></div>
                                                 </div>
                                             </div>
                                             <div class="text-right shrink-0">
                                                 <div class="font-mono font-bold text-zinc-800 dark:text-zinc-200 text-xs" x-text="conn.total_bytes_formatted"></div>
-                                                <div class="text-[10px] text-zinc-400" x-text="'↓' + conn.bytes_out_formatted + ' ↑' + conn.bytes_in_formatted"></div>
+                                                <div class="text-[10px] text-zinc-500 dark:text-zinc-400" x-text="'↓' + conn.bytes_out_formatted + ' ↑' + conn.bytes_in_formatted"></div>
                                             </div>
                                         </div>
                                     </template>
                                     <template x-if="!webActivityData?.live_connections || webActivityData.live_connections.length === 0">
-                                        <div class="py-4 text-center text-zinc-400 bg-zinc-50 dark:bg-zinc-800/20 rounded-lg border border-dashed border-zinc-200 dark:border-zinc-700 text-xs">
+                                        <div class="py-4 text-center text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-800/20 rounded-lg border border-dashed border-zinc-200 dark:border-zinc-700 text-xs">
                                             Tidak ada koneksi web aktif yang terdeteksi saat ini.
                                         </div>
                                     </template>
@@ -1115,7 +1115,7 @@
                                         type="text" 
                                         x-model="webSearch" 
                                         placeholder="Cari domain..." 
-                                        class="px-2.5 py-1 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 focus:outline-none w-36 sm:w-44"
+                                        class="px-2.5 py-1 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:focus:ring-zinc-600 w-36 sm:w-44"
                                     >
                                 </div>
 
@@ -1131,17 +1131,17 @@
                                                         <span class="font-bold text-zinc-900 dark:text-zinc-100 truncate" x-text="item.domain"></span>
                                                         <span class="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300" x-text="item.category_label"></span>
                                                     </div>
-                                                    <div class="text-[10px] text-zinc-400 mt-0.5" x-text="'Terakhir: ' + item.last_seen_formatted + ' (' + item.last_seen_datetime + ')'"></div>
+                                                    <div class="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5" x-text="'Terakhir: ' + item.last_seen_formatted + ' (' + item.last_seen_datetime + ')'"></div>
                                                 </div>
                                             </div>
                                             <div class="text-right shrink-0">
                                                 <div class="font-semibold text-zinc-800 dark:text-zinc-200 text-xs" x-text="formatNumber(item.hit_count) + 'x diakses'"></div>
-                                                <div class="text-[10px] text-zinc-400 font-mono" x-text="item.total_bytes_formatted"></div>
+                                                <div class="text-[10px] text-zinc-500 dark:text-zinc-400 font-mono" x-text="item.total_bytes_formatted"></div>
                                             </div>
                                         </div>
                                     </template>
                                     <template x-if="filteredWebHistory.length === 0">
-                                        <div class="py-6 text-center text-zinc-400 bg-zinc-50 dark:bg-zinc-800/20 rounded-lg border border-dashed border-zinc-200 dark:border-zinc-700 text-xs">
+                                        <div class="py-6 text-center text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-800/20 rounded-lg border border-dashed border-zinc-200 dark:border-zinc-700 text-xs">
                                             Belum ada riwayat web yang tersimpan untuk perangkat ini.
                                         </div>
                                     </template>
@@ -1152,7 +1152,7 @@
 
                     <!-- Modal Footer -->
                     <div class="flex justify-between items-center pt-3 border-t border-zinc-100 dark:border-zinc-800">
-                        <div class="text-[11px] text-zinc-400">
+                        <div class="text-[11px] text-zinc-500 dark:text-zinc-400">
                             MAC: <span class="font-mono font-medium text-zinc-600 dark:text-zinc-300" x-text="selectedDevice.mac_address"></span>
                         </div>
                         <div class="flex items-center gap-2">

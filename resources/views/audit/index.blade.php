@@ -10,7 +10,7 @@
         <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden shadow-xs">
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs">
-                    <thead class="bg-zinc-50/80 dark:bg-zinc-800/50 text-[11px] font-semibold text-zinc-400 uppercase border-b border-zinc-200 dark:border-zinc-800">
+                    <thead class="bg-zinc-50/80 dark:bg-zinc-800/50 text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase border-b border-zinc-200 dark:border-zinc-800">
                         <tr>
                             <th class="py-3.5 px-4">Waktu</th>
                             <th class="py-3.5 px-4">User / Operator</th>
@@ -22,27 +22,27 @@
                     </thead>
                     <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
                         <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/40">
-                            <td class="py-3.5 px-4 font-mono text-zinc-500">{{ \App\Support\FormatHelper::formatDateTimeShort(now()->subMinutes(30)) }}</td>
+                            <td class="py-3.5 px-4 font-mono text-zinc-500 dark:text-zinc-400">{{ \App\Support\FormatHelper::formatDateTimeShort(now()->subMinutes(30)) }}</td>
                             <td class="py-3.5 px-4 font-semibold text-zinc-900 dark:text-zinc-100">System (Collector)</td>
                             <td class="py-3.5 px-4 font-mono">voucher_activated</td>
                             <td class="py-3.5 px-4 text-zinc-600 dark:text-zinc-300">Voucher: VC-89241</td>
-                            <td class="py-3.5 px-4 font-mono text-zinc-400">127.0.0.1</td>
+                            <td class="py-3.5 px-4 font-mono text-zinc-500 dark:text-zinc-400">127.0.0.1</td>
                             <td class="py-3.5 px-4 text-right"><x-badge type="success">Success</x-badge></td>
                         </tr>
                         <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/40">
-                            <td class="py-3.5 px-4 font-mono text-zinc-500">{{ \App\Support\FormatHelper::formatDateTimeShort(now()->subHours(2)) }}</td>
+                            <td class="py-3.5 px-4 font-mono text-zinc-500 dark:text-zinc-400">{{ \App\Support\FormatHelper::formatDateTimeShort(now()->subHours(2)) }}</td>
                             <td class="py-3.5 px-4 font-semibold text-zinc-900 dark:text-zinc-100">Admin (Kaligata)</td>
                             <td class="py-3.5 px-4 font-mono">monthly_payment_created</td>
                             <td class="py-3.5 px-4 text-zinc-600 dark:text-zinc-300">Customer: Budi Santoso (Rp 150.000)</td>
-                            <td class="py-3.5 px-4 font-mono text-zinc-400">192.168.88.10</td>
+                            <td class="py-3.5 px-4 font-mono text-zinc-500 dark:text-zinc-400">192.168.88.10</td>
                             <td class="py-3.5 px-4 text-right"><x-badge type="success">Success</x-badge></td>
                         </tr>
                         <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/40">
-                            <td class="py-3.5 px-4 font-mono text-zinc-500">{{ \App\Support\FormatHelper::formatDateTimeShort(now()->subHours(3)) }}</td>
+                            <td class="py-3.5 px-4 font-mono text-zinc-500 dark:text-zinc-400">{{ \App\Support\FormatHelper::formatDateTimeShort(now()->subHours(3)) }}</td>
                             <td class="py-3.5 px-4 font-semibold text-zinc-900 dark:text-zinc-100">Admin (Kaligata)</td>
                             <td class="py-3.5 px-4 font-mono">cashier_shift_opened</td>
                             <td class="py-3.5 px-4 text-zinc-600 dark:text-zinc-300">Shift #104 (Modal: Rp 200.000)</td>
-                            <td class="py-3.5 px-4 font-mono text-zinc-400">192.168.88.10</td>
+                            <td class="py-3.5 px-4 font-mono text-zinc-500 dark:text-zinc-400">192.168.88.10</td>
                             <td class="py-3.5 px-4 text-right"><x-badge type="success">Success</x-badge></td>
                         </tr>
                     </tbody>

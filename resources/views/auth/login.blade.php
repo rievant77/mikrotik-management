@@ -42,7 +42,7 @@
         <div class="mt-8 bg-white dark:bg-zinc-900 py-8 px-6 shadow-sm border border-zinc-200 dark:border-zinc-800 rounded-2xl sm:px-10">
             @if(session('info'))
                 <div class="mb-4 p-3 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs flex items-center gap-2 border border-zinc-200 dark:border-zinc-700">
-                    <svg class="w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="w-4 h-4 text-zinc-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <span>{{ session('info') }}</span>
@@ -73,7 +73,7 @@
                         <input type="checkbox" name="remember" class="rounded border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 focus:ring-zinc-500">
                         <span>Ingat saya</span>
                     </label>
-                    <span class="text-zinc-400 text-[11px]">Default: admin@mikrotik.lan</span>
+                    <span class="text-zinc-500 dark:text-zinc-400 text-[11px]">Default: admin@mikrotik.lan</span>
                 </div>
 
                 <div class="pt-2">
@@ -85,7 +85,7 @@
         </div>
 
         <!-- Footer / Theme Toggle -->
-        <div class="mt-6 flex items-center justify-between text-xs text-zinc-400 px-2">
+        <div class="mt-6 flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400 px-2">
             <span>&copy; {{ date('Y') }} MikroTik Manager</span>
             <div class="flex items-center gap-2">
                 <span>Tema:</span>

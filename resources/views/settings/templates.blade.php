@@ -12,7 +12,7 @@
             </div>
             <div class="flex items-center gap-2">
                 <a href="{{ route('vouchers.index') }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors shadow-xs">
-                    <svg class="w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="w-4 h-4 text-zinc-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
                     </svg>
                     <span>Daftar Voucher</span>
@@ -33,7 +33,7 @@
                             <span class="w-6 h-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center font-bold text-xs text-zinc-700 dark:text-zinc-300">1</span>
                             <div>
                                 <h3 class="font-bold text-sm text-zinc-900 dark:text-zinc-100">Identitas & Header Voucher</h3>
-                                <p class="text-[11px] text-zinc-400">Header yang tercetak di bagian atas kertas struk atau lembar voucher</p>
+                                <p class="text-[11px] text-zinc-500 dark:text-zinc-400">Header yang tercetak di bagian atas kertas struk atau lembar voucher</p>
                             </div>
                         </div>
 
@@ -48,7 +48,7 @@
                                 class="w-full px-3.5 py-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 text-xs focus:ring-2 focus:ring-zinc-400" 
                                 placeholder="e.g. WARKOP DIGITAL HOTSPOT"
                             >
-                            <span class="text-[10px] text-zinc-400 mt-1 block">Nama utama hotspot yang dicetak tebal di baris paling atas</span>
+                            <span class="text-[10px] text-zinc-500 dark:text-zinc-400 mt-1 block">Nama utama hotspot yang dicetak tebal di baris paling atas</span>
                         </div>
 
                         <div>
@@ -74,7 +74,7 @@
                                     class="w-full px-3.5 py-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 text-xs font-mono focus:ring-2 focus:ring-zinc-400" 
                                     placeholder="http://hotspot.lan"
                                 >
-                                <span class="text-[10px] text-zinc-400 mt-1 block">Tujuan link pada QR Code dan browser</span>
+                                <span class="text-[10px] text-zinc-500 dark:text-zinc-400 mt-1 block">Tujuan link pada QR Code dan browser</span>
                             </div>
 
                             <div>
@@ -97,7 +97,7 @@
                             <span class="w-6 h-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center font-bold text-xs text-zinc-700 dark:text-zinc-300">2</span>
                             <div>
                                 <h3 class="font-bold text-sm text-zinc-900 dark:text-zinc-100">Ketentuan & Footer Struk</h3>
-                                <p class="text-[11px] text-zinc-400">Pesan penutup, disclaimer keamanan, dan opsi QR Code</p>
+                                <p class="text-[11px] text-zinc-500 dark:text-zinc-400">Pesan penutup, disclaimer keamanan, dan opsi QR Code</p>
                             </div>
                         </div>
 
@@ -130,7 +130,7 @@
                                 type="checkbox" 
                                 id="showQrCheck" 
                                 x-model="form.show_qr" 
-                                class="rounded border-zinc-300 text-zinc-900 focus:ring-zinc-500"
+                                class="rounded border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 text-zinc-900 focus:ring-zinc-500"
                             >
                             <label for="showQrCheck" class="font-medium text-zinc-700 dark:text-zinc-300 cursor-pointer">
                                 Tampilkan QR Code login otomatis pada cetakan
@@ -145,13 +145,13 @@
                                 <span class="w-6 h-6 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 flex items-center justify-center font-bold text-xs">3</span>
                                 <div>
                                     <h3 class="font-bold text-sm text-zinc-900 dark:text-zinc-100">Template Chat WhatsApp</h3>
-                                    <p class="text-[11px] text-zinc-400">Format teks yang dikirim ke pelanggan saat klik tombol WhatsApp</p>
+                                    <p class="text-[11px] text-zinc-500 dark:text-zinc-400">Format teks yang dikirim ke pelanggan saat klik tombol WhatsApp</p>
                                 </div>
                             </div>
                             <button 
                                 type="button" 
                                 @click="resetWaTemplate()" 
-                                class="text-[11px] text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 underline cursor-pointer"
+                                class="text-[11px] text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 underline cursor-pointer"
                             >
                                 Reset ke Default
                             </button>
@@ -184,7 +184,7 @@
                                 class="w-full px-3.5 py-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 font-mono text-[11px] leading-relaxed focus:ring-2 focus:ring-emerald-500"
                                 placeholder="Tuliskan format template pesan WhatsApp..."
                             ></textarea>
-                            <span class="text-[10px] text-zinc-400 mt-1 block">
+                            <span class="text-[10px] text-zinc-500 dark:text-zinc-400 mt-1 block">
                                 Variabel <code class="text-zinc-600 dark:text-zinc-300 font-bold">{kredensial}</code> otomatis menampilkan "Kode Login: xxx" jika username & password sama.
                             </span>
                         </div>
@@ -212,12 +212,12 @@
                     
                     <!-- Preview Tabs -->
                     <div class="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800 mb-4">
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-zinc-400">Live Preview</span>
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Live Preview</span>
                         <div class="flex items-center gap-1 p-0.5 bg-zinc-100 dark:bg-zinc-800 rounded-lg text-xs">
                             <button 
                                 type="button" 
                                 @click="previewTab = 'receipt'" 
-                                :class="previewTab === 'receipt' ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 font-semibold shadow-xs' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200'"
+                                :class="previewTab === 'receipt' ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 font-semibold shadow-xs' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'"
                                 class="px-2.5 py-1 rounded-md transition-colors cursor-pointer text-[11px]"
                             >
                                 Struk Thermal
@@ -225,7 +225,7 @@
                             <button 
                                 type="button" 
                                 @click="previewTab = 'whatsapp'" 
-                                :class="previewTab === 'whatsapp' ? 'bg-white dark:bg-zinc-700 text-emerald-600 dark:text-emerald-400 font-semibold shadow-xs' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200'"
+                                :class="previewTab === 'whatsapp' ? 'bg-white dark:bg-zinc-700 text-emerald-600 dark:text-emerald-400 font-semibold shadow-xs' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'"
                                 class="px-2.5 py-1 rounded-md transition-colors cursor-pointer text-[11px]"
                             >
                                 Chat WhatsApp
@@ -237,7 +237,7 @@
                     <div x-show="previewTab === 'receipt'" class="space-y-3">
                         <div class="w-[60mm] mx-auto bg-white text-zinc-900 p-4 border border-zinc-300 rounded-lg font-mono text-[11px] leading-tight shadow-md text-center">
                             <div class="font-bold text-sm" x-text="form.hotspot_name || 'MIKROTIK HOTSPOT'"></div>
-                            <div class="text-[9px] text-zinc-500 mt-0.5" x-text="form.header_subtext || 'Internet Cepat & Stabil'"></div>
+                            <div class="text-[9px] text-zinc-500 dark:text-zinc-500 mt-0.5" x-text="form.header_subtext || 'Internet Cepat & Stabil'"></div>
                             <div class="my-2 border-t border-dashed border-zinc-400"></div>
 
                             <div class="text-[10px] flex justify-between">
@@ -255,7 +255,7 @@
 
                             <!-- Credential Box -->
                             <div class="my-2 p-1.5 bg-zinc-100 border border-zinc-300 rounded text-center">
-                                <div class="text-[9px] text-zinc-500 uppercase">KODE LOGIN</div>
+                                <div class="text-[9px] text-zinc-500 dark:text-zinc-500 uppercase">KODE LOGIN</div>
                                 <div class="text-sm font-extrabold tracking-wider my-0.5">VC-884920</div>
                             </div>
 
@@ -265,22 +265,22 @@
                                     <div class="w-16 h-16 bg-zinc-900 flex items-center justify-center text-white rounded text-[9px] font-sans">
                                         [QR Code]
                                     </div>
-                                    <span class="text-[8px] text-zinc-500 mt-1 font-sans">Scan QR untuk Login</span>
+                                    <span class="text-[8px] text-zinc-500 dark:text-zinc-500 mt-1 font-sans">Scan QR untuk Login</span>
                                 </div>
                             </template>
 
-                            <div class="text-[9px] text-zinc-500 mt-1.5">
+                            <div class="text-[9px] text-zinc-500 dark:text-zinc-500 mt-1.5">
                                 Login di: <span class="font-bold" x-text="form.login_url || 'http://hotspot.lan'"></span>
                             </div>
 
                             <template x-if="form.contact_phone">
-                                <div class="text-[9px] text-zinc-500 mt-0.5">
+                                <div class="text-[9px] text-zinc-500 dark:text-zinc-500 mt-0.5">
                                     CS WA: <span x-text="form.contact_phone"></span>
                                 </div>
                             </template>
 
                             <template x-if="form.terms_text">
-                                <div class="text-[8px] text-zinc-400 mt-1 border-t border-dashed border-zinc-300 pt-1" x-text="form.terms_text"></div>
+                                <div class="text-[8px] text-zinc-400 dark:text-zinc-400 mt-1 border-t border-dashed border-zinc-300 pt-1" x-text="form.terms_text"></div>
                             </template>
 
                             <div class="text-[9px] text-zinc-600 mt-1 border-t border-zinc-200 pt-1 font-medium" x-text="form.footer_text || 'Terima kasih atas kunjungan Anda'"></div>
@@ -292,7 +292,7 @@
                         <div class="bg-emerald-900/10 dark:bg-emerald-950/30 p-3 rounded-xl border border-emerald-500/20">
                             <!-- WhatsApp Simulated Chat Bubble -->
                             <div class="bg-[#e7fedb] dark:bg-[#005c4b] text-zinc-900 dark:text-zinc-100 p-3.5 rounded-2xl rounded-tr-none shadow-xs text-xs font-sans leading-relaxed whitespace-pre-wrap max-w-sm ml-auto border border-emerald-300/40 dark:border-emerald-600/40" x-text="computedWaPreview"></div>
-                            <div class="text-right text-[10px] text-zinc-400 mt-1 mr-1">10:45 ✓✓</div>
+                            <div class="text-right text-[10px] text-zinc-500 dark:text-zinc-400 mt-1 mr-1">10:45 ✓✓</div>
                         </div>
 
                         <div class="text-[11px] text-zinc-500 dark:text-zinc-400 leading-normal p-2 bg-zinc-50 dark:bg-zinc-800/60 rounded-lg">

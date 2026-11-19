@@ -160,6 +160,26 @@
                     </div>
                 </div>
 
+                <!-- Batch Action Bar -->
+                <div x-show="selectedInvoiceIds.length > 0" x-cloak class="px-4 py-2.5 bg-rose-50 dark:bg-rose-950/40 border-b border-rose-200 dark:border-rose-900/60 flex items-center justify-between gap-3 transition-all">
+                    <div class="flex items-center gap-2">
+                        <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-rose-600 text-white text-[11px] font-bold font-mono" x-text="selectedInvoiceIds.length"></span>
+                        <span class="text-xs font-semibold text-rose-900 dark:text-rose-200">Tagihan dipilih</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button type="button" @click="selectedInvoiceIds = []" class="px-2.5 py-1 text-xs font-semibold rounded-lg text-zinc-700 dark:text-zinc-300 hover:bg-rose-100/60 dark:hover:bg-rose-900/40 transition-colors">
+                            Batal Pilih
+                        </button>
+                        <button type="button" @click="confirmBatchDeleteInvoices()" :disabled="isBatchDeleting" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white shadow-xs transition-colors">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            <span x-show="!isBatchDeleting">Hapus <span x-text="selectedInvoiceIds.length"></span> Tagihan Terpilih</span>
+                            <span x-show="isBatchDeleting">Menghapus...</span>
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Empty Invoices State -->
                 <template x-if="filteredInvoices.length === 0">
                     <div class="p-12 text-center">
@@ -183,6 +203,9 @@
                     <table class="w-full text-left text-xs">
                         <thead class="bg-zinc-100/90 dark:bg-zinc-800/80 text-[11px] font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider border-b border-zinc-200 dark:border-zinc-700">
                             <tr>
+                                <th class="py-3.5 px-4 w-10 text-center">
+                                    <input type="checkbox" @change="toggleSelectAllInvoices($event)" :checked="isAllInvoicesSelected()" class="rounded border-zinc-300 dark:border-zinc-700 text-rose-600 focus:ring-rose-500">
+                                </th>
                                 <th class="py-3.5 px-4">No. Invoice</th>
                                 <th class="py-3.5 px-4">Nama Pelanggan</th>
                                 <th class="py-3.5 px-4">Jatuh Tempo</th>
@@ -195,7 +218,10 @@
                         </thead>
                         <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800">
                             <template x-for="inv in filteredInvoices" :key="inv.id">
-                                <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors">
+                                <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors" :class="selectedInvoiceIds.includes(inv.id) ? 'bg-rose-50/50 dark:bg-rose-950/20' : ''">
+                                    <td class="py-3.5 px-4 text-center">
+                                        <input type="checkbox" :value="inv.id" x-model="selectedInvoiceIds" class="rounded border-zinc-300 dark:border-zinc-700 text-rose-600 focus:ring-rose-500">
+                                    </td>
                                     <td class="py-3.5 px-4 font-mono font-bold text-zinc-900 dark:text-zinc-100" x-text="inv.invoice_number"></td>
                                     <td class="py-3.5 px-4">
                                         <div class="font-bold text-zinc-900 dark:text-zinc-100" x-text="inv.customer ? inv.customer.name : '-'"></div>
@@ -239,6 +265,12 @@
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                 </svg>
                                                 <span>Riwayat</span>
+                                            </button>
+                                            <button @click="confirmDeleteInvoice(inv)" class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/40 border border-rose-200 dark:border-rose-800 transition-colors shadow-2xs" title="Hapus Tagihan">
+                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                                <span>Hapus</span>
                                             </button>
                                         </div>
                                     </td>
@@ -771,6 +803,90 @@
                     });
                 },
 
+                toggleSelectAllInvoices(e) {
+                    if (e.target.checked) {
+                        const allFilteredIds = this.filteredInvoices.map(i => i.id);
+                        this.selectedInvoiceIds = Array.from(new Set([...this.selectedInvoiceIds, ...allFilteredIds]));
+                    } else {
+                        const filteredSet = new Set(this.filteredInvoices.map(i => i.id));
+                        this.selectedInvoiceIds = this.selectedInvoiceIds.filter(id => !filteredSet.has(id));
+                    }
+                },
+
+                isAllInvoicesSelected() {
+                    if (this.filteredInvoices.length === 0) return false;
+                    return this.filteredInvoices.every(i => this.selectedInvoiceIds.includes(i.id));
+                },
+
+                confirmDeleteInvoice(inv) {
+                    const custName = inv.customer ? inv.customer.name : 'Pelanggan';
+                    const hasPayments = (inv.amount_paid > 0);
+                    let msg = `Hapus tagihan ${inv.invoice_number} (${custName})?`;
+                    if (hasPayments) {
+                        msg += `\nPERINGATAN: Seluruh riwayat pembayaran (${this.formatRupiah(inv.amount_paid)}) yang terkait dengan tagihan ini akan ikut terhapus!`;
+                    }
+                    if (!confirm(msg)) return;
+
+                    fetch(`/pos/monthly/invoices/${inv.id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            window.showToast(data.message || 'Tagihan berhasil dihapus', 'success');
+                            this.invoices = this.invoices.filter(i => i.id !== inv.id);
+                            this.selectedInvoiceIds = this.selectedInvoiceIds.filter(id => id !== inv.id);
+                            this.recalcLocalMetrics();
+                        } else {
+                            window.showToast(data.message || 'Gagal menghapus tagihan', 'error');
+                        }
+                    })
+                    .catch(() => {
+                        window.showToast('Terjadi kesalahan koneksi', 'error');
+                    });
+                },
+
+                confirmBatchDeleteInvoices() {
+                    if (this.selectedInvoiceIds.length === 0) return;
+                    const count = this.selectedInvoiceIds.length;
+                    const msg = `Apakah Anda yakin ingin menghapus ${count} tagihan terpilih?\nPERINGATAN: Semua catatan pembayaran yang terhubung dengan tagihan tersebut akan ikut terhapus permanen!`;
+                    if (!confirm(msg)) return;
+
+                    this.isBatchDeleting = true;
+                    fetch('{{ route("pos.monthly.invoices.batch-delete") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            invoice_ids: this.selectedInvoiceIds
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        this.isBatchDeleting = false;
+                        if (data.success) {
+                            window.showToast(data.message || `${count} tagihan berhasil dihapus`, 'success');
+                            const deletedSet = new Set(this.selectedInvoiceIds);
+                            this.invoices = this.invoices.filter(i => !deletedSet.has(i.id));
+                            this.selectedInvoiceIds = [];
+                            this.recalcLocalMetrics();
+                        } else {
+                            window.showToast(data.message || 'Gagal menghapus tagihan secara massal', 'error');
+                        }
+                    })
+                    .catch(() => {
+                        this.isBatchDeleting = false;
+                        window.showToast('Terjadi kesalahan koneksi', 'error');
+                    });
+                },
+
                 openPayInvoiceModal(inv) {
                     this.activeInvoice = inv;
                     this.payForm = {
@@ -956,6 +1072,7 @@
                 },
 
                 recalcLocalMetrics() {
+                    let totalAmount = 0;
                     let totalPaid = 0;
                     let totalUnpaid = 0;
                     let paidCount = 0;
@@ -963,6 +1080,7 @@
                     let unpaidCount = 0;
 
                     this.invoices.forEach(inv => {
+                        totalAmount += (parseFloat(inv.amount) || 0);
                         totalPaid += (parseFloat(inv.amount_paid) || 0);
                         totalUnpaid += (parseFloat(inv.balance_due) || 0);
                         if (inv.status === 'paid') paidCount++;
@@ -970,6 +1088,8 @@
                         else unpaidCount++;
                     });
 
+                    this.metrics.total_count = this.invoices.length;
+                    this.metrics.total_amount = totalAmount;
                     this.metrics.total_paid = totalPaid;
                     this.metrics.total_unpaid = totalUnpaid;
                     this.metrics.paid_count = paidCount;

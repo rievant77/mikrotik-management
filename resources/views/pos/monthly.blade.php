@@ -206,14 +206,14 @@
                                 <th class="py-3.5 px-4 w-10 text-center">
                                     <input type="checkbox" @change="toggleSelectAllInvoices($event)" :checked="isAllInvoicesSelected()" class="rounded border-zinc-300 dark:border-zinc-700 text-rose-600 focus:ring-rose-500">
                                 </th>
-                                <th class="py-3.5 px-4">No. Invoice</th>
-                                <th class="py-3.5 px-4">Nama Pelanggan</th>
-                                <th class="py-3.5 px-4">Jatuh Tempo</th>
-                                <th class="py-3.5 px-4">Total Tagihan</th>
-                                <th class="py-3.5 px-4">Sudah Dibayar</th>
-                                <th class="py-3.5 px-4">Sisa Tagihan</th>
-                                <th class="py-3.5 px-4">Status</th>
-                                <th class="py-3.5 px-4 text-right">Aksi</th>
+                                <th class="py-3.5 px-4 text-left whitespace-nowrap">No. Invoice</th>
+                                <th class="py-3.5 px-4 text-left">Nama Pelanggan</th>
+                                <th class="py-3.5 px-4 text-center whitespace-nowrap">Jatuh Tempo</th>
+                                <th class="py-3.5 px-4 text-right whitespace-nowrap">Total Tagihan</th>
+                                <th class="py-3.5 px-4 text-right whitespace-nowrap">Sudah Dibayar</th>
+                                <th class="py-3.5 px-4 text-right whitespace-nowrap">Sisa Tagihan</th>
+                                <th class="py-3.5 px-4 text-center whitespace-nowrap">Status</th>
+                                <th class="py-3.5 px-4 text-right whitespace-nowrap">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800">
@@ -222,8 +222,8 @@
                                     <td class="py-3.5 px-4 text-center">
                                         <input type="checkbox" :value="inv.id" x-model.number="selectedInvoiceIds" class="rounded border-zinc-300 dark:border-zinc-700 text-rose-600 focus:ring-rose-500">
                                     </td>
-                                    <td class="py-3.5 px-4 font-mono font-bold text-zinc-900 dark:text-zinc-100" x-text="inv.invoice_number"></td>
-                                    <td class="py-3.5 px-4">
+                                    <td class="py-3.5 px-4 text-left whitespace-nowrap font-mono font-bold text-zinc-900 dark:text-zinc-100" x-text="inv.invoice_number"></td>
+                                    <td class="py-3.5 px-4 text-left">
                                         <div class="font-bold text-zinc-900 dark:text-zinc-100" x-text="inv.customer ? inv.customer.name : '-'"></div>
                                         <template x-if="inv.customer && inv.customer.hotspot_user">
                                             <a :href="'/users/' + inv.customer.hotspot_user.username" class="inline-flex items-center gap-1.5 mt-0.5 px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-[11px] font-mono font-semibold text-zinc-800 dark:text-zinc-200 hover:text-emerald-700 dark:hover:text-emerald-400 border border-zinc-200 dark:border-zinc-700 transition-colors" title="Lihat Detail User Hotspot">
@@ -234,26 +234,26 @@
                                             </a>
                                         </template>
                                     </td>
-                                    <td class="py-3.5 px-4 text-zinc-700 dark:text-zinc-300 font-mono text-[11px] font-medium" x-text="inv.due_date ? formatDateIndo(inv.due_date) : '-'"></td>
-                                    <td class="py-3.5 px-4 font-mono font-bold text-zinc-900 dark:text-zinc-100" x-text="formatRupiah(inv.amount)"></td>
-                                    <td class="py-3.5 px-4 font-mono text-emerald-700 dark:text-emerald-400 font-bold" x-text="formatRupiah(inv.amount_paid)"></td>
-                                    <td class="py-3.5 px-4 font-mono font-bold">
+                                    <td class="py-3.5 px-4 text-center whitespace-nowrap text-zinc-700 dark:text-zinc-300 font-mono text-[11px] font-medium" x-text="inv.due_date ? formatDateIndo(inv.due_date) : '-'"></td>
+                                    <td class="py-3.5 px-4 text-right whitespace-nowrap font-mono font-bold text-zinc-900 dark:text-zinc-100" x-text="formatRupiah(inv.amount)"></td>
+                                    <td class="py-3.5 px-4 text-right whitespace-nowrap font-mono text-emerald-700 dark:text-emerald-400 font-bold" x-text="formatRupiah(inv.amount_paid)"></td>
+                                    <td class="py-3.5 px-4 text-right whitespace-nowrap font-mono font-bold">
                                         <span x-show="inv.balance_due > 0" class="text-rose-700 dark:text-rose-400" x-text="formatRupiah(inv.balance_due)"></span>
                                         <span x-show="inv.balance_due <= 0" class="text-zinc-500 dark:text-zinc-400 font-medium">Rp 0 (Lunas)</span>
                                     </td>
-                                    <td class="py-3.5 px-4">
+                                    <td class="py-3.5 px-4 text-center whitespace-nowrap">
                                         <span 
                                             :class="inv.status === 'paid' ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700' : (inv.status === 'partial' ? 'bg-amber-50 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-700' : 'bg-rose-50 dark:bg-rose-950/50 text-rose-800 dark:text-rose-300 border-rose-300 dark:border-rose-700')" 
-                                            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border shadow-xs"
+                                            class="inline-flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border shadow-xs"
                                         >
                                             <span class="w-1.5 h-1.5 rounded-full" :class="inv.status === 'paid' ? 'bg-emerald-500' : (inv.status === 'partial' ? 'bg-amber-500' : 'bg-rose-500')"></span>
                                             <span x-text="inv.status === 'paid' ? 'LUNAS' : (inv.status === 'partial' ? 'ANGSURAN' : 'BELUM BAYAR')"></span>
                                         </span>
                                     </td>
-                                    <td class="py-3.5 px-4 text-right">
+                                    <td class="py-3.5 px-4 text-right whitespace-nowrap">
                                         <div class="flex items-center justify-end gap-1.5">
                                             <template x-if="inv.status !== 'paid'">
-                                                <button @click="openPayInvoiceModal(inv)" class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-xs">
+                                                <button @click="openPayInvoiceModal(inv)" class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-2xs">
                                                     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                                                     </svg>
@@ -299,18 +299,18 @@
                     <table class="w-full text-left text-xs">
                         <thead class="bg-zinc-100/90 dark:bg-zinc-800/80 text-[11px] font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider border-b border-zinc-200 dark:border-zinc-700">
                             <tr>
-                                <th class="py-3.5 px-4">Nama Pelanggan</th>
-                                <th class="py-3.5 px-4">Akun Hotspot</th>
-                                <th class="py-3.5 px-4">Kontak / Alamat</th>
-                                <th class="py-3.5 px-4">Tarif Bulanan Default</th>
-                                <th class="py-3.5 px-4">Jatuh Tempo (Tgl)</th>
-                                <th class="py-3.5 px-4 text-right">Aksi</th>
+                                <th class="py-3.5 px-4 text-left">Nama Pelanggan</th>
+                                <th class="py-3.5 px-4 text-left whitespace-nowrap">Akun Hotspot</th>
+                                <th class="py-3.5 px-4 text-left">Kontak / Alamat</th>
+                                <th class="py-3.5 px-4 text-right whitespace-nowrap">Tarif Bulanan Default</th>
+                                <th class="py-3.5 px-4 text-center whitespace-nowrap">Jatuh Tempo (Tgl)</th>
+                                <th class="py-3.5 px-4 text-right whitespace-nowrap">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800">
                             <template x-for="c in filteredMasterCustomers" :key="c.id">
                                 <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors">
-                                    <td class="py-3.5 px-4 font-bold text-zinc-900 dark:text-zinc-100">
+                                    <td class="py-3.5 px-4 text-left font-bold text-zinc-900 dark:text-zinc-100">
                                         <div class="flex items-center gap-1.5 flex-wrap">
                                             <span x-text="c.name"></span>
                                             <template x-if="c.profile">
@@ -318,7 +318,7 @@
                                             </template>
                                         </div>
                                     </td>
-                                    <td class="py-3.5 px-4 font-mono">
+                                    <td class="py-3.5 px-4 text-left whitespace-nowrap font-mono">
                                         <template x-if="c.hotspot_user">
                                             <a :href="'/users/' + c.hotspot_user.username" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-zinc-100 dark:bg-zinc-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 border border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 hover:text-emerald-700 dark:hover:text-emerald-400 font-mono text-xs transition-colors font-bold">
                                                 <svg class="w-3 h-3 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -331,13 +331,13 @@
                                             <span class="text-zinc-500 dark:text-zinc-400 text-xs italic">Tanpa Akun (Manual)</span>
                                         </template>
                                     </td>
-                                    <td class="py-3.5 px-4 text-zinc-700 dark:text-zinc-300">
+                                    <td class="py-3.5 px-4 text-left text-zinc-700 dark:text-zinc-300">
                                         <div class="font-medium" x-text="c.contact || '-'"></div>
                                         <div class="text-[11px] text-zinc-500 dark:text-zinc-400" x-text="c.address || ''"></div>
                                     </td>
-                                    <td class="py-3.5 px-4 font-mono font-bold text-zinc-900 dark:text-zinc-100" x-text="formatRupiah(c.monthly_price)"></td>
-                                    <td class="py-3.5 px-4 font-mono text-zinc-700 dark:text-zinc-300 font-semibold" x-text="'Tgl ' + (c.billing_day || 1)"></td>
-                                    <td class="py-3.5 px-4 text-right">
+                                    <td class="py-3.5 px-4 text-right whitespace-nowrap font-mono font-bold text-zinc-900 dark:text-zinc-100" x-text="formatRupiah(c.monthly_price)"></td>
+                                    <td class="py-3.5 px-4 text-center whitespace-nowrap font-mono text-zinc-700 dark:text-zinc-300 font-semibold" x-text="'Tgl ' + (c.billing_day || 1)"></td>
+                                    <td class="py-3.5 px-4 text-right whitespace-nowrap">
                                         <div class="flex items-center justify-end gap-1.5">
                                             <button @click="editCustomer(c)" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold text-zinc-800 dark:text-zinc-200 bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 border border-zinc-300 dark:border-zinc-700 transition-colors shadow-2xs">
                                                 <svg class="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -345,7 +345,7 @@
                                                 </svg>
                                                 <span>Edit</span>
                                             </button>
-                                            <button @click="deleteCustomer(c)" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold text-rose-700 dark:text-rose-400 bg-white dark:bg-zinc-800 hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-rose-300 dark:border-rose-800 transition-colors shadow-2xs">
+                                            <button @click="deleteCustomer(c)" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/40 border border-rose-200 dark:border-rose-800 transition-colors shadow-2xs">
                                                 <svg class="w-3.5 h-3.5 text-rose-500 dark:text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                 </svg>

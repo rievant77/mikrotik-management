@@ -114,11 +114,11 @@
                     <table class="w-full text-left text-xs">
                         <thead class="bg-zinc-50 dark:bg-zinc-800/60 border-b border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 uppercase tracking-wider font-semibold">
                             <tr>
-                                <th class="py-3 px-4">Tanggal</th>
-                                <th class="py-3 px-4">Deskripsi Pengeluaran</th>
-                                <th class="py-3 px-4">Dicatat Oleh</th>
-                                <th class="py-3 px-4 text-right">Nominal</th>
-                                <th class="py-3 px-4 text-center">Aksi</th>
+                                <th class="py-3 px-4 text-center whitespace-nowrap">Tanggal</th>
+                                <th class="py-3 px-4 text-left">Deskripsi Pengeluaran</th>
+                                <th class="py-3 px-4 text-left whitespace-nowrap">Dicatat Oleh</th>
+                                <th class="py-3 px-4 text-right whitespace-nowrap">Nominal</th>
+                                <th class="py-3 px-4 text-right whitespace-nowrap">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800/80">
@@ -131,17 +131,23 @@
                             </template>
                             <template x-for="item in dailyExpenses" :key="item.id">
                                 <tr class="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/50 transition-colors">
-                                    <td class="py-3 px-4 font-mono font-medium text-zinc-900 dark:text-zinc-100" x-text="formatDateIndo(item.expense_date)"></td>
-                                    <td class="py-3 px-4 font-medium text-zinc-900 dark:text-zinc-100" x-text="item.description"></td>
-                                    <td class="py-3 px-4 text-zinc-600 dark:text-zinc-400" x-text="item.creator?.name || 'Kasir/Admin'"></td>
-                                    <td class="py-3 px-4 text-right font-mono font-bold text-rose-700 dark:text-rose-400" x-text="formatRupiah(item.amount)"></td>
-                                    <td class="py-3 px-4 text-center">
-                                        <div class="inline-flex items-center gap-1.5">
-                                            <button @click="editDailyExpense(item)" class="px-2.5 py-1 text-xs font-semibold rounded bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-300 dark:border-zinc-700 transition-colors">
-                                                Edit
+                                    <td class="py-3 px-4 text-center whitespace-nowrap font-mono font-medium text-zinc-900 dark:text-zinc-100" x-text="formatDateIndo(item.expense_date)"></td>
+                                    <td class="py-3 px-4 text-left font-medium text-zinc-900 dark:text-zinc-100" x-text="item.description"></td>
+                                    <td class="py-3 px-4 text-left whitespace-nowrap text-zinc-600 dark:text-zinc-400" x-text="item.creator?.name || 'Kasir/Admin'"></td>
+                                    <td class="py-3 px-4 text-right whitespace-nowrap font-mono font-bold text-rose-700 dark:text-rose-400" x-text="formatRupiah(item.amount)"></td>
+                                    <td class="py-3 px-4 text-right whitespace-nowrap">
+                                        <div class="flex items-center justify-end gap-1.5">
+                                            <button @click="editDailyExpense(item)" class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-300 dark:border-zinc-700 transition-colors shadow-2xs">
+                                                <svg class="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                </svg>
+                                                <span>Edit</span>
                                             </button>
-                                            <button @click="deleteDailyExpense(item)" class="px-2.5 py-1 text-xs font-semibold rounded bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-700 transition-colors">
-                                                Hapus
+                                            <button @click="deleteDailyExpense(item)" class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800 transition-colors shadow-2xs">
+                                                <svg class="w-3.5 h-3.5 text-rose-500 dark:text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                                <span>Hapus</span>
                                             </button>
                                         </div>
                                     </td>
@@ -151,7 +157,7 @@
                         <tfoot class="bg-zinc-50 dark:bg-zinc-800/60 border-t border-zinc-200 dark:border-zinc-800 font-semibold">
                             <tr>
                                 <td colspan="3" class="py-3 px-4 text-right text-zinc-700 dark:text-zinc-300 uppercase tracking-wider text-[11px]">Subtotal Harian:</td>
-                                <td class="py-3 px-4 text-right font-mono font-bold text-rose-700 dark:text-rose-400 text-sm" x-text="formatRupiah(dailyTotal)"></td>
+                                <td class="py-3 px-4 text-right font-mono font-bold text-rose-700 dark:text-rose-400 text-sm whitespace-nowrap" x-text="formatRupiah(dailyTotal)"></td>
                                 <td></td>
                             </tr>
                         </tfoot>
@@ -184,10 +190,10 @@
                     <table class="w-full text-left text-xs">
                         <thead class="bg-zinc-50 dark:bg-zinc-800/60 border-b border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 uppercase tracking-wider font-semibold">
                             <tr>
-                                <th class="py-3 px-4">Nama Pos Pengeluaran</th>
-                                <th class="py-3 px-4">Catatan Khusus Bulan Ini</th>
-                                <th class="py-3 px-4 text-right">Nominal Beban</th>
-                                <th class="py-3 px-4 text-center">Aksi</th>
+                                <th class="py-3 px-4 text-left">Nama Pos Pengeluaran</th>
+                                <th class="py-3 px-4 text-left">Catatan Khusus Bulan Ini</th>
+                                <th class="py-3 px-4 text-right whitespace-nowrap">Nominal Beban</th>
+                                <th class="py-3 px-4 text-right whitespace-nowrap">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800/80">
@@ -200,13 +206,18 @@
                             </template>
                             <template x-for="entry in monthlyEntries" :key="entry.id">
                                 <tr class="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/50 transition-colors">
-                                    <td class="py-3 px-4 font-bold text-zinc-900 dark:text-zinc-100" x-text="entry.name"></td>
-                                    <td class="py-3 px-4 text-zinc-600 dark:text-zinc-400" x-text="entry.notes || '-'"></td>
-                                    <td class="py-3 px-4 text-right font-mono font-bold text-zinc-900 dark:text-zinc-100" x-text="formatRupiah(entry.amount)"></td>
-                                    <td class="py-3 px-4 text-center">
-                                        <button @click="editMonthlyEntry(entry)" class="px-2.5 py-1 text-xs font-semibold rounded bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-300 dark:border-zinc-700 transition-colors">
-                                            Sesuaikan Nominal Bulan Ini
-                                        </button>
+                                    <td class="py-3 px-4 text-left font-bold text-zinc-900 dark:text-zinc-100" x-text="entry.name"></td>
+                                    <td class="py-3 px-4 text-left text-zinc-600 dark:text-zinc-400" x-text="entry.notes || '-'"></td>
+                                    <td class="py-3 px-4 text-right whitespace-nowrap font-mono font-bold text-zinc-900 dark:text-zinc-100" x-text="formatRupiah(entry.amount)"></td>
+                                    <td class="py-3 px-4 text-right whitespace-nowrap">
+                                        <div class="flex items-center justify-end">
+                                            <button @click="editMonthlyEntry(entry)" class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-300 dark:border-zinc-700 transition-colors shadow-2xs">
+                                                <svg class="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                </svg>
+                                                <span>Sesuaikan Nominal</span>
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             </template>
@@ -214,7 +225,7 @@
                         <tfoot class="bg-zinc-50 dark:bg-zinc-800/60 border-t border-zinc-200 dark:border-zinc-800 font-semibold">
                             <tr>
                                 <td colspan="2" class="py-3 px-4 text-right text-zinc-700 dark:text-zinc-300 uppercase tracking-wider text-[11px]">Subtotal Biaya Tetap:</td>
-                                <td class="py-3 px-4 text-right font-mono font-bold text-rose-700 dark:text-rose-400 text-sm" x-text="formatRupiah(monthlyTotal)"></td>
+                                <td class="py-3 px-4 text-right font-mono font-bold text-rose-700 dark:text-rose-400 text-sm whitespace-nowrap" x-text="formatRupiah(monthlyTotal)"></td>
                                 <td></td>
                             </tr>
                         </tfoot>
@@ -240,10 +251,10 @@
                     <table class="w-full text-left text-xs">
                         <thead class="bg-zinc-50 dark:bg-zinc-800/60 border-b border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 uppercase tracking-wider font-semibold">
                             <tr>
-                                <th class="py-3 px-4">Nama Template</th>
-                                <th class="py-3 px-4">Status</th>
-                                <th class="py-3 px-4 text-right">Nominal Default</th>
-                                <th class="py-3 px-4 text-center">Aksi Master</th>
+                                <th class="py-3 px-4 text-left">Nama Template</th>
+                                <th class="py-3 px-4 text-center whitespace-nowrap">Status</th>
+                                <th class="py-3 px-4 text-right whitespace-nowrap">Nominal Default</th>
+                                <th class="py-3 px-4 text-right whitespace-nowrap">Aksi Master</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800/80">
@@ -256,18 +267,27 @@
                             </template>
                             <template x-for="tmpl in templates" :key="tmpl.id">
                                 <tr class="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/50 transition-colors">
-                                    <td class="py-3 px-4 font-bold text-zinc-900 dark:text-zinc-100" x-text="tmpl.name"></td>
-                                    <td class="py-3 px-4">
-                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold" :class="tmpl.is_active ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-300 dark:border-zinc-700'" x-text="tmpl.is_active ? 'Aktif' : 'Nonaktif'"></span>
+                                    <td class="py-3 px-4 text-left font-bold text-zinc-900 dark:text-zinc-100" x-text="tmpl.name"></td>
+                                    <td class="py-3 px-4 text-center whitespace-nowrap">
+                                        <span class="inline-flex items-center justify-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold border shadow-xs" :class="tmpl.is_active ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-300 dark:border-zinc-700'">
+                                            <span class="w-1.5 h-1.5 rounded-full" :class="tmpl.is_active ? 'bg-emerald-500' : 'bg-zinc-400'"></span>
+                                            <span x-text="tmpl.is_active ? 'Aktif' : 'Nonaktif'"></span>
+                                        </span>
                                     </td>
-                                    <td class="py-3 px-4 text-right font-mono font-bold text-zinc-900 dark:text-zinc-100" x-text="formatRupiah(tmpl.amount)"></td>
-                                    <td class="py-3 px-4 text-center">
-                                        <div class="inline-flex items-center gap-1.5">
-                                            <button @click="editTemplate(tmpl)" class="px-2.5 py-1 text-xs font-semibold rounded bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-300 dark:border-zinc-700 transition-colors">
-                                                Edit
+                                    <td class="py-3 px-4 text-right whitespace-nowrap font-mono font-bold text-zinc-900 dark:text-zinc-100" x-text="formatRupiah(tmpl.amount)"></td>
+                                    <td class="py-3 px-4 text-right whitespace-nowrap">
+                                        <div class="flex items-center justify-end gap-1.5">
+                                            <button @click="editTemplate(tmpl)" class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-300 dark:border-zinc-700 transition-colors shadow-2xs">
+                                                <svg class="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                </svg>
+                                                <span>Edit</span>
                                             </button>
-                                            <button @click="deleteTemplate(tmpl)" class="px-2.5 py-1 text-xs font-semibold rounded bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-700 transition-colors">
-                                                Hapus
+                                            <button @click="deleteTemplate(tmpl)" class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800 transition-colors shadow-2xs">
+                                                <svg class="w-3.5 h-3.5 text-rose-500 dark:text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                                <span>Hapus</span>
                                             </button>
                                         </div>
                                     </td>

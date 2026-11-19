@@ -108,6 +108,16 @@ Route::middleware('auth')->group(function () {
         Route::post('/monthly/payments', [PosController::class, 'storePayment'])->name('pos.monthly.payments.store');
         Route::post('/monthly/payments/{payment}/void', [PosController::class, 'voidPayment'])->name('pos.monthly.payments.void');
 
+        // Pengeluaran (Expenses)
+        Route::get('/expenses', [PosController::class, 'expenses'])->name('pos.expenses');
+        Route::post('/expenses/daily', [PosController::class, 'storeDailyExpense'])->name('pos.expenses.daily.store');
+        Route::put('/expenses/daily/{dailyExpense}', [PosController::class, 'updateDailyExpense'])->name('pos.expenses.daily.update');
+        Route::delete('/expenses/daily/{dailyExpense}', [PosController::class, 'deleteDailyExpense'])->name('pos.expenses.daily.delete');
+        Route::post('/expenses/templates', [PosController::class, 'storeExpenseTemplate'])->name('pos.expenses.templates.store');
+        Route::put('/expenses/templates/{template}', [PosController::class, 'updateExpenseTemplate'])->name('pos.expenses.templates.update');
+        Route::delete('/expenses/templates/{template}', [PosController::class, 'deleteExpenseTemplate'])->name('pos.expenses.templates.delete');
+        Route::put('/expenses/entries/{entry}', [PosController::class, 'updateMonthlyExpenseEntry'])->name('pos.expenses.entries.update');
+
         Route::get('/shifts', [PosController::class, 'shifts'])->name('pos.shifts');
         Route::post('/shifts/open', [PosController::class, 'openShift'])->name('pos.shifts.open');
         Route::post('/shifts/close', [PosController::class, 'closeShift'])->name('pos.shifts.close');

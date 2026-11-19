@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\CashierShift;
+use App\Models\DailyExpense;
 use App\Models\HotspotProfile;
 use App\Models\MonthlyCustomer;
+use App\Models\MonthlyExpenseEntry;
+use App\Models\MonthlyExpenseTemplate;
 use App\Models\MonthlyPayment;
 use App\Models\VoucherSale;
 use App\Services\PosManagerService;
@@ -274,6 +277,100 @@ class PosController extends Controller
         } catch (Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 422);
         }
+    }
+
+    public function expenses(Request $request): View
+    {
+        $selectedMonth = $request->get('month', now()->format('Y-m'));
+        $expenseData = $this->posService->getExpensesForMonth($selectedMonth);
+        $templates = MonthlyExpenseTemplate::orderBy('name')->get();
+
+        return view('pos.expenses', compact('expenseData', 'selectedMonth', 'templates'));
+    }
+
+    public function storeDailyExpense(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'description' => 'required|string|max:255',
+            'amount' => 'required|numeric|min:1',
+            'expense_date' => 'required|date',
+        ]);
+
+        $expense = DailyExpense::create([
+            'description' => $validated['description'],
+            'amount' => $validated['amount'],
+            'expense_date' => $validated['expense_date'],
+            'created_by' => auth()->id(),
+        ]);
+
+        return response()->json(['success' => true, 'expense' => $expense]);
+    }
+
+    public function updateDailyExpense(Request $request, DailyExpense $dailyExpense): JsonResponse
+    {
+        $validated = $request->validate([
+            'description' => 'required|string|max:255',
+            'amount' => 'required|numeric|min:1',
+            'expense_date' => 'required|date',
+        ]);
+
+        $dailyExpense->update($validated);
+
+        return response()->json(['success' => true, 'expense' => $dailyExpense]);
+    }
+
+    public function deleteDailyExpense(DailyExpense $dailyExpense): JsonResponse
+    {
+        $dailyExpense->delete();
+        return response()->json(['success' => true]);
+    }
+
+    public function storeExpenseTemplate(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:100',
+            'amount' => 'required|numeric|min:0',
+            'is_active' => 'boolean',
+        ]);
+
+        $template = MonthlyExpenseTemplate::create([
+            'name' => $validated['name'],
+            'amount' => $validated['amount'],
+            'is_active' => $validated['is_active'] ?? true,
+        ]);
+
+        return response()->json(['success' => true, 'template' => $template]);
+    }
+
+    public function updateExpenseTemplate(Request $request, MonthlyExpenseTemplate $template): JsonResponse
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:100',
+            'amount' => 'required|numeric|min:0',
+            'is_active' => 'boolean',
+        ]);
+
+        $template->update($validated);
+
+        return response()->json(['success' => true, 'template' => $template]);
+    }
+
+    public function deleteExpenseTemplate(MonthlyExpenseTemplate $template): JsonResponse
+    {
+        $template->delete();
+        return response()->json(['success' => true]);
+    }
+
+    public function updateMonthlyExpenseEntry(Request $request, MonthlyExpenseEntry $entry): JsonResponse
+    {
+        $validated = $request->validate([
+            'amount' => 'required|numeric|min:0',
+            'notes' => 'nullable|string|max:500',
+        ]);
+
+        $entry->update($validated);
+
+        return response()->json(['success' => true, 'entry' => $entry]);
     }
 
     public function shifts(): View

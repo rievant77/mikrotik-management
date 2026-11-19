@@ -107,7 +107,7 @@
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                         </svg>
-                        <span>+ Catat Pengeluaran</span>
+                        <span>Catat Pengeluaran</span>
                     </button>
                 </div>
                 <div class="overflow-x-auto">
@@ -233,7 +233,7 @@
                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                         </svg>
-                        <span>+ Template Baru</span>
+                        <span>Template Baru</span>
                     </button>
                 </div>
                 <div class="overflow-x-auto">
@@ -250,7 +250,7 @@
                             <template x-if="templates.length === 0">
                                 <tr>
                                     <td colspan="4" class="py-8 text-center text-zinc-500 dark:text-zinc-400">
-                                        Belum ada master template biaya. Klik "+ Template Baru" untuk mendaftarkan pos biaya ISP/listrik.
+                                        Belum ada master template biaya. Klik "Template Baru" untuk mendaftarkan pos biaya ISP/listrik.
                                     </td>
                                 </tr>
                             </template>

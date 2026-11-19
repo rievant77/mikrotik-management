@@ -335,23 +335,85 @@
                 <div>
                     <label class="block font-bold text-zinc-800 dark:text-zinc-200 mb-1">Pilih Periode Bulan & Tahun *</label>
                     <input type="month" x-model="genForm.month" required class="w-full px-3 py-2 text-sm font-bold font-mono rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 focus:ring-emerald-500 focus:border-emerald-500">
-                    <p class="text-xs text-zinc-600 dark:text-zinc-400 mt-1.5">Sistem akan membuat tagihan baru untuk seluruh pelanggan aktif yang belum memiliki tagihan pada bulan tersebut.</p>
+                    <p class="text-xs text-zinc-600 dark:text-zinc-400 mt-1.5">Sistem akan membuat tagihan baru untuk pelanggan yang dipilih dan belum memiliki tagihan pada bulan tersebut.</p>
+                </div>
+
+                <!-- Customer Selection Section -->
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between gap-2">
+                        <label class="font-bold text-zinc-800 dark:text-zinc-200">Pilih Pelanggan Yang Diberi Tagihan</label>
+                        <span class="text-[11px] font-mono text-zinc-600 dark:text-zinc-400">
+                            <span class="font-bold text-emerald-600 dark:text-emerald-400" x-text="selectedCustomerIds.length"></span> / <span x-text="customers.length"></span> dipilih
+                        </span>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <div class="relative flex-1">
+                            <input 
+                                type="text" 
+                                x-model="customerSelectSearch" 
+                                placeholder="Cari nama, username, atau paket..." 
+                                class="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 focus:ring-emerald-500 focus:border-emerald-500"
+                            >
+                            <svg class="w-3.5 h-3.5 text-zinc-400 absolute left-2.5 top-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                        <label class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/80 cursor-pointer select-none hover:bg-zinc-100 dark:hover:bg-zinc-700/50 transition-colors">
+                            <input 
+                                type="checkbox" 
+                                @change="toggleSelectAllCustomers($event)" 
+                                :checked="isAllCustomersSelected()" 
+                                class="rounded border-zinc-300 dark:border-zinc-700 text-emerald-600 focus:ring-emerald-500"
+                            >
+                            <span class="text-[11px] font-semibold text-zinc-700 dark:text-zinc-300">Pilih Semua</span>
+                        </label>
+                    </div>
+
+                    <div class="max-h-52 overflow-y-auto rounded-lg border border-zinc-200 dark:border-zinc-700/80 divide-y divide-zinc-200 dark:divide-zinc-800 bg-white dark:bg-zinc-900/60 p-1">
+                        <template x-for="cust in selectableCustomers" :key="cust.id">
+                            <label class="flex items-center justify-between p-2 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 rounded-md cursor-pointer transition-colors">
+                                <div class="flex items-center gap-2.5 min-w-0">
+                                    <input 
+                                        type="checkbox" 
+                                        :value="cust.id" 
+                                        x-model="selectedCustomerIds" 
+                                        class="rounded border-zinc-300 dark:border-zinc-700 text-emerald-600 focus:ring-emerald-500"
+                                    >
+                                    <div class="truncate">
+                                        <div class="font-bold text-zinc-900 dark:text-zinc-100 truncate" x-text="cust.name"></div>
+                                        <div class="flex items-center gap-1.5 text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">
+                                            <span x-show="cust.hotspot_user" class="font-mono bg-zinc-100 dark:bg-zinc-800 px-1 py-0.5 rounded" x-text="cust.hotspot_user ? cust.hotspot_user.username : ''"></span>
+                                            <span x-show="cust.profile" class="text-emerald-600 dark:text-emerald-400 font-medium" x-text="cust.profile ? cust.profile.name : ''"></span>
+                                            <span x-show="cust.billing_day" class="text-zinc-400" x-text="'Tgl ' + cust.billing_day"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="font-mono font-bold text-zinc-900 dark:text-zinc-100 text-xs shrink-0 pl-2" x-text="formatRupiah(cust.monthly_price)"></div>
+                            </label>
+                        </template>
+                        <div x-show="selectableCustomers.length === 0" class="py-6 text-center text-xs text-zinc-500 dark:text-zinc-400">
+                            Tidak ada pelanggan yang cocok dengan pencarian
+                        </div>
+                    </div>
                 </div>
 
                 <div class="p-3.5 bg-zinc-50 dark:bg-zinc-800/80 rounded-xl border border-zinc-300 dark:border-zinc-700 space-y-1.5">
                     <div class="flex justify-between items-center">
-                        <span class="text-zinc-700 dark:text-zinc-300 font-medium">Total Pelanggan Aktif:</span>
-                        <strong class="font-mono font-bold text-zinc-900 dark:text-zinc-100 text-sm" x-text="formatNumber(customers.length)"></strong>
+                        <span class="text-zinc-700 dark:text-zinc-300 font-medium">Pelanggan Dipilih:</span>
+                        <strong class="font-mono font-bold text-zinc-900 dark:text-zinc-100 text-sm">
+                            <span x-text="formatNumber(selectedCustomerIds.length)"></span> / <span x-text="formatNumber(customers.length)"></span>
+                        </strong>
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="text-zinc-700 dark:text-zinc-300 font-medium">Estimasi Total Tagihan:</span>
-                        <strong class="font-mono font-bold text-emerald-700 dark:text-emerald-400 text-sm" x-text="formatRupiah(customers.reduce((acc, c) => acc + (parseFloat(c.monthly_price) || 0), 0))"></strong>
+                        <strong class="font-mono font-bold text-emerald-700 dark:text-emerald-400 text-sm" x-text="formatRupiah(selectedCustomersTotal())"></strong>
                     </div>
                 </div>
 
                 <div class="flex justify-end gap-2 pt-4 border-t border-zinc-200 dark:border-zinc-800">
                     <button type="button" @click="$dispatch('close-modal', 'generate-invoices-modal')" class="px-4 py-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-300 dark:border-zinc-700 font-semibold hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors">Batal</button>
-                    <button type="submit" :disabled="isGenerating" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold flex items-center gap-2 shadow-xs transition-colors">
+                    <button type="submit" :disabled="isGenerating || selectedCustomerIds.length === 0" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold flex items-center gap-2 shadow-xs transition-colors">
                         <span x-show="isGenerating">Memproses...</span>
                         <span x-show="!isGenerating">Mulai Generate Tagihan</span>
                     </button>
@@ -583,6 +645,10 @@
                 isGenerating: false,
                 isPaying: false,
                 activeInvoice: null,
+                selectedCustomerIds: [],
+                customerSelectSearch: '',
+                selectedInvoiceIds: [],
+                isBatchDeleting: false,
                 genForm: { month: '{{ $selectedMonth ?? now()->format("Y-m") }}' },
                 custForm: { id: null, name: '', hotspot_user_id: '', profile_id: '', monthly_price: 150000, cost_price: 0, billing_day: 1, contact: '', address: '' },
                 payForm: { amount_paid: 0, paid_at: '{{ now()->toDateString() }}', payment_method: 'cash', notes: '' },
@@ -628,12 +694,51 @@
                     }
                 },
 
+                get selectableCustomers() {
+                    return this.customers.filter(c => {
+                        if (!this.customerSelectSearch) return true;
+                        const q = this.customerSelectSearch.toLowerCase();
+                        const matchName = c.name && c.name.toLowerCase().includes(q);
+                        const matchHotspot = c.hotspot_user && c.hotspot_user.username && c.hotspot_user.username.toLowerCase().includes(q);
+                        const matchContact = c.contact && c.contact.toLowerCase().includes(q);
+                        const matchProfile = c.profile && c.profile.name && c.profile.name.toLowerCase().includes(q);
+                        return matchName || matchHotspot || matchContact || matchProfile;
+                    });
+                },
+
+                toggleSelectAllCustomers(e) {
+                    if (e.target.checked) {
+                        const selectableIds = this.selectableCustomers.map(c => c.id);
+                        this.selectedCustomerIds = Array.from(new Set([...this.selectedCustomerIds, ...selectableIds]));
+                    } else {
+                        const selectableIds = new Set(this.selectableCustomers.map(c => c.id));
+                        this.selectedCustomerIds = this.selectedCustomerIds.filter(id => !selectableIds.has(id));
+                    }
+                },
+
+                isAllCustomersSelected() {
+                    if (this.selectableCustomers.length === 0) return false;
+                    return this.selectableCustomers.every(c => this.selectedCustomerIds.includes(c.id));
+                },
+
+                selectedCustomersTotal() {
+                    return this.customers
+                        .filter(c => this.selectedCustomerIds.includes(c.id))
+                        .reduce((acc, c) => acc + (parseFloat(c.monthly_price) || 0), 0);
+                },
+
                 openGenerateModal() {
                     this.genForm.month = this.selectedMonth;
+                    this.customerSelectSearch = '';
+                    this.selectedCustomerIds = this.customers.map(c => c.id);
                     this.$dispatch('open-modal', 'generate-invoices-modal');
                 },
 
                 submitGenerateInvoices() {
+                    if (this.selectedCustomerIds.length === 0) {
+                        window.showToast('Pilih minimal satu pelanggan untuk generate tagihan!', 'error');
+                        return;
+                    }
                     this.isGenerating = true;
                     fetch('{{ route("pos.monthly.invoices.generate") }}', {
                         method: 'POST',
@@ -642,7 +747,10 @@
                             'X-CSRF-TOKEN': '{{ csrf_token() }}',
                             'Accept': 'application/json'
                         },
-                        body: JSON.stringify({ billing_month: this.genForm.month })
+                        body: JSON.stringify({
+                            billing_month: this.genForm.month,
+                            customer_ids: this.selectedCustomerIds
+                        })
                     })
                     .then(res => res.json())
                     .then(data => {

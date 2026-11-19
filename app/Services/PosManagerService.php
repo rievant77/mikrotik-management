@@ -188,7 +188,7 @@ class PosManagerService
     {
         $targetMonth = Carbon::parse($billingMonth)->startOfMonth();
         $query = MonthlyCustomer::with('profile')->where('is_active', true);
-        if (!empty($customerIds)) {
+        if (is_array($customerIds)) {
             $query->whereIn('id', $customerIds);
         }
 
@@ -361,6 +361,12 @@ class PosManagerService
                 'created_at' => now(),
             ]);
 
+            $activeShift = CashierShift::where('status', 'open')->latest()->first();
+            if ($activeShift && $method === 'cash') {
+                $payment->update(['shift_id' => $activeShift->id]);
+                $this->recalculateShiftExpectedCash($activeShift);
+            }
+
             DB::commit();
             return $payment;
         } catch (Exception $e) {
@@ -445,6 +451,7 @@ class PosManagerService
                     'customer_name' => $invoice->customer?->name,
                     'billing_month' => $invoice->billing_month?->toDateString(),
                     'amount' => $invoice->amount,
+                    'amount_paid' => $invoice->amount_paid,
                 ],
                 'ip_address' => request()->ip() ?? '127.0.0.1',
                 'created_at' => now(),
@@ -608,7 +615,12 @@ class PosManagerService
 
         $totalExpected = $opening + $voucherCash + $monthlyCash;
 
-        $shift->update(['expected_cash' => $totalExpected]);
+        $updateData = ['expected_cash' => $totalExpected];
+        if ($shift->status === 'closed' && $shift->actual_cash !== null) {
+            $updateData['discrepancy'] = (float) $shift->actual_cash - $totalExpected;
+        }
+
+        $shift->update($updateData);
 
         return $totalExpected;
     }

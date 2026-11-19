@@ -140,4 +140,81 @@ class MonthlyInvoiceManagementTest extends TestCase
         $this->assertDatabaseHas('monthly_invoices', ['id' => $inv3->id]);
         $this->assertDatabaseMissing('monthly_payments', ['monthly_invoice_id' => $inv1->id]);
     }
+
+    public function test_empty_customer_ids_array_fails_validation_or_does_not_generate_all(): void
+    {
+        MonthlyCustomer::create(['name' => 'Cust A', 'monthly_price' => 50000, 'is_active' => true]);
+
+        $response = $this->postJson(route('pos.monthly.invoices.generate'), [
+            'billing_month' => '2026-11',
+            'customer_ids' => [],
+        ]);
+
+        // Should either fail validation 422 or return generated = 0 (never generate for Cust A)
+        $this->assertTrue(in_array($response->status(), [422, 200]));
+        if ($response->status() === 200) {
+            $this->assertEquals(0, $response->json('generated'));
+        }
+        $this->assertDatabaseMissing('monthly_invoices', ['billing_month' => '2026-11-01']);
+    }
+
+    public function test_record_invoice_payment_attaches_shift_and_deletion_recalculates_cash(): void
+    {
+        $shift = CashierShift::create([
+            'user_id' => $this->user->id,
+            'opened_at' => now(),
+            'opening_cash' => 20000,
+            'status' => 'open',
+        ]);
+
+        $customer = MonthlyCustomer::create(['name' => 'Cust Modal Pay', 'monthly_price' => 75000, 'is_active' => true]);
+        $pos = new PosManagerService();
+        $pos->generateMonthlyInvoices('2026-11');
+        $invoice = MonthlyInvoice::where('monthly_customer_id', $customer->id)->first();
+
+        // Pay via API route (calls recordInvoicePayment)
+        $payRes = $this->postJson(route('pos.monthly.invoices.pay', $invoice->id), [
+            'amount_paid' => 75000,
+            'paid_at' => '2026-11-03',
+            'payment_method' => 'cash',
+        ]);
+        $payRes->assertStatus(200);
+
+        // Check payment has shift_id
+        $payment = MonthlyPayment::where('monthly_invoice_id', $invoice->id)->first();
+        $this->assertNotNull($payment->shift_id);
+        $this->assertEquals($shift->id, $payment->shift_id);
+
+        $shift->refresh();
+        $this->assertEquals(95000, (float) $shift->expected_cash);
+
+        // Delete invoice and verify shift expected cash recalculated
+        $delRes = $this->deleteJson(route('pos.monthly.invoices.delete', $invoice->id));
+        $delRes->assertStatus(200);
+
+        $shift->refresh();
+        $this->assertEquals(20000, (float) $shift->expected_cash);
+    }
+
+    public function test_shift_recalculation_updates_discrepancy_for_closed_shift(): void
+    {
+        $shift = CashierShift::create([
+            'user_id' => $this->user->id,
+            'opened_at' => now()->subHours(8),
+            'opening_cash' => 50000,
+            'expected_cash' => 150000,
+            'actual_cash' => 160000,
+            'discrepancy' => 10000,
+            'status' => 'closed',
+            'closed_at' => now()->subHour(),
+        ]);
+
+        $pos = new PosManagerService();
+        // Recalculating closed shift with 0 extra cash payments should set expected_cash = 50000 and discrepancy = 160000 - 50000 = 110000
+        $pos->recalculateShiftExpectedCash($shift);
+
+        $shift->refresh();
+        $this->assertEquals(50000, (float) $shift->expected_cash);
+        $this->assertEquals(110000, (float) $shift->discrepancy);
+    }
 }

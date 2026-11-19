@@ -157,7 +157,7 @@ class PosController extends Controller
     {
         $validated = $request->validate([
             'billing_month' => 'required|string',
-            'customer_ids' => 'nullable|array',
+            'customer_ids' => 'nullable|array|min:1',
             'customer_ids.*' => 'exists:monthly_customers,id',
         ]);
 

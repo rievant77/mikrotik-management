@@ -218,9 +218,9 @@
                         </thead>
                         <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800">
                             <template x-for="inv in filteredInvoices" :key="inv.id">
-                                <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors" :class="selectedInvoiceIds.includes(inv.id) ? 'bg-rose-50/50 dark:bg-rose-950/20' : ''">
+                                <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors" :class="selectedInvoiceIds.includes(Number(inv.id)) ? 'bg-rose-50/50 dark:bg-rose-950/20' : ''">
                                     <td class="py-3.5 px-4 text-center">
-                                        <input type="checkbox" :value="inv.id" x-model="selectedInvoiceIds" class="rounded border-zinc-300 dark:border-zinc-700 text-rose-600 focus:ring-rose-500">
+                                        <input type="checkbox" :value="inv.id" x-model.number="selectedInvoiceIds" class="rounded border-zinc-300 dark:border-zinc-700 text-rose-600 focus:ring-rose-500">
                                     </td>
                                     <td class="py-3.5 px-4 font-mono font-bold text-zinc-900 dark:text-zinc-100" x-text="inv.invoice_number"></td>
                                     <td class="py-3.5 px-4">
@@ -409,7 +409,7 @@
                                     <input 
                                         type="checkbox" 
                                         :value="cust.id" 
-                                        x-model="selectedCustomerIds" 
+                                        x-model.number="selectedCustomerIds" 
                                         class="rounded border-zinc-300 dark:border-zinc-700 text-emerald-600 focus:ring-emerald-500"
                                     >
                                     <div class="truncate">
@@ -685,6 +685,11 @@
                 custForm: { id: null, name: '', hotspot_user_id: '', profile_id: '', monthly_price: 150000, cost_price: 0, billing_day: 1, contact: '', address: '' },
                 payForm: { amount_paid: 0, paid_at: '{{ now()->toDateString() }}', payment_method: 'cash', notes: '' },
 
+                init() {
+                    this.$watch('statusFilter', () => { this.selectedInvoiceIds = []; });
+                    this.$watch('invoiceSearch', () => { this.selectedInvoiceIds = []; });
+                },
+
                 get filteredInvoices() {
                     return this.invoices.filter(inv => {
                         if (this.statusFilter !== 'all' && inv.status !== this.statusFilter) return false;
@@ -740,29 +745,31 @@
 
                 toggleSelectAllCustomers(e) {
                     if (e.target.checked) {
-                        const selectableIds = this.selectableCustomers.map(c => c.id);
-                        this.selectedCustomerIds = Array.from(new Set([...this.selectedCustomerIds, ...selectableIds]));
+                        const selectableIds = this.selectableCustomers.map(c => Number(c.id));
+                        this.selectedCustomerIds = Array.from(new Set([...this.selectedCustomerIds.map(Number), ...selectableIds]));
                     } else {
-                        const selectableIds = new Set(this.selectableCustomers.map(c => c.id));
-                        this.selectedCustomerIds = this.selectedCustomerIds.filter(id => !selectableIds.has(id));
+                        const selectableSet = new Set(this.selectableCustomers.map(c => Number(c.id)));
+                        this.selectedCustomerIds = this.selectedCustomerIds.map(Number).filter(id => !selectableSet.has(id));
                     }
                 },
 
                 isAllCustomersSelected() {
                     if (this.selectableCustomers.length === 0) return false;
-                    return this.selectableCustomers.every(c => this.selectedCustomerIds.includes(c.id));
+                    const selectedSet = new Set(this.selectedCustomerIds.map(Number));
+                    return this.selectableCustomers.every(c => selectedSet.has(Number(c.id)));
                 },
 
                 selectedCustomersTotal() {
+                    const selectedSet = new Set(this.selectedCustomerIds.map(Number));
                     return this.customers
-                        .filter(c => this.selectedCustomerIds.includes(c.id))
+                        .filter(c => selectedSet.has(Number(c.id)))
                         .reduce((acc, c) => acc + (parseFloat(c.monthly_price) || 0), 0);
                 },
 
                 openGenerateModal() {
                     this.genForm.month = this.selectedMonth;
                     this.customerSelectSearch = '';
-                    this.selectedCustomerIds = this.customers.map(c => c.id);
+                    this.selectedCustomerIds = this.customers.map(c => Number(c.id));
                     this.$dispatch('open-modal', 'generate-invoices-modal');
                 },
 
@@ -781,7 +788,7 @@
                         },
                         body: JSON.stringify({
                             billing_month: this.genForm.month,
-                            customer_ids: this.selectedCustomerIds
+                            customer_ids: this.selectedCustomerIds.map(Number)
                         })
                     })
                     .then(res => res.json())
@@ -805,17 +812,18 @@
 
                 toggleSelectAllInvoices(e) {
                     if (e.target.checked) {
-                        const allFilteredIds = this.filteredInvoices.map(i => i.id);
-                        this.selectedInvoiceIds = Array.from(new Set([...this.selectedInvoiceIds, ...allFilteredIds]));
+                        const allFilteredIds = this.filteredInvoices.map(i => Number(i.id));
+                        this.selectedInvoiceIds = Array.from(new Set([...this.selectedInvoiceIds.map(Number), ...allFilteredIds]));
                     } else {
-                        const filteredSet = new Set(this.filteredInvoices.map(i => i.id));
-                        this.selectedInvoiceIds = this.selectedInvoiceIds.filter(id => !filteredSet.has(id));
+                        const filteredSet = new Set(this.filteredInvoices.map(i => Number(i.id)));
+                        this.selectedInvoiceIds = this.selectedInvoiceIds.map(Number).filter(id => !filteredSet.has(id));
                     }
                 },
 
                 isAllInvoicesSelected() {
                     if (this.filteredInvoices.length === 0) return false;
-                    return this.filteredInvoices.every(i => this.selectedInvoiceIds.includes(i.id));
+                    const selectedSet = new Set(this.selectedInvoiceIds.map(Number));
+                    return this.filteredInvoices.every(i => selectedSet.has(Number(i.id)));
                 },
 
                 confirmDeleteInvoice(inv) {
@@ -838,8 +846,8 @@
                     .then(data => {
                         if (data.success) {
                             window.showToast(data.message || 'Tagihan berhasil dihapus', 'success');
-                            this.invoices = this.invoices.filter(i => i.id !== inv.id);
-                            this.selectedInvoiceIds = this.selectedInvoiceIds.filter(id => id !== inv.id);
+                            this.invoices = this.invoices.filter(i => Number(i.id) !== Number(inv.id));
+                            this.selectedInvoiceIds = this.selectedInvoiceIds.map(Number).filter(id => id !== Number(inv.id));
                             this.recalcLocalMetrics();
                         } else {
                             window.showToast(data.message || 'Gagal menghapus tagihan', 'error');
@@ -865,7 +873,7 @@
                             'Accept': 'application/json'
                         },
                         body: JSON.stringify({
-                            invoice_ids: this.selectedInvoiceIds
+                            invoice_ids: this.selectedInvoiceIds.map(Number)
                         })
                     })
                     .then(res => res.json())
@@ -873,8 +881,8 @@
                         this.isBatchDeleting = false;
                         if (data.success) {
                             window.showToast(data.message || `${count} tagihan berhasil dihapus`, 'success');
-                            const deletedSet = new Set(this.selectedInvoiceIds);
-                            this.invoices = this.invoices.filter(i => !deletedSet.has(i.id));
+                            const deletedSet = new Set(this.selectedInvoiceIds.map(Number));
+                            this.invoices = this.invoices.filter(i => !deletedSet.has(Number(i.id)));
                             this.selectedInvoiceIds = [];
                             this.recalcLocalMetrics();
                         } else {

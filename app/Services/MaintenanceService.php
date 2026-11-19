@@ -4,10 +4,12 @@ namespace App\Services;
 
 use App\Models\AuditLog;
 use App\Models\CashierShift;
+use App\Models\DailyExpense;
 use App\Models\DailyUserUsageSummary;
 use App\Models\HotspotSession;
 use App\Models\HotspotUser;
 use App\Models\MonthlyCustomer;
+use App\Models\MonthlyExpenseEntry;
 use App\Models\MonthlyInvoice;
 use App\Models\MonthlyPayment;
 use App\Models\UsageSnapshot;
@@ -35,6 +37,8 @@ class MaintenanceService
             'monthly_invoices' => MonthlyInvoice::count(),
             'monthly_payments' => MonthlyPayment::count(),
             'cashier_shifts' => CashierShift::count(),
+            'daily_expenses' => DailyExpense::count(),
+            'monthly_expense_entries' => MonthlyExpenseEntry::count(),
             'hotspot_users' => HotspotUser::count(),
             'monthly_customers' => MonthlyCustomer::count(),
             'daily_summaries' => DailyUserUsageSummary::count(),
@@ -56,18 +60,24 @@ class MaintenanceService
             $paymentsQ = MonthlyPayment::query();
             $invoicesQ = MonthlyInvoice::query();
             $shiftsQ = CashierShift::query();
+            $dailyExpensesQ = DailyExpense::query();
+            $monthlyEntriesQ = MonthlyExpenseEntry::query();
 
             if ($beforeDate) {
                 $salesQ->where('activated_at', '<', $beforeDate);
                 $paymentsQ->where('paid_at', '<', $beforeDate);
                 $invoicesQ->where('billing_month', '<', $beforeDate);
                 $shiftsQ->where('opened_at', '<', $beforeDate);
+                $dailyExpensesQ->where('expense_date', '<', $beforeDate);
+                $monthlyEntriesQ->where('billing_month', '<', $beforeDate);
             }
 
             $deletedSales = $salesQ->delete();
             $deletedPayments = $paymentsQ->delete();
             $deletedInvoices = $invoicesQ->delete();
             $deletedShifts = $shiftsQ->delete();
+            $deletedDailyExpenses = $dailyExpensesQ->delete();
+            $deletedMonthlyEntries = $monthlyEntriesQ->delete();
 
             AuditLog::create([
                 'user_id' => auth()->id() ?? null,
@@ -80,6 +90,8 @@ class MaintenanceService
                     'deleted_payments' => $deletedPayments,
                     'deleted_invoices' => $deletedInvoices,
                     'deleted_shifts' => $deletedShifts,
+                    'deleted_daily_expenses' => $deletedDailyExpenses,
+                    'deleted_monthly_entries' => $deletedMonthlyEntries,
                 ],
                 'ip_address' => request()->ip() ?? '127.0.0.1',
                 'created_at' => now(),
@@ -89,11 +101,13 @@ class MaintenanceService
 
             return [
                 'success' => true,
-                'message' => "Data penjualan berhasil direset ({$deletedSales} voucher, {$deletedPayments} pembayaran, {$deletedInvoices} invoice).",
+                'message' => "Data penjualan & pengeluaran berhasil direset ({$deletedSales} voucher, {$deletedPayments} pembayaran, {$deletedInvoices} invoice, {$deletedDailyExpenses} pengeluaran).",
                 'deleted' => [
                     'sales' => $deletedSales,
                     'payments' => $deletedPayments,
                     'invoices' => $deletedInvoices,
+                    'daily_expenses' => $deletedDailyExpenses,
+                    'monthly_expense_entries' => $deletedMonthlyEntries,
                 ],
             ];
         } catch (Exception $e) {

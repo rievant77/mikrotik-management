@@ -61,6 +61,7 @@ class FrontendPagesTest extends TestCase
             '/pos',
             '/pos/vouchers',
             '/pos/monthly',
+            '/pos/expenses',
             '/pos/shifts',
             '/settings/router',
             '/settings/profile',

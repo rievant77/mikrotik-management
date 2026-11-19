@@ -67,23 +67,23 @@
                 </div>
             </div>
 
-            <!-- 2. Total Laba Bersih / Net Profit -->
+            <!-- 2. Total Laba Bersih / Net Profit (Operasional) -->
             <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3.5 sm:p-5 shadow-xs relative overflow-hidden flex flex-col justify-between">
                 <div>
                     <div class="flex items-center justify-between">
-                        <span class="text-[11px] sm:text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">Laba Bersih</span>
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700" x-text="'Margin ' + (overview.overall_profit_margin || 0) + '%'"></span>
+                        <span class="text-[11px] sm:text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">Laba Operasional</span>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold" :class="overview.total_operational_profit >= 0 ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700' : 'bg-rose-50 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-700'" x-text="'Margin ' + (overview.operational_profit_margin || 0) + '%'"></span>
                     </div>
-                    <div class="mt-1.5 sm:mt-2 text-lg sm:text-2xl font-bold text-emerald-700 dark:text-emerald-400 font-mono" x-text="formatRupiah(overview.total_net_profit)"></div>
+                    <div class="mt-1.5 sm:mt-2 text-lg sm:text-2xl font-bold font-mono" :class="overview.total_operational_profit >= 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'" x-text="formatRupiah(overview.total_operational_profit)"></div>
                 </div>
                 <div class="mt-2.5 pt-2 border-t border-zinc-200 dark:border-zinc-800/80 text-[10px] sm:text-[11px] text-zinc-600 dark:text-zinc-400 flex flex-col gap-0.5">
                     <div class="flex justify-between">
-                        <span class="truncate">Laba Vchr:</span>
-                        <strong class="font-mono text-emerald-700 dark:text-emerald-400 ml-1" x-text="formatRupiah(overview.voucher_profit)"></strong>
+                        <span class="truncate">Laba Kotor:</span>
+                        <strong class="font-mono text-emerald-700 dark:text-emerald-400 ml-1" x-text="formatRupiah(overview.total_net_profit)"></strong>
                     </div>
                     <div class="flex justify-between">
-                        <span class="truncate">Laba Bln:</span>
-                        <strong class="font-mono text-emerald-700 dark:text-emerald-400 ml-1" x-text="formatRupiah(overview.monthly_profit)"></strong>
+                        <span class="truncate">Beban Biaya:</span>
+                        <strong class="font-mono text-rose-600 dark:text-rose-400 ml-1" x-text="'-' + formatRupiah(overview.total_expenses)"></strong>
                     </div>
                 </div>
             </div>

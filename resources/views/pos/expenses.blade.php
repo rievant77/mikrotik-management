@@ -8,7 +8,7 @@
                 <h1 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">Pengeluaran Operasional</h1>
                 <p class="text-xs sm:text-sm text-zinc-600 dark:text-zinc-300 mt-1">Pencatatan pengeluaran kas harian dan alokasi biaya bulanan tetap (ISP, listrik, operasional)</p>
             </div>
-            <div class="flex flex-wrap items-center gap-2">
+            <div class="flex items-center gap-2">
                 <!-- Month Filter -->
                 <div class="flex items-center gap-2 bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-lg p-1 shadow-xs">
                     <input 
@@ -21,38 +21,6 @@
                         Bulan Ini
                     </button>
                 </div>
-
-                <a href="{{ route('pos.index') }}" class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors shadow-xs">
-                    <svg class="w-4 h-4 text-zinc-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                    </svg>
-                    <span>Ringkasan POS</span>
-                </a>
-
-                <a href="{{ route('pos.monthly') }}" class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors shadow-xs">
-                    <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    <span>Tagihan Bulanan</span>
-                </a>
-
-                <template x-if="activeTab === 'daily'">
-                    <button @click="openDailyModal()" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-zinc-200 dark:text-zinc-900 transition-colors shadow-xs">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                        <span>Tambah Pengeluaran</span>
-                    </button>
-                </template>
-
-                <template x-if="activeTab === 'monthly'">
-                    <button @click="openTemplateModal()" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-zinc-200 dark:text-zinc-900 transition-colors shadow-xs">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                        <span>Tambah Master Template</span>
-                    </button>
-                </template>
             </div>
         </div>
 
@@ -130,6 +98,18 @@
         <!-- TAB 1: PENGELUARAN HARIAN -->
         <div x-show="activeTab === 'daily'" class="space-y-4">
             <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-xs overflow-hidden">
+                <div class="p-4 border-b border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Buku Kas Pengeluaran Harian</h3>
+                        <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Catatan operasional dan belanja insidentil periode <span class="font-bold text-zinc-800 dark:text-zinc-200" x-text="periodLabel"></span></p>
+                    </div>
+                    <button @click="openDailyModal()" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-zinc-200 dark:text-zinc-900 transition-colors shadow-xs shrink-0 self-start sm:self-auto">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        <span>+ Catat Pengeluaran</span>
+                    </button>
+                </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-xs">
                         <thead class="bg-zinc-50 dark:bg-zinc-800/60 border-b border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 uppercase tracking-wider font-semibold">
@@ -249,8 +229,11 @@
                         <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">Master Template Biaya Bulanan</h3>
                         <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Template biaya default untuk bulan-bulan mendatang (ISP, listrik, dll)</p>
                     </div>
-                    <button @click="openTemplateModal()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-zinc-200 dark:text-zinc-900 transition-colors shadow-xs">
-                        + Template Baru
+                    <button @click="openTemplateModal()" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-zinc-200 dark:text-zinc-900 transition-colors shadow-xs">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        <span>+ Template Baru</span>
                     </button>
                 </div>
                 <div class="overflow-x-auto">

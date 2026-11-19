@@ -4,7 +4,10 @@ namespace App\Services;
 
 use App\Models\AuditLog;
 use App\Models\CashierShift;
+use App\Models\DailyExpense;
 use App\Models\MonthlyCustomer;
+use App\Models\MonthlyExpenseEntry;
+use App\Models\MonthlyExpenseTemplate;
 use App\Models\MonthlyInvoice;
 use App\Models\MonthlyPayment;
 use App\Models\VoucherSale;
@@ -131,12 +134,25 @@ class PosManagerService
             'unpaid_count' => $invoices->where('status', 'unpaid')->count(),
         ];
 
+        // 8. Expense Metrics (Operational Expenses: Daily & Monthly Recurring)
+        $expenseTotals = $this->getExpenseTotalsForMonth($targetMonth->format('Y-m'));
+        $dailyExpensesTotal = $expenseTotals['daily_total'];
+        $monthlyExpensesTotal = $expenseTotals['monthly_total'];
+        $totalExpenses = $expenseTotals['total_expenses'];
+        $totalOperationalProfit = $totalNetProfit - $totalExpenses;
+        $operationalProfitMargin = $totalGrossIncome > 0 ? round(($totalOperationalProfit / $totalGrossIncome) * 100, 1) : 0;
+
         return [
             'period' => \App\Support\FormatHelper::formatMonthIndo($targetMonth),
             'month_value' => $targetMonth->format('Y-m'),
             'total_gross_income' => $totalGrossIncome,
             'total_net_profit' => $totalNetProfit,
+            'total_operational_profit' => $totalOperationalProfit,
+            'operational_profit_margin' => $operationalProfitMargin,
             'total_cost' => $totalOperationalCost,
+            'total_expenses' => $totalExpenses,
+            'daily_expenses_total' => $dailyExpensesTotal,
+            'monthly_expenses_total' => $monthlyExpensesTotal,
             'overall_profit_margin' => $overallProfitMargin,
             'arpu' => $arpu,
             'voucher_revenue' => $totalVoucherRevenue,
@@ -492,5 +508,94 @@ class PosManagerService
         $shift->update(['expected_cash' => $totalExpected]);
 
         return $totalExpected;
+    }
+
+    /**
+     * Auto-generate monthly expense entries for a given month from active templates.
+     */
+    public function generateMonthlyExpenseEntries(string $month): array
+    {
+        $targetMonth = Carbon::parse($month)->startOfMonth();
+        $templates = MonthlyExpenseTemplate::where('is_active', true)->get();
+        $generated = [];
+
+        foreach ($templates as $t) {
+            $entry = MonthlyExpenseEntry::firstOrCreate(
+                [
+                    'template_id' => $t->id,
+                    'billing_month' => $targetMonth->toDateString(),
+                ],
+                [
+                    'name' => $t->name,
+                    'amount' => $t->amount,
+                ]
+            );
+            $generated[] = $entry;
+        }
+
+        return $generated;
+    }
+
+    /**
+     * Get detailed daily expenses and monthly entries for a month.
+     */
+    public function getExpensesForMonth(string $month): array
+    {
+        $targetMonth = Carbon::parse($month)->startOfMonth();
+        $targetMonthEnd = $targetMonth->copy()->endOfMonth();
+
+        // 1. Ensure monthly entries exist for active templates
+        $this->generateMonthlyExpenseEntries($month);
+
+        // 2. Query daily expenses
+        $dailyExpenses = DailyExpense::with('creator')
+            ->whereBetween('expense_date', [$targetMonth->toDateString(), $targetMonthEnd->toDateString()])
+            ->orderByDesc('expense_date')
+            ->orderByDesc('id')
+            ->get();
+
+        // 3. Query monthly entries
+        $monthlyEntries = MonthlyExpenseEntry::with('template')
+            ->whereDate('billing_month', $targetMonth->toDateString())
+            ->orderBy('id')
+            ->get();
+
+        $dailyTotal = (float) $dailyExpenses->sum('amount');
+        $monthlyTotal = (float) $monthlyEntries->sum('amount');
+        $totalExpenses = $dailyTotal + $monthlyTotal;
+
+        return [
+            'period' => \App\Support\FormatHelper::formatMonthIndo($targetMonth),
+            'month_value' => $targetMonth->format('Y-m'),
+            'daily_expenses' => $dailyExpenses,
+            'monthly_entries' => $monthlyEntries,
+            'daily_total' => $dailyTotal,
+            'monthly_total' => $monthlyTotal,
+            'total_expenses' => $totalExpenses,
+        ];
+    }
+
+    /**
+     * Quick totals of expenses for dashboard analytics.
+     */
+    public function getExpenseTotalsForMonth(string $month): array
+    {
+        $targetMonth = Carbon::parse($month)->startOfMonth();
+        $targetMonthEnd = $targetMonth->copy()->endOfMonth();
+
+        // Ensure monthly entries exist
+        $this->generateMonthlyExpenseEntries($month);
+
+        $dailyTotal = (float) DailyExpense::whereBetween('expense_date', [$targetMonth->toDateString(), $targetMonthEnd->toDateString()])
+            ->sum('amount');
+
+        $monthlyTotal = (float) MonthlyExpenseEntry::whereDate('billing_month', $targetMonth->toDateString())
+            ->sum('amount');
+
+        return [
+            'daily_total' => $dailyTotal,
+            'monthly_total' => $monthlyTotal,
+            'total_expenses' => $dailyTotal + $monthlyTotal,
+        ];
     }
 }

@@ -302,15 +302,19 @@
                     >
                 </div>
                 <div>
-                    <label class="block font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Nominal (Rp)</label>
-                    <input 
-                        type="number" 
-                        x-model.number="dailyForm.amount" 
-                        required 
-                        min="1" 
-                        step="1000" 
-                        class="w-full px-3 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:ring-1 focus:ring-rose-500 font-mono font-bold"
-                    >
+                    <label class="block font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Nominal Biaya (Rp) *</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-xs font-bold text-zinc-500 dark:text-zinc-400 select-none">Rp</span>
+                        <input 
+                            type="text" 
+                            inputmode="numeric"
+                            :value="formatNumber(dailyForm.amount)" 
+                            @input="dailyForm.amount = parseNumber($event.target.value); $event.target.value = formatNumber(dailyForm.amount)" 
+                            required 
+                            placeholder="50.000"
+                            class="w-full pl-9 pr-3 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:ring-1 focus:ring-rose-500 font-mono font-bold"
+                        >
+                    </div>
                 </div>
 
                 <div class="pt-3 border-t border-zinc-200 dark:border-zinc-800 flex justify-end gap-2">
@@ -337,15 +341,19 @@
                     >
                 </div>
                 <div>
-                    <label class="block font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Nominal Beban Bulan Ini (Rp)</label>
-                    <input 
-                        type="number" 
-                        x-model.number="entryForm.amount" 
-                        required 
-                        min="0" 
-                        step="1000" 
-                        class="w-full px-3 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:ring-1 focus:ring-rose-500 font-mono font-bold"
-                    >
+                    <label class="block font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Nominal Beban Bulan Ini (Rp) *</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-xs font-bold text-zinc-500 dark:text-zinc-400 select-none">Rp</span>
+                        <input 
+                            type="text" 
+                            inputmode="numeric"
+                            :value="formatNumber(entryForm.amount)" 
+                            @input="entryForm.amount = parseNumber($event.target.value); $event.target.value = formatNumber(entryForm.amount)" 
+                            required 
+                            placeholder="500.000"
+                            class="w-full pl-9 pr-3 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:ring-1 focus:ring-rose-500 font-mono font-bold"
+                        >
+                    </div>
                     <p class="text-[11px] text-zinc-500 mt-1">Perubahan nominal ini hanya berlaku untuk bulan berjalan (<span x-text="periodLabel"></span>).</p>
                 </div>
                 <div>
@@ -383,15 +391,19 @@
                     >
                 </div>
                 <div>
-                    <label class="block font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Nominal Default (Rp)</label>
-                    <input 
-                        type="number" 
-                        x-model.number="templateForm.amount" 
-                        required 
-                        min="0" 
-                        step="1000" 
-                        class="w-full px-3 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:ring-1 focus:ring-rose-500 font-mono font-bold"
-                    >
+                    <label class="block font-semibold text-zinc-700 dark:text-zinc-300 mb-1">Nominal Default (Rp) *</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-xs font-bold text-zinc-500 dark:text-zinc-400 select-none">Rp</span>
+                        <input 
+                            type="text" 
+                            inputmode="numeric"
+                            :value="formatNumber(templateForm.amount)" 
+                            @input="templateForm.amount = parseNumber($event.target.value); $event.target.value = formatNumber(templateForm.amount)" 
+                            required 
+                            placeholder="500.000"
+                            class="w-full pl-9 pr-3 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:ring-1 focus:ring-rose-500 font-mono font-bold"
+                        >
+                    </div>
                     <p class="text-[11px] text-zinc-500 mt-1">Nominal ini otomatis dipakai saat sistem membuat snapshot untuk bulan baru.</p>
                 </div>
                 <div class="flex items-center gap-2">
@@ -477,6 +489,12 @@
                 },
 
                 saveDailyExpense() {
+                    this.dailyForm.amount = this.parseNumber(this.dailyForm.amount);
+                    if (!this.dailyForm.amount || this.dailyForm.amount <= 0) {
+                        window.showToast('Nominal pengeluaran harus lebih dari 0', 'error');
+                        return;
+                    }
+
                     const url = this.isEditingDaily 
                         ? `/pos/expenses/daily/${this.dailyForm.id}` 
                         : '/pos/expenses/daily';
@@ -548,6 +566,7 @@
                 },
 
                 saveMonthlyEntry() {
+                    const amount = this.parseNumber(this.entryForm.amount);
                     fetch(`/pos/expenses/entries/${this.entryForm.id}`, {
                         method: 'PUT',
                         headers: {
@@ -556,7 +575,7 @@
                             'Accept': 'application/json'
                         },
                         body: JSON.stringify({
-                            amount: this.entryForm.amount,
+                            amount: amount,
                             notes: this.entryForm.notes
                         })
                     })
@@ -596,6 +615,7 @@
                 },
 
                 saveTemplate() {
+                    this.templateForm.amount = this.parseNumber(this.templateForm.amount);
                     const url = this.isEditingTemplate 
                         ? `/pos/expenses/templates/${this.templateForm.id}` 
                         : '/pos/expenses/templates';
@@ -665,6 +685,14 @@
                     this.dailyTotal = dTot;
                     this.monthlyTotal = mTot;
                     this.totalExpenses = dTot + mTot;
+                },
+
+                formatNumber(num) {
+                    return window.formatNumber ? window.formatNumber(num || 0) : Number(num || 0).toLocaleString('id-ID');
+                },
+
+                parseNumber(val) {
+                    return window.parseNumber ? window.parseNumber(val) : (parseInt(String(val).replace(/\D/g, ''), 10) || 0);
                 },
 
                 formatRupiah(num) {

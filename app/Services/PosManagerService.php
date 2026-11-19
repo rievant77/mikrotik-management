@@ -418,6 +418,109 @@ class PosManagerService
     }
 
     /**
+     * Delete a single monthly invoice and cascade delete its payments.
+     */
+    public function deleteMonthlyInvoice(MonthlyInvoice $invoice): bool
+    {
+        DB::beginTransaction();
+        try {
+            // Find shifts affected by cash payments before deleting
+            $shiftIds = $invoice->payments()
+                ->where('payment_method', 'cash')
+                ->whereNotNull('shift_id')
+                ->pluck('shift_id')
+                ->unique();
+
+            // Cascade delete payments
+            $invoice->payments()->delete();
+
+            AuditLog::create([
+                'user_id' => auth()->id() ?? null,
+                'action' => 'monthly_invoice_deleted',
+                'entity_type' => 'MonthlyInvoice',
+                'entity_id' => $invoice->id,
+                'old_values' => [
+                    'invoice_number' => $invoice->invoice_number,
+                    'customer_id' => $invoice->monthly_customer_id,
+                    'customer_name' => $invoice->customer?->name,
+                    'billing_month' => $invoice->billing_month?->toDateString(),
+                    'amount' => $invoice->amount,
+                ],
+                'ip_address' => request()->ip() ?? '127.0.0.1',
+                'created_at' => now(),
+            ]);
+
+            $invoice->delete();
+
+            // Recalculate shifts
+            foreach ($shiftIds as $sId) {
+                $shift = CashierShift::find($sId);
+                if ($shift) {
+                    $this->recalculateShiftExpectedCash($shift);
+                }
+            }
+
+            DB::commit();
+            return true;
+        } catch (Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+    }
+
+    /**
+     * Batch delete monthly invoices and cascade delete their payments.
+     */
+    public function batchDeleteMonthlyInvoices(array $invoiceIds): int
+    {
+        DB::beginTransaction();
+        try {
+            $invoices = MonthlyInvoice::with('payments')->whereIn('id', $invoiceIds)->get();
+            $count = 0;
+            $shiftIds = collect();
+
+            foreach ($invoices as $invoice) {
+                $shiftIds = $shiftIds->merge(
+                    $invoice->payments
+                        ->where('payment_method', 'cash')
+                        ->whereNotNull('shift_id')
+                        ->pluck('shift_id')
+                );
+
+                $invoice->payments()->delete();
+                $invoice->delete();
+                $count++;
+            }
+
+            foreach ($shiftIds->unique() as $sId) {
+                $shift = CashierShift::find($sId);
+                if ($shift) {
+                    $this->recalculateShiftExpectedCash($shift);
+                }
+            }
+
+            AuditLog::create([
+                'user_id' => auth()->id() ?? null,
+                'action' => 'monthly_invoices_batch_deleted',
+                'entity_type' => 'MonthlyInvoice',
+                'entity_id' => 0,
+                'new_values' => [
+                    'deleted_count' => $count,
+                    'invoice_ids' => $invoiceIds,
+                ],
+                'ip_address' => request()->ip() ?? '127.0.0.1',
+                'created_at' => now(),
+            ]);
+
+            DB::commit();
+            return $count;
+        } catch (Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+    }
+
+    /**
      * Open a new cashier shift.
      */
     public function openShift(float $openingCash = 0, ?int $userId = null): CashierShift

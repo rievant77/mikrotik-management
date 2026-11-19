@@ -204,6 +204,39 @@ class PosController extends Controller
         return response()->json(['success' => true, 'payments' => $payments]);
     }
 
+    public function deleteInvoice(\App\Models\MonthlyInvoice $invoice): JsonResponse
+    {
+        try {
+            $invoiceNumber = $invoice->invoice_number;
+            $this->posService->deleteMonthlyInvoice($invoice);
+            return response()->json([
+                'success' => true,
+                'message' => "Tagihan {$invoiceNumber} dan seluruh pembayaran terkait berhasil dihapus.",
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 422);
+        }
+    }
+
+    public function batchDeleteInvoices(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'invoice_ids' => 'required|array|min:1',
+            'invoice_ids.*' => 'exists:monthly_invoices,id',
+        ]);
+
+        try {
+            $count = $this->posService->batchDeleteMonthlyInvoices($validated['invoice_ids']);
+            return response()->json([
+                'success' => true,
+                'message' => "Sebanyak {$count} tagihan dan seluruh pembayaran terkait berhasil dihapus.",
+                'deleted_count' => $count,
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 422);
+        }
+    }
+
     public function storeCustomer(Request $request): JsonResponse
     {
         $validated = $request->validate([

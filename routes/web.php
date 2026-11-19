@@ -103,6 +103,8 @@ Route::middleware('auth')->group(function () {
         Route::put('/monthly/customers/{customer}', [PosController::class, 'updateCustomer'])->name('pos.monthly.customers.update');
         Route::delete('/monthly/customers/{customer}', [PosController::class, 'deleteCustomer'])->name('pos.monthly.customers.delete');
         Route::post('/monthly/invoices/generate', [PosController::class, 'generateInvoices'])->name('pos.monthly.invoices.generate');
+        Route::delete('/monthly/invoices/{invoice}', [PosController::class, 'deleteInvoice'])->name('pos.monthly.invoices.delete');
+        Route::post('/monthly/invoices/batch-delete', [PosController::class, 'batchDeleteInvoices'])->name('pos.monthly.invoices.batch-delete');
         Route::post('/monthly/invoices/{invoice}/pay', [PosController::class, 'payInvoice'])->name('pos.monthly.invoices.pay');
         Route::get('/monthly/invoices/{invoice}/payments', [PosController::class, 'invoicePayments'])->name('pos.monthly.invoices.payments');
         Route::post('/monthly/payments', [PosController::class, 'storePayment'])->name('pos.monthly.payments.store');

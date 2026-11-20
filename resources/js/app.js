@@ -1,5 +1,6 @@
 import Alpine from 'alpinejs';
 import ApexCharts from 'apexcharts';
+import { initPwa } from './pwa';
 
 window.Alpine = Alpine;
 window.ApexCharts = ApexCharts;
@@ -192,24 +193,4 @@ Alpine.magic('formatBytes', () => window.formatBytes);
 
 Alpine.start();
 
-// PWA Service Worker Registration
-if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.endsWith('.lan') || window.location.hostname.endsWith('.test'))) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-            .then((registration) => {
-                registration.addEventListener('updatefound', () => {
-                    const newWorker = registration.installing;
-                    if (newWorker) {
-                        newWorker.addEventListener('statechange', () => {
-                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                window.dispatchEvent(new CustomEvent('pwa-update-available'));
-                            }
-                        });
-                    }
-                });
-            })
-            .catch((err) => {
-                console.debug('PWA ServiceWorker registration notice:', err);
-            });
-    });
-}
+initPwa();

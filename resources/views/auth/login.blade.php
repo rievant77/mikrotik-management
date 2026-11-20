@@ -8,6 +8,8 @@
     <title>Login - {{ $appSetting?->app_name ?? 'MikroTik Hotspot & Bandwidth Manager' }}</title>
     <link rel="icon" href="{{ !empty($appSetting?->app_favicon) ? asset($appSetting->app_favicon) : asset('favicon.ico') }}">
 
+    <x-pwa-head :app-setting="$appSetting ?? null" />
+
     <script>
         if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
@@ -84,6 +86,9 @@
             </form>
         </div>
 
+        <!-- Install PWA Button (hidden until supported & installable) -->
+        <x-pwa-install-button variant="full" class="mt-4" />
+
         <!-- Footer / Theme Toggle -->
         <div class="mt-6 flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400 px-2">
             <span>&copy; {{ date('Y') }} MikroTik Manager</span>
@@ -94,5 +99,6 @@
         </div>
     </div>
 
+    <x-pwa-update-banner />
 </body>
 </html>

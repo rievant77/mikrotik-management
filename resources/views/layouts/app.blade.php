@@ -8,19 +8,7 @@
     <title>{{ $title ?? ($appSetting?->app_name ?? 'MikroTik Hotspot Manager') }}</title>
     <link rel="icon" href="{{ !empty($appSetting?->app_favicon) ? asset($appSetting->app_favicon) : asset('favicon.ico') }}">
 
-    <!-- PWA Manifest & App Metadata -->
-    <link rel="manifest" href="/manifest.json">
-    <meta name="application-name" content="{{ $appSetting?->app_name ?? 'MikroTik Hotspot Manager' }}">
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)">
-
-    <!-- iOS Safari PWA Support -->
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="{{ $appSetting?->app_name ?? 'MikroTik' }}">
-    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
-    <link rel="mask-icon" href="/icons/icon.svg" color="#10b981">
+    <x-pwa-head :app-setting="$appSetting ?? null" />
 
     <!-- Prevent FOUC: Early Dark Mode Initialization -->
     <script>
@@ -294,6 +282,7 @@
                             <a href="{{ route('hotspot.generate') }}" class="block px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('hotspot.generate') ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'text-zinc-700 dark:text-zinc-300' }}">Generate Voucher</a>
                             <a href="{{ route('pos.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('pos.*') ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'text-zinc-700 dark:text-zinc-300' }}">POS Kasir</a>
                             <a href="{{ route('settings.router') }}" class="block px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('settings.*') ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900' : 'text-zinc-700 dark:text-zinc-300' }}">Settings</a>
+                            <x-pwa-install-button variant="full" />
                         </div>
                     </div>
                 </div>
@@ -339,6 +328,9 @@
                             <span class="hidden sm:inline">Online</span>
                             <span class="text-[10px] opacity-75">3ms</span>
                         </div>
+
+                        <!-- Install PWA Button (hidden until supported & installable) -->
+                        <x-pwa-install-button />
 
                         <!-- Theme Switcher -->
                         <x-theme-toggle />
@@ -428,6 +420,7 @@
 
     <!-- Global Command Palette Modal -->
     <x-command-palette />
+    <x-pwa-update-banner />
 
     @stack('scripts')
 </body>

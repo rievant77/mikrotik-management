@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mikrotik-manager-v1.0.0';
+const CACHE_NAME = 'mikrotik-manager-v1.1.0';
 
 const PRECACHE_ASSETS = [
     '/offline.html',
@@ -84,7 +84,7 @@ self.addEventListener('fetch', (event) => {
     // Network first with standard fetch; don't cache live router states
     event.respondWith(
         fetch(request).catch(() => {
-            return caches.match(request);
+            return caches.match(request).then((cached) => cached || Response.error());
         })
     );
 });
